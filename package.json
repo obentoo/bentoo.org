@@ -1,0 +1,45 @@
+{
+  "name": "bentoo-website",
+  "version": "0.1.0",
+  "description": "bentoo.org — coming-soon landing site (Astro 6 + Cloudflare Pages)",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "typecheck": "astro check && tsc --noEmit",
+    "test:unit": "vitest run",
+    "test:visual": "playwright test --project=visual",
+    "test:integration": "playwright test --project=integration",
+    "check:js": "node scripts/check-js-budget.mjs",
+    "check:og": "node scripts/check-og-images.mjs",
+    "check:forms": "node scripts/verify-forms.mjs",
+    "check:variants-sync": "node scripts/check-variants-sync.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/obentoo/bentoo.org.git"
+  },
+  "bugs": {
+    "url": "https://github.com/obentoo/bentoo.org/issues"
+  },
+  "homepage": "https://bentoo.org",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@astrojs/check": "^0.9.8",
+    "@astrojs/sitemap": "^3.7.2",
+    "astro": "^6.1.8",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.2",
+    "@playwright/test": "^1.59.1",
+    "@testing-library/dom": "^10.4.1",
+    "jsdom": "^29.0.2",
+    "vitest": "^4.1.5"
+  }
+}
