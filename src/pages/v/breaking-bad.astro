@@ -1,0 +1,761 @@
+---
+import VariantLayout from '~/layouts/VariantLayout.astro';
+import { strings } from '~/i18n/en';
+const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
+---
+<VariantLayout
+  lang="en"
+  path="/v/breaking-bad/"
+  title="bentoo — say my name · 99.1% pure stage5"
+  description="Bentoo — a Linux distribution for the masses. Say my name. I am the one who compiles."
+  variantSlug="breaking-bad"
+>
+  <Fragment slot="head-extra">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Roboto+Condensed:wght@400;700&family=Special+Elite&display=swap" rel="stylesheet" />
+  </Fragment>
+  <style is:global slot="style">
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    .v-breaking-bad {
+      --sky-1:   #6c8a98;
+      --sky-2:   #8bacbd;
+      --sky-3:   #a8c3d2;
+      --dune-1:  #c47434;
+      --dune-2:  #a95820;
+      --dune-3:  #7b3a10;
+      --hazmat:  #fbc83c;
+      --hazmat-d:#c09020;
+      --danger:  #e82020;
+      --blue:    #6bceff;
+      --blue-d:  #2488b0;
+      --blue-g:  #aef0ff;
+      --green-s: #b0d020;
+      --green-p: #3c8a2a;
+      --black:   #0a0a0a;
+      --smog:    #3a2a1c;
+      --text:    #141414;
+      --text-dim:#4a4a4a;
+      --paper:   #f4f1ea;
+      --cash:    #558a44;
+      --cash-d:  #2a4a1c;
+
+      font-family: 'Roboto Condensed', sans-serif;
+      background: var(--paper);
+      color: var(--text);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      display: block;
+    }
+
+    /* Desert sky gradient */
+    .v-breaking-bad::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 40% at 50% 22%, rgba(240,230,180,.45) 0%, transparent 60%),
+        linear-gradient(180deg,
+          var(--sky-1) 0%,
+          var(--sky-2) 28%,
+          var(--sky-3) 48%,
+          #e2c28a 55%,
+          var(--dune-1) 65%,
+          var(--dune-2) 85%,
+          var(--dune-3) 100%);
+    }
+    .v-breaking-bad::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: .4;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.7' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .7  0 0 0 0 .5  0 0 0 0 .3  0 0 0 .25 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+    }
+
+    /* Distant mesas */
+    .v-breaking-bad .mesas {
+      position: fixed;
+      bottom: 32%;
+      left: 0; right: 0;
+      height: 100px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .v-breaking-bad .mesas svg { width: 100%; height: 100%; display: block; }
+
+    /* RV silhouette (Crystal Ship) */
+    .v-breaking-bad .rv {
+      position: fixed;
+      bottom: 28%;
+      left: 10%;
+      width: 130px;
+      z-index: 3;
+      pointer-events: none;
+      filter: drop-shadow(0 2px 4px rgba(60,30,10,.5));
+      animation: breakingbad-rvBob 4s ease-in-out infinite;
+    }
+    @keyframes breakingbad-rvBob {
+      0%, 100% { transform: translateX(0); }
+      50%      { transform: translateX(6px); }
+    }
+    .v-breaking-bad .rv svg { width: 100%; height: auto; }
+
+    /* Hazmat figure */
+    .v-breaking-bad .haz {
+      position: fixed;
+      bottom: 6%;
+      right: 6%;
+      width: 110px;
+      height: 210px;
+      z-index: 4;
+      pointer-events: none;
+      filter: drop-shadow(0 10px 18px rgba(40,20,10,.5));
+    }
+    .v-breaking-bad .haz svg { width: 100%; height: 100%; }
+
+    /* Fly (in the lab joke) */
+    .v-breaking-bad .fly {
+      position: fixed;
+      top: 42%;
+      left: 45%;
+      width: 22px; height: 22px;
+      z-index: 8;
+      pointer-events: none;
+      animation: breakingbad-flyPath 18s linear infinite;
+    }
+    @keyframes breakingbad-flyPath {
+      0%   { top: 42%; left: 45%; }
+      25%  { top: 28%; left: 60%; }
+      50%  { top: 55%; left: 70%; }
+      75%  { top: 40%; left: 30%; }
+      100% { top: 42%; left: 45%; }
+    }
+    .v-breaking-bad .fly svg { width: 100%; height: 100%; }
+
+    /* ========== HEADER / NAV ========== */
+    .v-breaking-bad header {
+      position: relative;
+      z-index: 10;
+      padding: 14px 40px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      background: rgba(10,10,10,.92);
+      border-bottom: 3px solid var(--hazmat);
+    }
+    .v-breaking-bad .logo-el {
+      width: 52px; height: 52px;
+      background: var(--hazmat);
+      border: 2.5px solid var(--black);
+      display: grid;
+      grid-template-rows: 1fr 2fr 1fr;
+      align-items: center;
+      padding: 3px 5px;
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      color: var(--black);
+      box-shadow: 3px 3px 0 rgba(0,0,0,.25);
+    }
+    .v-breaking-bad .logo-el .num { font-size: 9px; text-align: left; line-height: 1; }
+    .v-breaking-bad .logo-el .sym { font-size: 28px; text-align: center; line-height: 1; letter-spacing: -0.02em; }
+    .v-breaking-bad .logo-el .mass { font-size: 7px; text-align: center; line-height: 1; opacity: .7; }
+
+    .v-breaking-bad header .brand {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 600;
+      font-size: 1.5rem;
+      color: var(--hazmat);
+      letter-spacing: 0.22em;
+    }
+    .v-breaking-bad header .brand em { font-style: normal; color: var(--blue); }
+
+    .v-breaking-bad header nav {
+      display: flex;
+      gap: 2px;
+      margin-left: auto;
+      font-family: 'Oswald', sans-serif;
+    }
+    .v-breaking-bad header nav a {
+      padding: 10px 20px;
+      color: var(--paper);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 13px;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      border-left: 1px solid rgba(255,255,255,.12);
+      transition: all .2s;
+    }
+    .v-breaking-bad header nav a.active, .v-breaking-bad header nav a:hover {
+      color: var(--hazmat);
+      background: rgba(251,200,60,.08);
+    }
+    .v-breaking-bad header nav a:first-child { border-left: none; }
+
+    /* Status banner (DEA / Los Pollos) */
+    .v-breaking-bad .stat-banner {
+      position: relative;
+      z-index: 10;
+      background: var(--black);
+      color: var(--hazmat);
+      padding: 6px 40px;
+      display: flex;
+      gap: 22px;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border-bottom: 1px solid #2a1a08;
+    }
+    .v-breaking-bad .stat-banner .pill {
+      padding: 3px 10px;
+      border: 1px solid var(--hazmat);
+      color: var(--hazmat);
+      letter-spacing: 0.26em;
+    }
+    .v-breaking-bad .stat-banner .pill.warn { color: var(--danger); border-color: var(--danger); }
+    .v-breaking-bad .stat-banner .pill.blue { color: var(--blue); border-color: var(--blue); }
+    .v-breaking-bad .stat-banner .pill.cash { color: var(--green-s); border-color: var(--green-s); }
+    .v-breaking-bad .stat-banner .scroller {
+      overflow: hidden;
+      position: relative;
+      flex: 1;
+      height: 14px;
+    }
+    .v-breaking-bad .stat-banner .scroller .track {
+      display: inline-block;
+      white-space: nowrap;
+      animation: breakingbad-tick 40s linear infinite;
+    }
+    .v-breaking-bad .stat-banner .scroller .track span { margin-right: 40px; color: rgba(251,200,60,.85); }
+    @keyframes breakingbad-tick {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ========== MAIN ========== */
+    .v-breaking-bad main {
+      position: relative;
+      z-index: 5;
+      min-height: calc(100vh - 140px);
+      padding: 38px 28px 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 22px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Periodic-table wordmark */
+    .v-breaking-bad .per-word {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .v-breaking-bad .el {
+      position: relative;
+      width: clamp(78px, 11.5vw, 118px);
+      aspect-ratio: 1;
+      background: var(--hazmat);
+      border: 3px solid var(--black);
+      padding: 7px 9px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      color: var(--black);
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      text-align: left;
+      box-shadow:
+        5px 5px 0 rgba(0,0,0,.75),
+        inset 0 2px 0 rgba(255,255,255,.25);
+      transition: transform .2s;
+    }
+    .v-breaking-bad .el:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 rgba(0,0,0,.75), inset 0 2px 0 rgba(255,255,255,.25); }
+    .v-breaking-bad .el .num {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      line-height: 1;
+      opacity: .85;
+    }
+    .v-breaking-bad .el .sym {
+      font-size: clamp(2.4rem, 6vw, 4.4rem);
+      text-align: center;
+      line-height: 0.85;
+      letter-spacing: -0.03em;
+    }
+    .v-breaking-bad .el .name {
+      font-size: 8px;
+      font-weight: 500;
+      text-align: center;
+      line-height: 1;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      opacity: .7;
+    }
+    .v-breaking-bad .el .mass {
+      font-size: 9px;
+      font-weight: 500;
+      text-align: center;
+      line-height: 1;
+      opacity: .65;
+      margin-top: 2px;
+    }
+
+    .v-breaking-bad .tagline {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      font-size: clamp(1rem, 2.4vw, 1.75rem);
+      letter-spacing: 0.22em;
+      color: var(--paper);
+      text-transform: uppercase;
+      background: rgba(10,10,10,.92);
+      padding: 10px 30px;
+      border: 3px solid var(--hazmat);
+      box-shadow: 4px 4px 0 rgba(0,0,0,.5);
+    }
+    .v-breaking-bad .tagline b { color: var(--hazmat); }
+
+    /* Character quote strip */
+    .v-breaking-bad .quotes {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      width: 100%;
+      max-width: 1100px;
+      margin-top: 4px;
+    }
+    .v-breaking-bad .quote-card {
+      background: rgba(10,10,10,.85);
+      color: var(--paper);
+      padding: 14px 16px;
+      border: 2px solid var(--hazmat);
+      text-align: left;
+      box-shadow: 4px 4px 0 rgba(0,0,0,.55);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .v-breaking-bad .quote-card::before {
+      content: '';
+      position: absolute;
+      top: -2px; left: -2px; bottom: -2px;
+      width: 4px;
+    }
+    .v-breaking-bad .quote-card.walt::before   { background: var(--blue-d); }
+    .v-breaking-bad .quote-card.jesse::before  { background: var(--danger); }
+    .v-breaking-bad .quote-card.saul::before   { background: var(--green-s); }
+    .v-breaking-bad .quote-card.gus::before    { background: var(--hazmat); }
+    .v-breaking-bad .quote-card .name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--hazmat);
+    }
+    .v-breaking-bad .quote-card.walt  .name { color: var(--blue-g); }
+    .v-breaking-bad .quote-card.jesse .name { color: #ff9a9a; }
+    .v-breaking-bad .quote-card.saul  .name { color: var(--green-s); }
+    .v-breaking-bad .quote-card.gus   .name { color: var(--hazmat); }
+    .v-breaking-bad .quote-card .role {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,.55);
+      text-transform: uppercase;
+    }
+    .v-breaking-bad .quote-card .q {
+      font-family: 'Special Elite', monospace;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--paper);
+      margin-top: 2px;
+    }
+
+    /* Mini periodic buttons */
+    .v-breaking-bad .mini-menu {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 6px;
+    }
+    .v-breaking-bad .mini-menu a {
+      position: relative;
+      width: 116px;
+      aspect-ratio: 1;
+      background: var(--hazmat);
+      border: 3px solid var(--black);
+      padding: 6px 8px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      color: var(--black);
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      box-shadow: 4px 4px 0 rgba(0,0,0,.7);
+      transition: transform .2s;
+    }
+    .v-breaking-bad .mini-menu a:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 rgba(0,0,0,.7); }
+    .v-breaking-bad .mini-menu a.blue { background: var(--blue); }
+    .v-breaking-bad .mini-menu a.green { background: var(--green-s); }
+    .v-breaking-bad .mini-menu a .num {
+      font-size: 10px;
+      text-align: left;
+      letter-spacing: 0.04em;
+      line-height: 1;
+      opacity: .8;
+    }
+    .v-breaking-bad .mini-menu a .sym {
+      font-size: 2rem;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .v-breaking-bad .mini-menu a .lbl {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    /* Blue crystal decoration */
+    .v-breaking-bad .blue-crystal {
+      position: absolute;
+      width: 22px; height: 26px;
+      background: linear-gradient(180deg, var(--blue-g) 0%, var(--blue) 50%, var(--blue-d) 100%);
+      clip-path: polygon(50% 0, 100% 30%, 85% 100%, 15% 100%, 0 30%);
+      box-shadow: 0 0 18px rgba(107,206,255,.6);
+      z-index: 6;
+    }
+    .v-breaking-bad .blue-crystal.bc1 { top: 10%; left: 4%; transform: rotate(-12deg); }
+    .v-breaking-bad .blue-crystal.bc2 { top: 18%; right: 5%; transform: rotate(8deg); width: 18px; height: 22px; }
+    .v-breaking-bad .blue-crystal.bc3 { bottom: 30%; left: 42%; width: 16px; height: 20px; transform: rotate(20deg); }
+    .v-breaking-bad .blue-crystal.bc4 { top: 50%; right: 28%; transform: rotate(-20deg); width: 14px; height: 18px; }
+
+    /* Cook form */
+    .v-breaking-bad .cook-wrap {
+      margin-top: 8px;
+      max-width: 520px;
+      width: 100%;
+    }
+    .v-breaking-bad .cook {
+      display: flex;
+      box-shadow: 5px 5px 0 rgba(0,0,0,.75);
+    }
+    .v-breaking-bad .cook input[type="email"] {
+      flex: 1;
+      padding: 14px 18px;
+      border: 3px solid var(--black);
+      border-right: none;
+      background: var(--paper);
+      color: var(--black);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      outline: none;
+    }
+    .v-breaking-bad .cook button {
+      padding: 14px 26px;
+      border: 3px solid var(--black);
+      background: var(--hazmat);
+      color: var(--black);
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .v-breaking-bad .cook button:hover { background: #ffd55a; }
+
+    .v-breaking-bad .cook-note {
+      font-family: 'Special Elite', monospace;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: var(--paper);
+      background: rgba(10,10,10,.92);
+      padding: 10px 16px;
+      border-left: 4px solid var(--blue);
+      margin-top: 0;
+    }
+    .v-breaking-bad .cook-note b { color: var(--blue); }
+
+    .v-breaking-bad .privacy-consent {
+      font-family: 'Special Elite', monospace;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      color: var(--paper);
+      background: rgba(10,10,10,.92);
+      padding: 10px 16px;
+      border-left: 4px solid var(--hazmat);
+      margin-top: 8px;
+      max-width: 520px;
+    }
+    .v-breaking-bad .privacy-consent a { color: var(--hazmat); text-decoration: underline; }
+
+    /* Footer */
+    .v-breaking-bad > footer {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      padding: 10px 40px;
+      z-index: 10;
+      background: rgba(10,10,10,.92);
+      border-top: 3px solid var(--hazmat);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-family: 'Oswald', sans-serif;
+      font-size: 12px;
+      color: var(--paper);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .v-breaking-bad > footer b { color: var(--hazmat); }
+    .v-breaking-bad > footer .sx {
+      display: flex; gap: 12px;
+      color: var(--hazmat);
+    }
+    .v-breaking-bad > footer .sx a { color: inherit; text-decoration: none; }
+
+    @media (max-width: 900px) {
+      .v-breaking-bad header { padding: 10px 16px; gap: 14px; flex-wrap: wrap; }
+      .v-breaking-bad header nav { gap: 0; flex-wrap: wrap; width: 100%; border-top: 1px solid rgba(255,255,255,.1); padding-top: 8px; }
+      .v-breaking-bad header nav a { padding: 6px 10px; font-size: 11px; letter-spacing: 0.15em; }
+      .v-breaking-bad header .brand { font-size: 1.1rem; }
+      .v-breaking-bad .stat-banner { padding: 6px 14px; font-size: 9px; gap: 10px; }
+      .v-breaking-bad main { padding: 26px 14px 140px; gap: 18px; }
+      .v-breaking-bad .rv { left: 4%; width: 70px; bottom: 32%; }
+      .v-breaking-bad .haz { right: 3%; width: 60px; height: 120px; }
+      .v-breaking-bad .el { width: 58px; }
+      .v-breaking-bad .quotes { grid-template-columns: 1fr 1fr; }
+      .v-breaking-bad > footer { padding: 10px 14px; font-size: 10px; }
+    }
+    @media (max-width: 540px) {
+      .v-breaking-bad .quotes { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <div class="v-breaking-bad">
+    <!-- Blue sky crystals scattered -->
+    <span class="blue-crystal bc1" aria-hidden="true"></span>
+    <span class="blue-crystal bc2" aria-hidden="true"></span>
+    <span class="blue-crystal bc3" aria-hidden="true"></span>
+    <span class="blue-crystal bc4" aria-hidden="true"></span>
+
+    <!-- Mesas -->
+    <div class="mesas" aria-hidden="true">
+      <svg viewBox="0 0 1400 100" preserveAspectRatio="none">
+        <path d="M0 100 L0 70 L120 70 L140 50 L260 50 L280 70 L460 70 L480 45 L650 45 L670 70 L860 70 L880 55 L1020 55 L1040 70 L1200 70 L1220 50 L1360 50 L1380 70 L1400 70 L1400 100 Z" fill="#6a3a18" opacity=".75"/>
+        <path d="M0 100 L0 85 L300 85 L320 72 L560 72 L580 88 L880 88 L900 75 L1160 75 L1180 85 L1400 85 L1400 100 Z" fill="#502a12" opacity=".85"/>
+      </svg>
+    </div>
+
+    <!-- RV Crystal Ship -->
+    <div class="rv" aria-hidden="true">
+      <svg viewBox="0 0 130 50">
+        <rect x="4" y="12" width="84" height="26" fill="#d8d4c0" stroke="#2a1a08" stroke-width="1.2"/>
+        <rect x="88" y="18" width="30" height="20" fill="#f5ece0" stroke="#2a1a08" stroke-width="1.2"/>
+        <rect x="90" y="20" width="24" height="10" fill="#88aabb" stroke="#2a1a08" stroke-width=".5"/>
+        <rect x="10" y="18" width="10" height="5" fill="#88aabb"/>
+        <rect x="25" y="18" width="10" height="5" fill="#88aabb"/>
+        <rect x="40" y="18" width="10" height="5" fill="#88aabb"/>
+        <rect x="55" y="18" width="10" height="5" fill="#88aabb"/>
+        <rect x="70" y="18" width="10" height="5" fill="#88aabb"/>
+        <!-- roof vent -->
+        <rect x="30" y="8" width="14" height="4" fill="#b0aa92" stroke="#2a1a08" stroke-width=".8"/>
+        <!-- wheels -->
+        <circle cx="22" cy="40" r="6" fill="#1a0a04"/>
+        <circle cx="70" cy="40" r="6" fill="#1a0a04"/>
+        <circle cx="108" cy="40" r="6" fill="#1a0a04"/>
+        <circle cx="22" cy="40" r="2" fill="#666"/>
+        <circle cx="70" cy="40" r="2" fill="#666"/>
+        <circle cx="108" cy="40" r="2" fill="#666"/>
+        <!-- smoke -->
+        <path d="M4 14 Q-2 8 4 2 Q0 -4 8 -8" stroke="#c8c4b0" stroke-width="2" fill="none" opacity=".6"/>
+        <!-- 'Crystal Ship' stencil -->
+        <text x="46" y="30" font-family="Oswald" font-size="5" fill="#2a1a08" text-anchor="middle" letter-spacing="1">CRYSTAL SHIP</text>
+      </svg>
+    </div>
+
+    <!-- Hazmat (Walt) -->
+    <div class="haz" aria-hidden="true">
+      <svg viewBox="0 0 110 210">
+        <!-- yellow hazmat suit -->
+        <ellipse cx="55" cy="32" rx="26" ry="30" fill="#fbc83c" stroke="#2a1a08" stroke-width="1.5"/>
+        <!-- gas mask faceplate -->
+        <circle cx="55" cy="34" r="17" fill="#1a1a1a" stroke="#2a1a08" stroke-width="1.2"/>
+        <circle cx="48" cy="32" r="5" fill="#333" stroke="#fbc83c" stroke-width=".8"/>
+        <circle cx="62" cy="32" r="5" fill="#333" stroke="#fbc83c" stroke-width=".8"/>
+        <!-- filter -->
+        <rect x="44" y="46" width="22" height="14" fill="#444" stroke="#2a1a08" stroke-width=".8"/>
+        <!-- body -->
+        <path d="M26 66 L84 66 L92 150 L72 186 L72 210 L38 210 L38 186 L18 150 Z" fill="#fbc83c" stroke="#2a1a08" stroke-width="1.5"/>
+        <!-- gloves (yellow rubber) -->
+        <rect x="10" y="130" width="14" height="34" fill="#fbc83c" stroke="#2a1a08" stroke-width="1"/>
+        <rect x="86" y="130" width="14" height="34" fill="#fbc83c" stroke="#2a1a08" stroke-width="1"/>
+        <!-- arms -->
+        <rect x="18" y="72" width="14" height="62" fill="#fbc83c" stroke="#2a1a08" stroke-width="1" transform="rotate(-8 25 103)"/>
+        <rect x="78" y="72" width="14" height="62" fill="#fbc83c" stroke="#2a1a08" stroke-width="1" transform="rotate(8 85 103)"/>
+        <!-- zipper -->
+        <line x1="55" y1="68" x2="55" y2="200" stroke="#2a1a08" stroke-width="1" stroke-dasharray="2 2"/>
+        <!-- hazard symbol patch -->
+        <circle cx="72" cy="94" r="11" fill="#0a0a0a"/>
+        <g transform="translate(72,94)" fill="#fbc83c">
+          <path d="M-7 -2 L0 -10 L7 -2 L3 3 L-3 3 Z"/>
+          <path d="M-7 2 L-4 10 L-2 6 L-4 6 Z"/>
+          <path d="M7 2 L4 10 L2 6 L4 6 Z"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Fly -->
+    <div class="fly" aria-hidden="true">
+      <svg viewBox="0 0 22 22">
+        <ellipse cx="11" cy="12" rx="4" ry="6" fill="#1a1a1a"/>
+        <ellipse cx="11" cy="8" rx="2" ry="2" fill="#1a1a1a"/>
+        <ellipse cx="6" cy="8"  rx="4" ry="2.5" fill="rgba(180,180,180,.5)"/>
+        <ellipse cx="16" cy="8" rx="4" ry="2.5" fill="rgba(180,180,180,.5)"/>
+      </svg>
+    </div>
+
+    <header>
+      <div class="logo-el" aria-hidden="true">
+        <span class="num">5</span>
+        <span class="sym">B</span>
+        <span class="mass">10.811</span>
+      </div>
+      <div class="brand">BENT<em>OO</em></div>
+      <nav>
+        <a href="#" class="active">LANDING</a>
+        <a href="#features">SCIENCE</a>
+        <a href="#install">INSTALL</a>
+        <a href="https://github.com/obentoo" target="_blank" rel="noopener">COMMUNITY</a>
+        <a href="#about">ABOUT</a>
+      </nav>
+    </header>
+
+    <div class="stat-banner">
+      <span class="pill">EP 05×08</span>
+      <div class="scroller">
+        <div class="track">
+          <span>99.1% PURE</span>
+          <span>SAY MY NAME</span>
+          <span>YEAH SCIENCE, BITCH</span>
+          <span>BETTER CALL SAUL</span>
+          <span>LOS POLLOS HERMANOS</span>
+          <span>I AM THE ONE WHO COMPILES</span>
+          <span>FOLLOW THE MONEY</span>
+          <span>TREAD LIGHTLY</span>
+          <span>99.1% PURE</span>
+          <span>SAY MY NAME</span>
+          <span>YEAH SCIENCE, BITCH</span>
+          <span>BETTER CALL SAUL</span>
+          <span>LOS POLLOS HERMANOS</span>
+          <span>I AM THE ONE WHO COMPILES</span>
+          <span>FOLLOW THE MONEY</span>
+          <span>TREAD LIGHTLY</span>
+        </div>
+      </div>
+      <span class="pill blue">BLUE SKY</span>
+      <span class="pill cash">$ 80M</span>
+      <span class="pill warn">DEA · HANK S.</span>
+    </div>
+
+    <main>
+      <div class="per-word">
+        <div class="el"><span class="num">5</span><span class="sym">B</span><span class="name">Boron</span><span class="mass">10.811</span></div>
+        <div class="el"><span class="num">99</span><span class="sym">Es</span><span class="name">Einsteinium</span><span class="mass">[252]</span></div>
+        <div class="el"><span class="num">7</span><span class="sym">N</span><span class="name">Nitrogen</span><span class="mass">14.007</span></div>
+        <div class="el"><span class="num">22</span><span class="sym">Ti</span><span class="name">Titanium</span><span class="mass">47.867</span></div>
+        <div class="el"><span class="num">8</span><span class="sym">O</span><span class="name">Oxygen</span><span class="mass">15.999</span></div>
+        <div class="el"><span class="num">8</span><span class="sym">O</span><span class="name">Oxygen</span><span class="mass">15.999</span></div>
+      </div>
+
+      <div class="tagline">A USER-FRIENDLY <b>STAGE5</b> OF GENTOO LINUX</div>
+
+      <section class="quotes">
+        <div class="quote-card walt">
+          <span class="name">Walter H. White</span>
+          <span class="role">Chemistry Teacher · Heisenberg</span>
+          <span class="q">"I am not in danger, Skyler. I <em>am</em> the danger. I am the one who <em>compiles</em>."</span>
+        </div>
+        <div class="quote-card jesse">
+          <span class="name">Jesse Pinkman</span>
+          <span class="role">Apprentice · "yo bitch"</span>
+          <span class="q">"Yeah <em>science</em>, Mr. White! Source-based, yo! Rolling release, bitch!"</span>
+        </div>
+        <div class="quote-card saul">
+          <span class="name">Saul Goodman</span>
+          <span class="role">Criminal Lawyer · S'all good</span>
+          <span class="q">"Better <em>call</em> Bentoo. Free consultations. Ebuilds filed same day."</span>
+        </div>
+        <div class="quote-card gus">
+          <span class="name">Gustavo "Gus" Fring</span>
+          <span class="role">Los Pollos · distribution</span>
+          <span class="q">"We are <em>not</em> the same. Our mirrors are faster. Our repos cleaner."</span>
+        </div>
+      </section>
+
+      <nav class="mini-menu">
+        <a class="blue" href="https://github.com/obentoo" target="_blank" rel="noopener">
+          <span class="num">31</span>
+          <span class="sym">Gh</span>
+          <span class="lbl">GITHUB</span>
+        </a>
+        <a href="mailto:contact@obentoo.org">
+          <span class="num">6</span>
+          <span class="sym">Cn</span>
+          <span class="lbl">CONTACT</span>
+        </a>
+        <a class="green" href="#notify">
+          <span class="num">93</span>
+          <span class="sym">Ntf</span>
+          <span class="lbl">NOTIFY ME</span>
+        </a>
+      </nav>
+
+      <div class="cook-wrap" id="notify">
+        <form
+          class="cook"
+          data-bentoo-subscribe
+          action={`https://buttondown.com/api/emails/embed-subscribe/${buttondownUser}`}
+          method="post"
+          data-success-msg={strings.successMsg}
+          data-error-msg={strings.errorMsg}
+        >
+          <input type="hidden" name="embed" value="1" />
+          <input type="email" name="email" required placeholder={strings.subscribePlaceholder} />
+          <button type="submit">{strings.subscribeButton}</button>
+        </form>
+        <div class="cook-note">▸ <b>99.1% pure</b> · single-shot ping · no newsletter · <em>tread lightly</em></div>
+        <p class="privacy-consent">
+          {strings.privacyConsent} <a href="/privacy">{strings.privacyLinkLabel}</a>
+        </p>
+      </div>
+    </main>
+
+    <footer>
+      <span>© 2024 <b>BENTOO</b> · A LINUX DISTRIBUTION FOR THE MASSES · ALBUQUERQUE, NM</span>
+      <span class="sx">
+        <a href="https://github.com/obentoo" target="_blank" rel="noopener">GITHUB</a>
+        <a href="mailto:contact@obentoo.org">✉</a>
+        · LOS POLLOS · SAUL · RV
+      </span>
+    </footer>
+  </div>
+</VariantLayout>

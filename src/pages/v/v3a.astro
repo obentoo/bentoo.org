@@ -1,0 +1,236 @@
+---
+import VariantLayout from '~/layouts/VariantLayout.astro';
+import { strings } from '~/i18n/en';
+const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
+---
+<VariantLayout
+  lang="en"
+  path="/v/v3a/"
+  title="BENTOO.EXE — アーケード・リナックス"
+  description="Bentoo is a user-friendly Stage5 of Gentoo Linux."
+  variantSlug="v3a"
+>
+  <Fragment slot="head-extra">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=VT323&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  </Fragment>
+  <style slot="style">
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#c7c8c3; --bg-2:#9e9fa0;
+      --ink:#0b0b0b;
+      --cyan:#1e6ab7; --cyan-2:#0f4078;
+      --magenta:#d6338e; --yellow:#f2c032; --lime:#7dd635;
+      --white:#f0eee3; --shadow:#3a3a3a;
+      --f-pix:'DotGothic16',monospace;
+      --f-crt:'VT323',monospace;
+      --f-mono:'JetBrains Mono',monospace;
+    }
+    html{image-rendering:pixelated}
+    html,body{background:var(--bg);color:var(--ink);font-family:var(--f-pix);font-size:15px;line-height:1.35;min-height:100vh;display:flex;flex-direction:column}
+    body{
+      background-color:var(--bg);
+      background-image:
+        repeating-linear-gradient(0deg,rgba(0,0,0,.045) 0 1px,transparent 1px 2px),
+        repeating-linear-gradient(90deg,rgba(0,0,0,.045) 0 1px,transparent 1px 2px);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
+      background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.08) 2px 3px);
+      mix-blend-mode:multiply;
+    }
+    a{color:inherit;text-decoration:none}
+
+    .win{
+      background:var(--bg);
+      border-top:3px solid var(--white);
+      border-left:3px solid var(--white);
+      border-right:3px solid var(--shadow);
+      border-bottom:3px solid var(--shadow);
+      box-shadow:6px 6px 0 rgba(0,0,0,.4);
+      margin-bottom:18px;
+    }
+    .win-bar{
+      background:repeating-linear-gradient(90deg,var(--cyan-2) 0 4px,var(--cyan) 4px 8px);
+      color:var(--white);padding:5px 8px;
+      display:flex;justify-content:space-between;align-items:center;
+      border-bottom:2px solid var(--shadow);
+      font-family:var(--f-pix);font-size:14px;letter-spacing:.02em;
+      position:relative;
+    }
+    .win-bar::before{
+      content:'';position:absolute;left:4px;right:4px;top:4px;bottom:4px;
+      background:repeating-linear-gradient(90deg,transparent 0 6px,rgba(255,255,255,.15) 6px 8px);
+      pointer-events:none;
+    }
+    .win-bar .ttl{background:var(--cyan-2);padding:1px 10px;z-index:1;position:relative;font-weight:400}
+    .win-bar .ctls{display:flex;gap:3px;z-index:1;position:relative}
+    .win-bar .ctls b{
+      display:inline-grid;place-items:center;width:22px;height:20px;
+      background:var(--bg);
+      border-top:1.5px solid var(--white);border-left:1.5px solid var(--white);
+      border-right:1.5px solid var(--shadow);border-bottom:1.5px solid var(--shadow);
+      font-family:var(--f-mono);font-size:10px;color:var(--ink);font-weight:700;
+    }
+    .win-body{padding:20px 24px}
+
+    main{flex:1;padding:28px 22px 20px;max-width:840px;margin:0 auto;width:100%}
+
+    .hero h1{
+      font-family:var(--f-pix);
+      font-size:clamp(52px,8vw,88px);
+      line-height:.95;letter-spacing:-.02em;
+      color:var(--ink);margin-bottom:8px;
+      text-shadow:
+        4px 0 var(--magenta),
+        8px 0 var(--cyan-2),
+        4px 4px 0 var(--shadow);
+    }
+    .hero h1 em{font-style:normal;color:var(--cyan-2)}
+    .hero h1 .dot{color:var(--magenta)}
+    .hero .tag-jp{font-family:var(--f-crt);font-size:18px;color:var(--cyan-2);letter-spacing:.14em;margin-bottom:12px}
+    .hero .tagline{
+      display:inline-block;background:var(--yellow);border:2.5px solid var(--ink);
+      padding:6px 14px;font-family:var(--f-pix);font-size:16px;color:var(--ink);
+      margin-bottom:16px;
+    }
+    .hero .tagline em{font-style:normal;color:var(--magenta);font-weight:400}
+    .hero p{font-family:var(--f-pix);font-size:14px;line-height:1.55;margin-bottom:16px;max-width:60ch}
+    .hero p b{color:var(--cyan-2)}
+    .hero p em{font-style:normal;color:var(--magenta);font-weight:400}
+
+    .box-specs{
+      background:var(--white);
+      border-top:2px solid var(--shadow);border-left:2px solid var(--shadow);
+      border-right:2px solid var(--white);border-bottom:2px solid var(--white);
+      padding:10px 14px;margin-bottom:18px;
+    }
+    .box-specs .r{display:grid;grid-template-columns:120px 1fr auto;gap:12px;padding:3px 0;border-bottom:1px dotted rgba(0,0,0,.2);font-family:var(--f-pix);font-size:13px}
+    .box-specs .r:last-child{border:none}
+    .box-specs .k{color:var(--cyan-2);font-weight:700}
+    .box-specs .t{color:var(--lime);font-weight:700}
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+    .btn{
+      background:var(--bg);color:var(--ink);
+      border-top:2px solid var(--white);border-left:2px solid var(--white);
+      border-right:2px solid var(--shadow);border-bottom:2px solid var(--shadow);
+      padding:8px 16px;
+      font-family:var(--f-pix);font-size:13px;
+      cursor:pointer;display:inline-flex;gap:8px;align-items:center;
+    }
+    .btn:hover{box-shadow:0 0 0 2px var(--cyan-2)}
+    .btn:active{border-top:2px solid var(--shadow);border-left:2px solid var(--shadow);border-right:2px solid var(--white);border-bottom:2px solid var(--white)}
+    .btn.pri{background:var(--yellow);font-weight:700}
+    .btn .arr{color:var(--magenta)}
+
+    .notify{
+      background:var(--white);
+      border:2px inset var(--shadow);
+      padding:14px 16px;
+      display:grid;gap:10px;
+    }
+    .notify .lbl{font-family:var(--f-pix);font-size:13px;color:var(--cyan-2);font-weight:700}
+    .notify .lbl span{color:var(--lime);font-size:11px;margin-left:8px}
+    .notify form{display:flex;gap:6px}
+    .notify input{
+      flex:1;padding:8px 10px;background:var(--white);color:var(--ink);
+      font-family:var(--f-crt);font-size:16px;
+      border-top:2px solid var(--shadow);border-left:2px solid var(--shadow);
+      border-right:2px solid var(--white);border-bottom:2px solid var(--white);
+      outline:none;
+    }
+
+    .privacy-consent{
+      font-family:var(--f-pix);font-size:11px;color:var(--ink);margin-top:10px;text-align:center;
+    }
+    .privacy-consent a{color:var(--cyan-2);text-decoration:underline}
+
+    footer{
+      background:var(--ink);color:var(--bg);
+      padding:14px 22px;
+      border-top:3px solid var(--shadow);
+      display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+      font-family:var(--f-pix);font-size:12px;
+    }
+    footer a{color:var(--yellow)}
+    footer a:hover{color:var(--magenta)}
+    footer em{color:var(--cyan);font-style:normal}
+    footer .dot{color:var(--magenta)}
+
+    @media (max-width:640px){
+      .hero h1{font-size:52px;text-shadow:3px 0 var(--magenta),6px 0 var(--cyan-2),3px 3px 0 var(--shadow)}
+      .box-specs .r{grid-template-columns:1fr}
+      .notify form{flex-direction:column}
+    }
+  </style>
+
+  <main>
+    <div class="win">
+      <div class="win-bar">
+        <span class="ttl">BENTOO.EXE — アーケード・リナックス</span>
+        <span class="ctls"><b>_</b><b>□</b><b>×</b></span>
+      </div>
+      <div class="win-body hero">
+        <h1>BENT<em>OO</em><span class="dot">.</span></h1>
+        <div class="tag-jp">ベントー · 源泉から</div>
+        <div class="tagline">A user-friendly <em>Stage5</em> of Gentoo Linux.</div>
+        <p>
+          <b>BENTOO</b> is a <em>source-based</em> Linux desktop — a <b>Stage5</b> extension of
+          Gentoo, pre-compiled and pre-configured. Portage stays intact, USE flags untouched,
+          desktop ready from first boot.
+        </p>
+        <div class="box-specs">
+          <div class="r"><span class="k">VERSION:</span><span>0.1.0-alpha · rolling</span><span class="t">YET TO COMPILE</span></div>
+          <div class="r"><span class="k">ARCH:</span><span>x86-64-v3 · -O2 -pipe</span><span class="t">FAST</span></div>
+          <div class="r"><span class="k">BASE:</span><span>gentoo · source-first</span><span class="t">GPL-2.0</span></div>
+          <div class="r"><span class="k">KITCHEN:</span><span>Brazil ⇄ 東京</span><span class="t">UTC-3</span></div>
+        </div>
+        <div class="actions">
+          <a class="btn pri" href="https://github.com/obentoo" target="_blank" rel="noopener">► SOURCE</a>
+          <a class="btn" href="mailto:contact@obentoo.org">✉ CONTACT</a>
+          <a class="btn" href="#notify">⚡ NOTIFY ME</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="win" id="notify">
+      <div class="win-bar">
+        <span class="ttl">release-ping — subscribe</span>
+        <span class="ctls"><b>_</b><b>□</b><b>×</b></span>
+      </div>
+      <div class="win-body">
+        <div class="notify">
+          <div class="lbl">RELEASE PING <span>ONE-SHOT · NO NEWSLETTER</span></div>
+          <form
+            data-bentoo-subscribe
+            action={`https://buttondown.com/api/emails/embed-subscribe/${buttondownUser}`}
+            method="post"
+            data-success-msg={strings.successMsg}
+            data-error-msg={strings.errorMsg}
+          >
+            <input type="hidden" name="embed" value="1" />
+            <input type="email" name="email" required placeholder={strings.subscribePlaceholder} />
+            <button class="btn pri" type="submit">{strings.subscribeButton}</button>
+          </form>
+          <p class="privacy-consent">
+            {strings.privacyConsent} <a href="/privacy">{strings.privacyLinkLabel}</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span>© 2018 – 2026 <em>BENTOO<span class="dot">.</span></em> · HANDCRAFTED · SOURCE-FIRST</span>
+    <span>
+      <a href="https://github.com/obentoo" target="_blank" rel="noopener">github.com/obentoo</a>
+      ·
+      <a href="mailto:contact@obentoo.org">contact@obentoo.org</a>
+    </span>
+  </footer>
+</VariantLayout>
+</content>
+</invoke>

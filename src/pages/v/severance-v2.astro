@@ -1,0 +1,648 @@
+---
+import VariantLayout from '~/layouts/VariantLayout.astro';
+import { strings } from '~/i18n/en';
+const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
+---
+<VariantLayout
+  lang="en"
+  path="/v/severance-v2/"
+  title="bentoo — macrodata refinement"
+  description="Bentoo is a user-friendly Stage5 of Gentoo Linux — mysterious and important."
+  variantSlug="severance-v2"
+>
+  <Fragment slot="head-extra">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=VT323&family=Inconsolata:wght@400;700&display=swap" rel="stylesheet" />
+  </Fragment>
+  <style is:global slot="style">
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    .v-severance-v2 {
+      --wall-1: #8da79c;
+      --wall-2: #7b9990;
+      --wall-dark: #4a5f56;
+      --desk: #dcd1b9;
+      --desk-shadow: #b8a98a;
+      --crt-bezel: #f0ead9;
+      --crt-screen: #0d1410;
+      --crt-glow: #8ef0a5;
+      --crt-dim: #3d6b4a;
+      --crt-amber: #ddb25a;
+      --lumon-blue: #1a3d70;
+      --lumon-red: #b02030;
+      --ink: #0d0d10;
+      --paper: #f5f1e3;
+
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: var(--wall-2);
+      color: var(--ink);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      font-size: 15px;
+      position: relative;
+      min-height: 100vh;
+      display: block;
+    }
+
+    /* Office wall texture: cubicle fabric */
+    .v-severance-v2::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05) 0%, transparent 40%, rgba(0,0,0,.25) 100%),
+        linear-gradient(90deg, rgba(0,0,0,.08) 0%, transparent 10%, transparent 90%, rgba(0,0,0,.08) 100%),
+        repeating-linear-gradient(45deg, rgba(255,255,255,.02) 0 2px, transparent 2px 5px),
+        repeating-linear-gradient(-45deg, rgba(0,0,0,.03) 0 2px, transparent 2px 5px),
+        radial-gradient(ellipse at 50% 40%, var(--wall-1) 0%, var(--wall-2) 60%, var(--wall-dark) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Fluorescent ceiling strips */
+    .v-severance-v2::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 90px;
+      background:
+        linear-gradient(180deg, rgba(255,255,245,.3) 0%, transparent 100%),
+        repeating-linear-gradient(90deg, rgba(255,255,235,.15) 0 60px, transparent 60px 160px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ========== HEADER ========== */
+    .v-severance-v2 header {
+      position: relative;
+      z-index: 10;
+      padding: 22px 42px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .v-severance-v2 .brand {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 700;
+      font-size: 1.3rem;
+      letter-spacing: 0.28em;
+      color: var(--paper);
+      text-shadow: 0 1px 2px rgba(0,0,0,.4);
+    }
+    .v-severance-v2 .breadcrumb {
+      font-family: 'Inconsolata', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,.55);
+      text-transform: uppercase;
+    }
+    .v-severance-v2 .breadcrumb b { color: var(--crt-glow); font-weight: 700; }
+    .v-severance-v2 .menu-dots {
+      display: flex; flex-direction: column; gap: 4px;
+      cursor: pointer; padding: 10px;
+    }
+    .v-severance-v2 .menu-dots span {
+      width: 26px; height: 2px; background: var(--paper);
+    }
+
+    /* ========== MAIN LAYOUT ========== */
+    .v-severance-v2 main {
+      position: relative;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 40px;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 10px 42px 40px;
+      align-items: stretch;
+    }
+
+    /* ========== DESK ========== */
+    .v-severance-v2 .desk {
+      position: relative;
+      padding: 40px 20px 30px;
+      min-height: 520px;
+      background:
+        linear-gradient(180deg, transparent 0%, transparent 55%, var(--desk) 55%, var(--desk-shadow) 100%);
+    }
+
+    /* CRT Monitor */
+    .v-severance-v2 .crt {
+      position: relative;
+      width: 480px;
+      max-width: 90%;
+      height: 380px;
+      margin: 0 auto;
+      background: linear-gradient(145deg, var(--crt-bezel) 0%, #d8cfb2 60%, #b8ad8a 100%);
+      border-radius: 22px 22px 18px 18px;
+      padding: 28px 30px 70px;
+      box-shadow:
+        inset 0 3px 0 rgba(255,255,255,.7),
+        inset 0 -3px 0 rgba(0,0,0,.2),
+        0 30px 60px -20px rgba(0,0,0,.4),
+        0 12px 20px -8px rgba(0,0,0,.3);
+    }
+    .v-severance-v2 .crt::before {
+      content: 'LUMON';
+      position: absolute;
+      bottom: 22px; left: 50%;
+      transform: translateX(-50%);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      color: rgba(0,0,0,.35);
+    }
+    .v-severance-v2 .crt::after {
+      content: '';
+      position: absolute;
+      bottom: 8px; right: 12px;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ff6a4a 0%, #b02020 70%);
+      box-shadow: 0 0 6px rgba(255,80,40,.6);
+    }
+    .v-severance-v2 .screen {
+      position: relative;
+      width: 100%; height: 100%;
+      background: radial-gradient(ellipse at center, #152018 0%, #0a1008 70%, #050704 100%);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow:
+        inset 0 0 60px rgba(0,0,0,.9),
+        inset 0 0 8px rgba(0,0,0,.8);
+    }
+    .v-severance-v2 .screen::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(180deg, transparent 0 2px, rgba(0,0,0,.15) 2px 3px);
+      pointer-events: none;
+      z-index: 3;
+    }
+    .v-severance-v2 .screen::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.5) 100%);
+      pointer-events: none;
+      z-index: 4;
+    }
+    .v-severance-v2 .mdr {
+      position: relative;
+      z-index: 2;
+      width: 100%; height: 100%;
+      padding: 18px 20px;
+      font-family: 'VT323', monospace;
+      line-height: 1;
+      color: var(--crt-glow);
+      text-shadow: 0 0 6px currentColor, 0 0 16px rgba(142,240,165,.4);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .v-severance-v2 .mdr-top {
+      display: flex; justify-content: space-between;
+      font-size: 14px;
+      color: var(--crt-amber);
+      text-shadow: 0 0 6px currentColor;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+    .v-severance-v2 .mdr-grid {
+      font-size: 32px;
+      letter-spacing: 0.15em;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px 14px;
+      text-align: center;
+    }
+    .v-severance-v2 .mdr-grid span { white-space: nowrap; }
+    .v-severance-v2 .mdr-grid .amber { color: var(--crt-amber); text-shadow: 0 0 6px currentColor; }
+    .v-severance-v2 .mdr-grid .wiggle { animation: severance-v2-wiggle 2.6s ease-in-out infinite; display: inline-block; }
+    .v-severance-v2 .mdr-grid .wiggle.d1 { animation-delay: .4s; }
+    .v-severance-v2 .mdr-grid .wiggle.d2 { animation-delay: .9s; }
+    .v-severance-v2 .mdr-grid .wiggle.d3 { animation-delay: 1.4s; }
+    @keyframes severance-v2-wiggle {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-4px); }
+    }
+    .v-severance-v2 .mdr-foot {
+      display: flex; justify-content: space-between;
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      color: var(--crt-glow);
+      padding-top: 6px;
+      border-top: 1px solid rgba(142,240,165,.2);
+    }
+    .v-severance-v2 .cursor-blink {
+      display: inline-block;
+      width: 10px; height: 16px;
+      background: var(--crt-glow);
+      vertical-align: middle;
+      animation: severance-v2-blink 1.05s steps(2) infinite;
+      box-shadow: 0 0 8px currentColor;
+    }
+    @keyframes severance-v2-blink { 50% { opacity: 0; } }
+
+    /* Keyboard */
+    .v-severance-v2 .keyboard {
+      margin: 22px auto 0;
+      width: 520px;
+      max-width: 95%;
+      height: 92px;
+      background: linear-gradient(180deg, #f5ebd0 0%, #e2d4b2 100%);
+      border-radius: 6px;
+      padding: 12px;
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,.8),
+        0 10px 18px rgba(0,0,0,.25);
+      position: relative;
+    }
+    .v-severance-v2 .keyboard::before {
+      content: '';
+      position: absolute;
+      top: -6px; left: 20px;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: rgba(0,0,0,.3);
+    }
+    .v-severance-v2 .key-rows {
+      display: grid;
+      grid-template-rows: repeat(4, 1fr);
+      gap: 5px;
+      height: 100%;
+    }
+    .v-severance-v2 .key-row {
+      display: grid;
+      grid-template-columns: repeat(14, 1fr);
+      gap: 3px;
+    }
+    .v-severance-v2 .key {
+      background: linear-gradient(180deg, #ede2c4 0%, #d6c69d 100%);
+      border-radius: 2px;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.8),
+        0 1px 1px rgba(0,0,0,.15);
+    }
+    .v-severance-v2 .key-row:last-child { grid-template-columns: 1fr 1fr 8fr 1fr 1fr 1fr 1fr; }
+
+    /* ID Badge (Lumon card) */
+    .v-severance-v2 .badge {
+      position: absolute;
+      left: 40px;
+      bottom: 20px;
+      width: 150px;
+      transform: rotate(-4deg);
+      z-index: 6;
+      animation: severance-v2-sway 8s ease-in-out infinite;
+    }
+    @keyframes severance-v2-sway {
+      0%, 100% { transform: rotate(-4deg); }
+      50%      { transform: rotate(-7deg) translateY(-3px); }
+    }
+    .v-severance-v2 .lanyard {
+      height: 60px;
+      width: 8px;
+      background: linear-gradient(180deg, #18181c 0%, #282830 100%);
+      margin: 0 auto -8px;
+      position: relative;
+    }
+    .v-severance-v2 .lanyard::before, .v-severance-v2 .lanyard::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 70px;
+      height: 4px;
+      background: linear-gradient(180deg, #18181c 0%, #282830 100%);
+    }
+    .v-severance-v2 .lanyard::before { left: -60px; transform: rotate(-28deg); transform-origin: right; }
+    .v-severance-v2 .lanyard::after  { right: -60px; transform: rotate(28deg); transform-origin: left; }
+    .v-severance-v2 .badge-card {
+      background: var(--paper);
+      padding: 12px 10px 14px;
+      text-align: center;
+      box-shadow: 0 6px 14px rgba(0,0,0,.35);
+      border-top: 5px solid var(--lumon-blue);
+      position: relative;
+    }
+    .v-severance-v2 .badge-card .logo-lumon {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.3em;
+      color: var(--lumon-blue);
+      margin-bottom: 10px;
+    }
+    .v-severance-v2 .badge-card .photo {
+      width: 48px; height: 60px;
+      background:
+        radial-gradient(circle at 50% 34%, #6b5846 0 10px, transparent 11px),
+        linear-gradient(180deg, #a89a86 0%, #5e5248 100%);
+      margin: 0 auto 8px;
+      border: 1px solid rgba(0,0,0,.15);
+    }
+    .v-severance-v2 .badge-card .name {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      color: var(--ink);
+    }
+    .v-severance-v2 .badge-card .role {
+      font-family: 'Inconsolata', monospace;
+      font-size: 8.5px;
+      color: rgba(0,0,0,.55);
+      letter-spacing: 0.15em;
+      margin-top: 2px;
+    }
+    .v-severance-v2 .badge-card .memo {
+      font-family: 'Inconsolata', monospace;
+      font-size: 7px;
+      color: rgba(0,0,0,.45);
+      letter-spacing: 0.1em;
+      margin-top: 10px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(0,0,0,.15);
+      line-height: 1.35;
+    }
+
+    /* Lunch pail */
+    .v-severance-v2 .pail {
+      position: absolute;
+      right: 70px;
+      bottom: 30px;
+      width: 90px;
+      height: 58px;
+      background: linear-gradient(180deg, #2a2a32 0%, #14141a 100%);
+      border-radius: 4px 4px 2px 2px;
+      box-shadow: 0 10px 18px rgba(0,0,0,.4);
+    }
+    .v-severance-v2 .pail::before {
+      content: '';
+      position: absolute;
+      top: -14px; left: 32px;
+      width: 26px; height: 18px;
+      border: 3px solid #1a1a20;
+      border-bottom: none;
+      border-radius: 13px 13px 0 0;
+    }
+    .v-severance-v2 .pail::after {
+      content: '';
+      position: absolute;
+      top: 22px; left: 0; right: 0;
+      height: 1px;
+      background: rgba(255,255,255,.1);
+    }
+
+    /* ========== SIDE PANEL ========== */
+    .v-severance-v2 .panel {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-top: 20px;
+    }
+    .v-severance-v2 .chip {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px 14px 14px;
+      background: linear-gradient(180deg, #2a2a32 0%, #14141a 100%);
+      color: var(--paper);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 600;
+      font-size: 13.5px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 28px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .v-severance-v2 .chip:hover { transform: translateX(4px); box-shadow: 0 8px 18px rgba(0,0,0,.4); }
+    .v-severance-v2 .chip .ic {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #4a6a52 0%, #2a4030 100%);
+      display: grid; place-items: center;
+      font-family: 'VT323', monospace;
+      font-weight: 700;
+      font-size: 22px;
+      color: var(--crt-glow);
+      text-shadow: 0 0 8px currentColor;
+      flex-shrink: 0;
+    }
+    .v-severance-v2 .chip.primary .ic { background: linear-gradient(180deg, #3a5a70 0%, #1d3348 100%); color: #8ec6f0; }
+
+    .v-severance-v2 .wordmark {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 700;
+      font-size: 3.6rem;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      color: var(--paper);
+      text-shadow: 0 2px 4px rgba(0,0,0,.35);
+      margin-top: 22px;
+    }
+    .v-severance-v2 .wordmark span { color: var(--crt-glow); text-shadow: 0 0 10px rgba(142,240,165,.5); }
+    .v-severance-v2 .tagline {
+      font-family: 'Inconsolata', monospace;
+      color: rgba(255,255,255,.75);
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      line-height: 1.7;
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: rgba(13,20,16,.55);
+      border-left: 2px solid var(--crt-glow);
+    }
+    .v-severance-v2 .tagline b { color: var(--crt-glow); font-weight: 700; }
+
+    .v-severance-v2 .notify {
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .v-severance-v2 .notify-label {
+      font-family: 'Inconsolata', monospace;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.55);
+    }
+    .v-severance-v2 .notify-row { display: flex; }
+    .v-severance-v2 .notify input[type="email"] {
+      flex: 1;
+      padding: 12px 14px;
+      border: 1px solid #1a1a20;
+      background: #0d1410;
+      color: var(--crt-glow);
+      font-family: 'VT323', monospace;
+      font-size: 16px;
+      letter-spacing: 0.08em;
+      outline: none;
+      text-shadow: 0 0 4px currentColor;
+    }
+    .v-severance-v2 .notify input::placeholder { color: rgba(142,240,165,.35); }
+    .v-severance-v2 .notify button {
+      padding: 12px 18px;
+      border: 1px solid #1a1a20;
+      border-left: none;
+      background: linear-gradient(180deg, #3a5a42 0%, #1e3126 100%);
+      color: var(--crt-glow);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-shadow: 0 0 4px rgba(142,240,165,.5);
+    }
+
+    .v-severance-v2 .privacy-consent {
+      font-family: 'Inconsolata', monospace;
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.55);
+      margin-top: 4px;
+    }
+    .v-severance-v2 .privacy-consent a { color: var(--crt-glow); text-decoration: underline; }
+
+    /* ========== FOOTER ========== */
+    .v-severance-v2 > footer {
+      position: relative;
+      z-index: 5;
+      max-width: 1280px;
+      margin: 20px auto 0;
+      padding: 18px 42px 22px;
+      border-top: 1px solid rgba(255,255,255,.1);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      font-family: 'Inconsolata', monospace;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.55);
+    }
+    .v-severance-v2 > footer b { color: var(--crt-glow); font-weight: 700; }
+
+    @media (max-width: 900px) {
+      .v-severance-v2 main { grid-template-columns: 1fr; padding: 0 20px 24px; }
+      .v-severance-v2 .crt { height: 320px; }
+      .v-severance-v2 .mdr-grid { font-size: 26px; }
+      .v-severance-v2 .keyboard { width: 100%; }
+      .v-severance-v2 .badge { left: 10px; bottom: 6px; transform: rotate(-6deg) scale(.8); transform-origin: left bottom; }
+      .v-severance-v2 .pail { display: none; }
+      .v-severance-v2 .wordmark { font-size: 2.6rem; }
+      .v-severance-v2 header { padding: 16px 20px; flex-wrap: wrap; gap: 10px; }
+      .v-severance-v2 > footer { padding: 16px 20px; }
+    }
+  </style>
+
+  <div class="v-severance-v2">
+    <header>
+      <div class="brand">BENTOO</div>
+      <div class="breadcrumb">MDR · FLOOR <b>5</b> · DEPT. <b>07-G</b></div>
+      <div class="menu-dots" aria-label="menu"><span></span><span></span><span></span></div>
+    </header>
+
+    <main>
+      <div class="desk">
+        <div class="crt">
+          <div class="screen">
+            <div class="mdr">
+              <div class="mdr-top">
+                <span>COLD HARBOR · 0.62</span>
+                <span>BENTOO / MOR</span>
+              </div>
+              <div class="mdr-grid">
+                <span>73 09 41</span>
+                <span class="amber">82 15 30</span>
+                <span class="wiggle">56 12 30</span>
+                <span>73 09 41</span>
+                <span class="amber wiggle d1">82 15 67</span>
+                <span>56 12 30</span>
+                <span class="wiggle d2">73 09 41</span>
+                <span>82 15 67</span>
+                <span class="amber wiggle d3">56 12 30</span>
+              </div>
+              <div class="mdr-foot">
+                <span>REFINING · STAGE5<span class="cursor-blink"></span></span>
+                <span>0.62 / 1.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="keyboard" aria-hidden="true">
+          <div class="key-rows">
+            <div class="key-row"><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div></div>
+            <div class="key-row"><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div></div>
+            <div class="key-row"><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div></div>
+            <div class="key-row"><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div></div>
+          </div>
+        </div>
+
+        <div class="badge">
+          <div class="lanyard"></div>
+          <div class="badge-card">
+            <div class="logo-lumon">LUMON</div>
+            <div class="photo"></div>
+            <div class="name">BENTOO</div>
+            <div class="role">DATA REFINER / MOR</div>
+            <div class="memo">YOUR WORK IS<br />MYSTERIOUS AND IMPORTANT</div>
+          </div>
+        </div>
+
+        <div class="pail" aria-hidden="true"></div>
+      </div>
+
+      <aside class="panel">
+        <a class="chip primary" href="#">
+          <span class="ic">L</span>
+          <span>BENTOO</span>
+        </a>
+        <a class="chip" href="https://github.com/obentoo" target="_blank" rel="noopener">
+          <span class="ic">GH</span>
+          <span>GITHUB · CONTACT</span>
+        </a>
+        <a class="chip" href="#notify">
+          <span class="ic">L</span>
+          <span>NOTIFY ME</span>
+        </a>
+
+        <div class="wordmark">bentoo<span>.</span></div>
+        <div class="tagline">
+          A user-friendly <b>Stage5</b> of Gentoo Linux.<br />
+          Source-based · rolling · desktop-ready.
+        </div>
+
+        <form
+          class="notify"
+          id="notify"
+          data-bentoo-subscribe
+          action={`https://buttondown.com/api/emails/embed-subscribe/${buttondownUser}`}
+          method="post"
+          data-success-msg={strings.successMsg}
+          data-error-msg={strings.errorMsg}
+        >
+          <div class="notify-label">File · onboard · single-ping</div>
+          <input type="hidden" name="embed" value="1" />
+          <div class="notify-row">
+            <input type="email" name="email" required placeholder={strings.subscribePlaceholder} />
+            <button type="submit">{strings.subscribeButton}</button>
+          </div>
+        </form>
+        <p class="privacy-consent">
+          {strings.privacyConsent} <a href="/privacy">{strings.privacyLinkLabel}</a>
+        </p>
+      </aside>
+    </main>
+
+    <footer>
+      <span>© 2018 – 2026 <b>bentoo</b> · handcrafted, source-first</span>
+      <span>kier eagan · praise · <b>gentoo inside</b></span>
+    </footer>
+  </div>
+</VariantLayout>
