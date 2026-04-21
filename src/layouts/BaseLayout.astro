@@ -1,0 +1,138 @@
+---
+import { rootUrl, siblingPath, canonicalForVariant } from '~/utils/siteUrl';
+import type { Lang } from '~/utils/getLang';
+import type { VariantSlug } from '~/data/variants';
+import { strings as enStrings } from '~/i18n/en';
+import { strings as ptStrings } from '~/i18n/pt';
+
+export interface Props {
+  lang: Lang;
+  path: string;
+  title: string;
+  description: string;
+  isVariantPage?: boolean;
+  variantSlug?: VariantSlug;
+  ogImage?: string;
+  noindexOverride?: boolean;
+}
+
+const {
+  lang,
+  path,
+  title,
+  description,
+  isVariantPage = false,
+  variantSlug,
+  ogImage = '/og/default.png',
+  noindexOverride = false,
+} = Astro.props;
+
+const htmlLang = lang === 'pt' ? 'pt-BR' : 'en';
+const isProduction = import.meta.env.PUBLIC_IS_PRODUCTION === true;
+const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
+const siteRoot = (import.meta.env.PUBLIC_SITE_URL || 'https://bentoo.org').replace(/\/$/, '');
+
+const canonicalHref =
+  isVariantPage && variantSlug
+    ? canonicalForVariant(variantSlug, lang)
+    : rootUrl(lang);
+
+const robotsContent =
+  noindexOverride || !isProduction
+    ? 'noindex,nofollow'
+    : isVariantPage
+      ? 'noindex,follow'
+      : 'index,follow';
+
+const hreflangEn = `${siteRoot}/`;
+const hreflangPt = `${siteRoot}/pt/`;
+
+const ogImageAbs = ogImage.startsWith('http') ? ogImage : `${siteRoot}${ogImage}`;
+
+const jsonLd = !isVariantPage && !noindexOverride
+  ? JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'Bentoo',
+      alternateName: 'bentoo.org',
+      applicationCategory: 'OperatingSystem',
+      operatingSystem: 'Linux (Gentoo-based)',
+      description,
+      url: siteRoot,
+      inLanguage: [htmlLang],
+    })
+  : null;
+
+const strings = lang === 'pt' ? ptStrings : enStrings;
+const sibling = siblingPath(path);
+const targetLang = lang === 'pt' ? 'en' : 'pt';
+const privacyHref = lang === 'pt' ? '/pt/privacy' : '/privacy';
+
+const langToggleScript = `
+try {
+  var links = document.querySelectorAll('[data-bentoo-lang-toggle]');
+  for (var i = 0; i < links.length; i++) {
+    links[i].addEventListener('click', function () {
+      try {
+        localStorage.setItem('bentoo-lang', this.getAttribute('data-target-lang'));
+        localStorage.setItem('bentoo-lang-expires', String(Date.now() + 86400000));
+      } catch (e) {}
+    });
+  }
+} catch (e) {}
+`.trim();
+---
+<!doctype html>
+<html lang={htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/bentoo-logo.svg" />
+    <link rel="canonical" href={canonicalHref} />
+    <meta name="robots" content={robotsContent} />
+    <link rel="alternate" hreflang="en" href={hreflangEn} />
+    <link rel="alternate" hreflang="pt-BR" href={hreflangPt} />
+    <link rel="alternate" hreflang="x-default" href={hreflangEn} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bentoo" />
+    <meta property="og:locale" content={htmlLang === 'pt-BR' ? 'pt_BR' : 'en_US'} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalHref} />
+    <meta property="og:image" content={ogImageAbs} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageAbs} />
+    {jsonLd && <script type="application/ld+json" is:inline set:html={jsonLd} />}
+    {isProduction && cfToken && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={`{"token": "${cfToken}"}`}
+      ></script>
+    )}
+    <slot name="head-extra" />
+    <slot name="style" />
+  </head>
+  <body>
+    <slot />
+    <footer class="bentoo-footer">
+      <a
+        href={sibling}
+        data-bentoo-lang-toggle
+        data-target-lang={targetLang}
+        rel="alternate"
+        hreflang={targetLang === 'pt' ? 'pt-BR' : 'en'}
+      >{strings.languageToggleLabel}</a>
+      <span class="bentoo-footer-sep">·</span>
+      <a href={privacyHref}>{strings.privacyLinkLabel}</a>
+      <span class="bentoo-footer-sep">·</span>
+      <span class="bentoo-footer-copy">{strings.footerCopyright}</span>
+    </footer>
+    <script is:inline set:html={langToggleScript} />
+  </body>
+</html>

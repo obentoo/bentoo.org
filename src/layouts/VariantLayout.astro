@@ -1,0 +1,40 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import type { Lang } from '~/utils/getLang';
+import type { VariantSlug } from '~/data/variants';
+import { FORM_HANDLER_JS } from '~/scripts/form-handler.inline';
+
+export interface Props {
+  lang: Lang;
+  path: string;
+  title: string;
+  description: string;
+  variantSlug: VariantSlug;
+  ogImage?: string;
+}
+
+const { lang, path, title, description, variantSlug, ogImage } = Astro.props;
+const resolvedOg = ogImage ?? `/og/${variantSlug}.png`;
+---
+<BaseLayout
+  lang={lang}
+  path={path}
+  title={title}
+  description={description}
+  isVariantPage={true}
+  variantSlug={variantSlug}
+  ogImage={resolvedOg}
+>
+  <slot name="head-extra" slot="head-extra" />
+  <slot name="style" slot="style" />
+  <iframe
+    name="bd-sink"
+    hidden
+    aria-hidden="true"
+    tabindex="-1"
+    style="display:none;position:absolute;left:-9999px;top:-9999px"
+    title="form-submission-sink"
+  ></iframe>
+  <slot />
+  {FORM_HANDLER_JS && <script is:inline set:html={FORM_HANDLER_JS} />}
+</BaseLayout>

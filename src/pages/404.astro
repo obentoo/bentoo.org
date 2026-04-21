@@ -1,0 +1,56 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { getLang } from '~/utils/getLang';
+import { strings as enStrings } from '~/i18n/en';
+import { strings as ptStrings } from '~/i18n/pt';
+
+const lang = getLang(Astro.url.pathname);
+const strings = lang === 'pt' ? ptStrings : enStrings;
+const homePath = lang === 'pt' ? '/pt/' : '/';
+const backLabel = lang === 'pt' ? '← voltar para a página inicial' : '← back to the landing';
+---
+<BaseLayout
+  lang={lang}
+  path={Astro.url.pathname}
+  title={`${strings.notFoundTitle} — Bentoo`}
+  description={strings.notFoundBody}
+  isVariantPage={false}
+  noindexOverride={true}
+>
+  <main class="bentoo-404">
+    <h1>{strings.notFoundTitle}</h1>
+    <p>{strings.notFoundBody}</p>
+    <p><a href={homePath}>{backLabel}</a></p>
+  </main>
+  <style slot="style">
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #e7e7e7;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .bentoo-404 {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1.25rem;
+      text-align: center;
+    }
+    .bentoo-404 h1 { font-size: 3rem; margin: 0 0 1rem; }
+    .bentoo-404 p { margin: 0 0 1rem; max-width: 36ch; }
+    .bentoo-404 a { color: #9eb6ff; min-height: 44px; display: inline-block; line-height: 44px; }
+    footer.bentoo-footer {
+      padding: 1rem 1.25rem;
+      font-size: 0.85rem;
+      opacity: 0.7;
+      text-align: center;
+    }
+    footer.bentoo-footer a { color: inherit; margin: 0 0.25rem; min-height: 44px; display: inline-block; line-height: 44px; }
+    .bentoo-footer-sep { margin: 0 0.5rem; opacity: 0.5; }
+  </style>
+</BaseLayout>
