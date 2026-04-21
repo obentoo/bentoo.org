@@ -1,0 +1,60 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { VARIANTS } from '~/data/variants';
+import { ROTATOR_JS } from '~/scripts/rotator.inline';
+---
+<BaseLayout
+  lang="en"
+  path="/"
+  title="bentoo — loading"
+  description="Bentoo is a user-friendly Stage5 of Gentoo Linux."
+  isVariantPage={false}
+>
+  <script is:inline set:html={ROTATOR_JS} />
+  <div class="loader" aria-label="loading">
+    <span>bentoo<span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+  </div>
+  <noscript>
+    <p>JavaScript disabled. Please visit one of:
+      {VARIANTS.map((slug, i) => (
+        <>
+          <a href={`/v/${slug}/`}>{slug}</a>
+          {i < VARIANTS.length - 1 ? ' · ' : ''}
+        </>
+      ))}
+    </p>
+  </noscript>
+  <style slot="style">
+    html, body { margin: 0; padding: 0; height: 100%; background: #fff; color: #1a1a2e; }
+    .loader {
+      height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+      font-size: 11px;
+      color: #5f5fd3;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadein .6s .3s forwards;
+    }
+    @keyframes fadein { to { opacity: 1; } }
+    .loader .dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #5f5fd3;
+      margin: 0 2px;
+      animation: bounce 1.2s ease-in-out infinite;
+    }
+    .loader .dot:nth-child(2) { background: #a69ff6; animation-delay: .15s; }
+    .loader .dot:nth-child(3) { background: #bc002d; animation-delay: .3s; }
+    @keyframes bounce {
+      0%, 70%, 100% { transform: translateY(0); opacity: .7; }
+      35%           { transform: translateY(-4px); opacity: 1; }
+    }
+    noscript { display: block; padding: 40px; text-align: center; font-family: system-ui; }
+    noscript a { color: #5f5fd3; min-height: 44px; display: inline-block; line-height: 44px; }
+    footer.bentoo-footer { display: none; }
+  </style>
+</BaseLayout>
