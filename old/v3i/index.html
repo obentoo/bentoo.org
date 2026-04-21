@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bentoo — install.exe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=DotGothic16&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --desk:#4b7d7d;
+  --desk-2:#3a6363;
+  --chrome:#c0c0c0;
+  --chrome-d:#808080;
+  --chrome-dd:#3a3a3a;
+  --chrome-l:#ffffff;
+  --chrome-ll:#dfdfdf;
+  --title:#0a246a;
+  --title-y:#f4d14a;
+  --title-y2:#e1b832;
+  --ink:#000;
+  --link:#1818d4;
+  --f-pix:'DotGothic16',monospace;
+  --f-crt:'VT323',monospace;
+  --f-mono:'JetBrains Mono',monospace;
+}
+html{image-rendering:pixelated}
+html,body{background:var(--desk);color:var(--ink);font-family:var(--f-pix);font-size:14px;min-height:100vh;line-height:1.3}
+body{
+  background-color:var(--desk);
+  background-image:
+    radial-gradient(rgba(255,255,255,.15) 1px,transparent 1px),
+    radial-gradient(rgba(0,0,0,.15) 1px,transparent 1px);
+  background-size:8px 8px,8px 8px;
+  background-position:0 0,4px 4px;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+
+/* ===== Window chrome ===== */
+.win{
+  background:var(--chrome);
+  border-top:2px solid var(--chrome-l);
+  border-left:2px solid var(--chrome-l);
+  border-right:2px solid var(--chrome-dd);
+  border-bottom:2px solid var(--chrome-dd);
+  box-shadow:
+    inset -1px -1px 0 var(--chrome-d),
+    inset 1px 1px 0 var(--chrome-ll),
+    3px 3px 0 rgba(0,0,0,.3);
+  margin-bottom:14px;
+  position:relative;
+}
+.win-bar{
+  background:
+    repeating-linear-gradient(90deg,var(--title-y) 0 4px,var(--title-y2) 4px 8px),
+    var(--title-y);
+  padding:4px 6px;
+  display:flex;align-items:center;justify-content:space-between;
+  color:var(--ink);
+  font-family:var(--f-pix);font-size:13px;
+  border-bottom:2px solid var(--chrome-dd);
+  position:relative;
+}
+.win-bar::before{
+  content:'';position:absolute;left:4px;right:4px;top:4px;bottom:4px;
+  background:repeating-linear-gradient(90deg,transparent 0 8px,rgba(0,0,0,.2) 8px 10px);
+  z-index:0;pointer-events:none;
+}
+.win-bar .title{
+  background:var(--title-y);
+  padding:0 8px;z-index:1;position:relative;
+  font-weight:700;
+  letter-spacing:.02em;
+}
+.win-bar .ctls{display:flex;gap:3px;z-index:1;position:relative}
+.win-bar .ctls b{
+  display:inline-grid;place-items:center;
+  width:20px;height:18px;
+  background:var(--chrome);
+  border-top:1.5px solid var(--chrome-l);
+  border-left:1.5px solid var(--chrome-l);
+  border-right:1.5px solid var(--chrome-dd);
+  border-bottom:1.5px solid var(--chrome-dd);
+  font-family:var(--f-mono);font-size:10px;font-weight:700;
+  color:var(--ink);
+}
+.win-bar.blue{
+  background:linear-gradient(90deg,var(--title),#1e49b5);
+  color:var(--chrome-l);
+  border-bottom-color:var(--chrome-dd);
+}
+.win-bar.blue::before{display:none}
+.win-bar.blue .title{background:transparent;color:var(--chrome-l)}
+
+.win-body{padding:14px}
+.win-menu{
+  background:var(--chrome);
+  padding:2px 4px;
+  display:flex;gap:14px;
+  font-family:var(--f-pix);font-size:13px;
+  border-bottom:1px solid var(--chrome-dd);
+}
+.win-menu span{padding:2px 4px;cursor:default}
+.win-menu span u{text-decoration:underline}
+
+/* ===== Desktop wrapper ===== */
+.desktop{padding:14px 14px 60px;max-width:1400px;margin:0 auto;position:relative;z-index:2}
+
+/* ===== Top bar (fake menubar) ===== */
+.topbar{
+  background:var(--chrome);
+  border-bottom:2px solid var(--chrome-dd);
+  padding:3px 8px;
+  display:flex;gap:18px;
+  font-family:var(--f-pix);font-size:13px;
+  position:sticky;top:0;z-index:40;
+}
+.topbar span{padding:2px 6px;cursor:default}
+.topbar span:first-child{font-weight:700;color:var(--title)}
+.topbar .clk{margin-left:auto;background:var(--chrome-ll);border:1px inset var(--chrome-dd);padding:2px 8px;font-family:var(--f-mono);font-size:11px}
+
+/* ===== HERO — install.exe window ===== */
+.hero-row{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;align-items:flex-start}
+
+.install-win .win-body{padding:18px 22px}
+.install-win h1{
+  font-family:var(--f-pix);
+  font-size:clamp(36px,5vw,64px);
+  line-height:1;letter-spacing:-.01em;
+  margin-bottom:10px;color:var(--title);
+}
+.install-win h1 em{font-style:normal;color:#c8145c}
+.install-win .brief{
+  font-family:var(--f-pix);font-size:14px;line-height:1.45;margin-bottom:12px;
+}
+.install-win .brief b{color:var(--title)}
+.install-win .box-list{
+  background:var(--chrome-ll);
+  border:1px inset var(--chrome-dd);
+  padding:10px 12px;
+  margin-bottom:14px;
+  font-family:var(--f-pix);font-size:13px;
+}
+.install-win .box-list .row{
+  display:grid;grid-template-columns:120px 1fr;
+  padding:2px 0;
+  border-bottom:1px dotted rgba(0,0,0,.2);
+}
+.install-win .box-list .row:last-child{border:none}
+.install-win .box-list .k{font-weight:700;color:var(--title)}
+.install-win .progress{
+  background:var(--chrome-ll);
+  border:1px inset var(--chrome-dd);
+  height:20px;
+  margin:10px 0 14px;
+  position:relative;
+  padding:2px;
+}
+.install-win .progress-bar{
+  height:100%;
+  background:
+    repeating-linear-gradient(90deg,var(--title) 0 10px,transparent 10px 14px),
+    linear-gradient(90deg,var(--title),#0d40b5);
+  width:47%;
+}
+.install-win .progress-label{
+  position:absolute;inset:0;display:grid;place-items:center;
+  font-family:var(--f-mono);font-size:11px;color:var(--ink);
+  text-shadow:1px 1px 0 var(--chrome-l);
+}
+.install-win .actions{display:flex;gap:10px;flex-wrap:wrap}
+
+.btn9x{
+  background:var(--chrome);
+  border-top:2px solid var(--chrome-l);
+  border-left:2px solid var(--chrome-l);
+  border-right:2px solid var(--chrome-dd);
+  border-bottom:2px solid var(--chrome-dd);
+  padding:8px 14px;
+  font-family:var(--f-pix);font-size:13px;color:var(--ink);
+  cursor:pointer;min-width:110px;
+  display:inline-flex;align-items:center;gap:8px;
+  box-shadow:inset 1px 1px 0 var(--chrome-ll);
+}
+.btn9x:hover{box-shadow:inset 1px 1px 0 var(--chrome-ll),0 0 0 1px var(--title)}
+.btn9x:active{
+  border-top:2px solid var(--chrome-dd);
+  border-left:2px solid var(--chrome-dd);
+  border-right:2px solid var(--chrome-l);
+  border-bottom:2px solid var(--chrome-l);
+  box-shadow:none;
+}
+.btn9x.pri{background:linear-gradient(180deg,#e1d9bc,#c7b575);border-top-color:#fff9cc;border-left-color:#fff9cc;font-weight:700}
+.btn9x .arr{color:#c8145c}
+
+/* CRT preview */
+.preview-win .win-body{padding:0}
+.crt{
+  background:#0d2813;
+  color:#8bff73;
+  padding:14px 16px;
+  font-family:var(--f-crt);font-size:20px;line-height:1.1;
+  border:2px inset var(--chrome-dd);
+  min-height:420px;
+  position:relative;overflow:hidden;
+}
+.crt::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.2) 2px 3px);
+  pointer-events:none;
+}
+.crt .ttl{color:#ffdf6b;margin-bottom:6px;font-size:16px;letter-spacing:.08em}
+.crt .row{display:flex;justify-content:space-between;border-bottom:1px dashed rgba(139,255,115,.3);padding:1px 0}
+.crt .row .v{color:#ffdf6b}
+.crt .row .v.c{color:#73f0ff}
+.crt .row .v.p{color:#ff73bc}
+.crt .bar{height:10px;background:rgba(139,255,115,.15);margin:4px 0 10px;padding:1px;position:relative}
+.crt .bar::before{content:'';position:absolute;inset:1px;width:calc(var(--f,50%));background:repeating-linear-gradient(90deg,#8bff73 0 4px,transparent 4px 6px)}
+.crt .prompt{margin-top:10px;color:#ff73bc;font-size:22px}
+.crt .blink{animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* Marquee — not a real element of Win9x but fitting */
+.marquee{
+  background:var(--title);
+  color:var(--title-y);
+  padding:4px 0;
+  overflow:hidden;white-space:nowrap;
+  font-family:var(--f-crt);font-size:18px;letter-spacing:.08em;
+  border-top:2px solid var(--chrome-l);
+  border-bottom:2px solid var(--chrome-dd);
+  margin:14px 0;
+}
+.mq{display:inline-flex;gap:42px;animation:scroll 38s linear infinite;padding-left:42px}
+.mq span{display:inline-flex;gap:10px;align-items:center}
+.mq i{color:var(--title-y);font-style:normal}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ===== Features — mini windows ===== */
+.features{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.feat .win-bar{background:linear-gradient(90deg,var(--title),#1e49b5);color:var(--chrome-l)}
+.feat .win-bar::before{display:none}
+.feat .win-bar .title{background:transparent;color:var(--chrome-l)}
+.feat .win-body{padding:14px 14px 16px}
+.feat .icon{
+  width:56px;height:56px;
+  background:var(--chrome-ll);
+  border:2px inset var(--chrome-dd);
+  display:grid;place-items:center;
+  font-family:var(--f-pix);font-size:28px;font-weight:700;color:var(--title);
+  margin-bottom:10px;
+  background-image:
+    linear-gradient(135deg,rgba(255,255,255,.5) 0%,transparent 50%);
+}
+.feat.b .icon{color:#c8145c}
+.feat.c .icon{color:#0b873e}
+.feat.d .icon{color:#945200}
+.feat h3{font-family:var(--f-pix);font-size:16px;margin-bottom:6px;color:var(--ink)}
+.feat p{font-family:var(--f-pix);font-size:13px;line-height:1.4;margin-bottom:10px}
+.feat .tags{background:var(--chrome-ll);border:1px inset var(--chrome-dd);padding:3px 8px;font-family:var(--f-mono);font-size:10px;display:inline-block;letter-spacing:.04em}
+
+/* ===== Stage + terminal ===== */
+.install-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:14px;margin-bottom:14px}
+.stage-win .win-body h2{
+  font-family:var(--f-pix);font-size:24px;margin-bottom:8px;color:var(--title);
+}
+.stage-win .win-body h2 em{font-style:normal;color:#c8145c}
+.stage-win .win-body p{font-family:var(--f-pix);font-size:13px;margin-bottom:12px;line-height:1.45}
+.stage-list{background:var(--chrome-l);border:1px inset var(--chrome-dd);padding:4px}
+.stage-list .row{
+  display:grid;grid-template-columns:70px 1fr auto;gap:10px;align-items:center;
+  padding:7px 10px;
+  border-bottom:1px solid var(--chrome-d);
+  font-family:var(--f-pix);font-size:13px;
+}
+.stage-list .row:last-child{border-bottom:none}
+.stage-list .row:nth-child(odd){background:#e9e9e9}
+.stage-list .n{
+  background:var(--title);color:var(--chrome-l);
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;
+  padding:3px 6px;text-align:center;
+}
+.stage-list .d em{font-style:normal;color:#c8145c;display:block;font-family:var(--f-mono);font-size:10px;margin-top:2px}
+.stage-list .t{font-family:var(--f-mono);font-size:11px;color:#0b873e;font-weight:700}
+
+.term-win .win-body{padding:0}
+.term{
+  background:#000;color:#8bff73;
+  padding:14px 16px;
+  font-family:var(--f-mono);font-size:12px;line-height:1.65;
+  min-height:360px;border:2px inset var(--chrome-dd);
+  position:relative;overflow:auto;
+}
+.term::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(139,255,115,.05) 2px 3px);pointer-events:none}
+.term .cmt{color:#ffdf6b;opacity:.85}
+.term .kw{color:#ff73bc;font-weight:700}
+.term .str{color:#73f0ff}
+.term .ok{color:#8bff73}
+.term .ok::before{content:'✓ '}
+.term .ps{color:#ff73bc}
+.term .cur{display:inline-block;width:8px;height:14px;background:#8bff73;vertical-align:middle;animation:blink 1s step-end infinite;margin-left:4px}
+
+/* ===== Downloads — file browser style ===== */
+.dl-win .win-body{padding:0}
+.file-list{
+  background:var(--chrome-l);
+  border:2px inset var(--chrome-dd);
+  padding:4px;
+}
+.file-head{
+  display:grid;grid-template-columns:60px 1.6fr 1fr 100px 100px 80px;gap:8px;
+  padding:5px 10px;
+  background:var(--chrome-ll);border:1px solid var(--chrome-d);
+  font-family:var(--f-pix);font-size:12px;font-weight:700;
+  letter-spacing:.02em;
+}
+.file-row{
+  display:grid;grid-template-columns:60px 1.6fr 1fr 100px 100px 80px;gap:8px;
+  padding:6px 10px;align-items:center;
+  font-family:var(--f-pix);font-size:13px;
+  cursor:pointer;
+}
+.file-row:hover{background:var(--title);color:var(--chrome-l)}
+.file-row:hover em,.file-row:hover .v{color:var(--title-y)}
+.file-row:nth-child(even){background:#eee}
+.file-row:nth-child(even):hover{background:var(--title)}
+.file-row .ico{
+  width:32px;height:32px;background:var(--chrome-ll);
+  border:1px outset var(--chrome-d);
+  display:grid;place-items:center;
+  font-family:var(--f-pix);font-size:16px;color:var(--title);
+}
+.file-row .v{color:var(--title);font-weight:700;font-family:var(--f-mono);font-size:11px}
+.file-row em{font-style:normal;color:#c8145c;font-size:11px;font-family:var(--f-mono)}
+
+/* Features section title */
+.sec-head{
+  background:
+    repeating-linear-gradient(90deg,var(--title-y) 0 4px,var(--title-y2) 4px 8px);
+  padding:4px 12px;
+  margin-bottom:10px;
+  border-top:2px solid var(--chrome-l);
+  border-bottom:2px solid var(--chrome-dd);
+  font-family:var(--f-pix);font-size:14px;font-weight:700;
+  display:flex;justify-content:space-between;
+}
+.sec-head span.ct{color:var(--title)}
+
+/* ===== Start bar (fixed bottom) ===== */
+.start-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:80;
+  background:var(--chrome);
+  border-top:2px solid var(--chrome-l);
+  padding:2px 6px;
+  display:flex;align-items:center;gap:4px;
+  box-shadow:inset 1px 1px 0 var(--chrome-ll);
+}
+.start-btn{
+  background:var(--chrome);
+  border-top:2px solid var(--chrome-l);
+  border-left:2px solid var(--chrome-l);
+  border-right:2px solid var(--chrome-dd);
+  border-bottom:2px solid var(--chrome-dd);
+  padding:5px 14px;
+  display:inline-flex;gap:6px;align-items:center;
+  font-family:var(--f-pix);font-size:13px;font-weight:700;
+  cursor:pointer;
+}
+.start-btn .logo-dot{
+  display:inline-block;width:14px;height:14px;
+  background:
+    linear-gradient(90deg,#e02020 33.33%,#2020e0 33.33% 66.66%,#e0a020 66.66%);
+}
+.task{
+  padding:4px 10px;min-width:130px;
+  background:var(--chrome);
+  border-top:1.5px solid var(--chrome-l);
+  border-left:1.5px solid var(--chrome-l);
+  border-right:1.5px solid var(--chrome-dd);
+  border-bottom:1.5px solid var(--chrome-dd);
+  font-family:var(--f-pix);font-size:12px;
+  display:flex;align-items:center;gap:6px;
+}
+.task.active{
+  border-top:1.5px solid var(--chrome-dd);
+  border-left:1.5px solid var(--chrome-dd);
+  border-right:1.5px solid var(--chrome-l);
+  border-bottom:1.5px solid var(--chrome-l);
+  background:var(--chrome-ll);
+  background-image:linear-gradient(45deg,rgba(0,0,0,.06) 25%,transparent 25%,transparent 50%,rgba(0,0,0,.06) 50%,rgba(0,0,0,.06) 75%,transparent 75%);
+  background-size:4px 4px;
+}
+.task .ico{display:inline-block;width:16px;height:16px;background:var(--title);color:var(--chrome-l);display:inline-grid;place-items:center;font-size:10px;font-family:var(--f-mono)}
+.tray{
+  margin-left:auto;
+  display:flex;align-items:center;gap:8px;padding:3px 8px;
+  border-top:1.5px solid var(--chrome-dd);
+  border-left:1.5px solid var(--chrome-dd);
+  border-right:1.5px solid var(--chrome-l);
+  border-bottom:1.5px solid var(--chrome-l);
+  font-family:var(--f-mono);font-size:11px;
+}
+.tray .ic{color:var(--title);cursor:default;font-family:var(--f-pix);font-size:12px}
+.tray .ic.r{color:#c8145c}
+.tray .ic.g{color:#0b873e}
+
+/* ===== Footer — readme.txt ===== */
+footer{padding:14px 14px 80px;max-width:1400px;margin:0 auto;position:relative;z-index:2}
+.foot-win .win-body{padding:18px 22px}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:24px;margin-bottom:16px;font-family:var(--f-pix);font-size:13px}
+.foot-grid h5{color:var(--title);font-size:14px;margin-bottom:8px;font-weight:700;border-bottom:1px dashed var(--chrome-d);padding-bottom:3px}
+.foot-grid ul{list-style:none}
+.foot-grid li{padding:2px 0}
+.foot-grid li a{color:var(--link);text-decoration:underline}
+.foot-grid p{line-height:1.45;margin-bottom:10px}
+.foot-grid .logo{font-size:32px;color:var(--title);line-height:.95;font-weight:700}
+.foot-grid .logo small{display:block;font-family:var(--f-mono);font-size:12px;color:#c8145c;margin-top:4px;letter-spacing:.08em}
+
+.status-bar{
+  background:var(--chrome);
+  border-top:2px solid var(--chrome-dd);
+  margin-top:8px;padding:4px 10px;
+  display:flex;justify-content:space-between;
+  font-family:var(--f-mono);font-size:11px;
+}
+.status-bar .ok{background:var(--chrome-ll);border:1px inset var(--chrome-d);padding:2px 8px;color:#0b873e;font-weight:700}
+
+@media (max-width:1000px){
+  .hero-row,.install-grid{grid-template-columns:1fr}
+  .features{grid-template-columns:repeat(2,1fr)}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .start-bar{flex-wrap:wrap;padding:6px}
+  .task{display:none}
+  .task.active{display:flex}
+  .file-head,.file-row{grid-template-columns:50px 1fr 1fr;font-size:11px}
+  .file-head span:nth-child(n+4),.file-row span:nth-child(n+4){display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span><u>B</u>entoo</span>
+  <span><u>F</u>ile</span>
+  <span><u>E</u>dit</span>
+  <span><u>V</u>iew</span>
+  <span><u>H</u>elp</span>
+  <span class="clk">2026/04/17 · 15:23</span>
+</div>
+
+<div class="desktop">
+
+  <!-- HERO ROW -->
+  <div class="hero-row">
+
+    <!-- install.exe main window -->
+    <div class="win install-win">
+      <div class="win-bar">
+        <span class="title">bentoo — install.exe</span>
+        <span class="ctls"><b>_</b><b>□</b><b>×</b></span>
+      </div>
+      <div class="win-menu"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>O</u>ptions</span><span><u>H</u>elp</span></div>
+      <div class="win-body">
+        <h1>BENTOO<br><em>Setup Wizard</em></h1>
+        <p class="brief">
+          Welcome to the <b>bentoo</b> Setup Wizard.
+          This program will install a <b>source-based Linux distribution</b>
+          — Gentoo-derived, rolling, hardened — onto your machine. Please close
+          all other applications before continuing. <b>30,412 ebuilds</b> will be available.
+        </p>
+
+        <div class="box-list">
+          <div class="row"><span class="k">Version:</span><span>v2026.04 · ROLLING</span></div>
+          <div class="row"><span class="k">Kernel:</span><span>6.19.12-LTS · MGLRU</span></div>
+          <div class="row"><span class="k">Portage:</span><span>3.0.65 · ::bentoo overlay</span></div>
+          <div class="row"><span class="k">Ebuilds:</span><span>30,412 · emerge --sync 24h</span></div>
+          <div class="row"><span class="k">Signature:</span><span>0xB3E7 00A4 · gpg --verify</span></div>
+          <div class="row"><span class="k">License:</span><span>CC BY-SA 4.0</span></div>
+        </div>
+
+        <div style="font-family:var(--f-pix);font-size:13px;margin-bottom:4px">Compiling glibc-2.41...</div>
+        <div class="progress">
+          <div class="progress-bar"></div>
+          <div class="progress-label">47% · 321 packages · 42:18 · zero failures</div>
+        </div>
+
+        <div class="actions">
+          <button class="btn9x pri"><span class="arr">▶</span>DOWNLOAD STAGE3</button>
+          <button class="btn9x">READ HANDBOOK</button>
+          <button class="btn9x">SOURCE OVERLAY</button>
+          <button class="btn9x">CANCEL</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- README window -->
+    <div class="win preview-win">
+      <div class="win-bar blue">
+        <span class="title">README.TXT — SYSTEM INFO</span>
+        <span class="ctls"><b>_</b><b>□</b><b>×</b></span>
+      </div>
+      <div class="win-body">
+        <div class="crt">
+          <div class="ttl">▶ SYSTEM v2026.04 · INSTALLED</div>
+          <div class="row"><span>OS</span><span class="v">BENTOO LINUX</span></div>
+          <div class="row"><span>KERNEL</span><span class="v p">6.19.12-LTS</span></div>
+          <div class="row"><span>PROFILE</span><span class="v c">DESK/PLASMA</span></div>
+          <div class="row"><span>EBUILDS</span><span class="v">30,412</span></div>
+          <div class="row"><span>CPU LOAD</span><span class="v">34%</span></div>
+          <div class="bar" style="--f:34%"></div>
+          <div class="row"><span>MEMORY</span><span class="v c">22G / 32G</span></div>
+          <div class="bar" style="--f:68%"></div>
+          <div class="row"><span>SWAP</span><span class="v">0.4G / 8G</span></div>
+          <div class="bar" style="--f:5%"></div>
+          <div class="row"><span style="color:#ff73bc">$ emerge</span><span class="v">@world</span></div>
+          <div class="row"><span>BUILD</span><span class="v">00:42:18</span></div>
+          <div class="row"><span>STATUS</span><span class="v">OK</span></div>
+          <div class="prompt">&gt; TYPE <span class="blink">_</span> TO CONTINUE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARQUEE -->
+  <div class="marquee">
+    <div class="mq">
+      <span><i>★</i> SOURCE BASED LINUX</span>
+      <span><i>◆</i> 30,412 EBUILDS</span>
+      <span><i>●</i> ROLLING RELEASE</span>
+      <span><i>▲</i> HARDENED BY DEFAULT</span>
+      <span><i>★</i> -MARCH=NATIVE</span>
+      <span><i>◆</i> PORTAGE 3.0.65</span>
+      <span><i>●</i> KERNEL 6.19.12</span>
+      <span><i>▲</i> WAYLAND READY</span>
+      <span><i>★</i> SOURCE BASED LINUX</span>
+      <span><i>◆</i> 30,412 EBUILDS</span>
+      <span><i>●</i> ROLLING RELEASE</span>
+      <span><i>▲</i> HARDENED BY DEFAULT</span>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="sec-head"><span>Features — 4 Components installed</span><span class="ct">[ADVANCED]</span></div>
+  <div class="features">
+    <div class="win feat a">
+      <div class="win-bar"><span class="title">portage.dll</span><span class="ctls"><b>×</b></span></div>
+      <div class="win-body">
+        <div class="icon">P</div>
+        <h3>Portage</h3>
+        <p>Source-based package manager. 30,412 ebuilds, per-package USE flags, your own CFLAGS.</p>
+        <span class="tags">USE · ECLASSES · CFLAGS</span>
+      </div>
+    </div>
+    <div class="win feat b">
+      <div class="win-bar"><span class="title">hardened.dll</span><span class="ctls"><b>×</b></span></div>
+      <div class="win-body">
+        <div class="icon">S</div>
+        <h3>Hardened</h3>
+        <p>PIE, SSP, ASLR and a hardened toolchain from first boot. Optional SELinux.</p>
+        <span class="tags">PIE · SSP · ASLR</span>
+      </div>
+    </div>
+    <div class="win feat c">
+      <div class="win-bar"><span class="title">turbo.dll</span><span class="ctls"><b>×</b></span></div>
+      <div class="win-body">
+        <div class="icon">T</div>
+        <h3>Turbo Build</h3>
+        <p>Optimized make.conf at install. Rebuild @world and your CPU runs as designed.</p>
+        <span class="tags">-MARCH=NATIVE · LTO</span>
+      </div>
+    </div>
+    <div class="win feat d">
+      <div class="win-bar"><span class="title">uxkit.dll</span><span class="ctls"><b>×</b></span></div>
+      <div class="win-body">
+        <div class="icon">D</div>
+        <h3>Short Path</h3>
+        <p>Pre-compiled kernel, TUI installer, curated profiles. Upstream compatibility preserved.</p>
+        <span class="tags">INSTALLER · PROFILES</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSTALL / TERMINAL -->
+  <div class="install-grid" id="install">
+    <div class="win stage-win">
+      <div class="win-bar"><span class="title">setup — Stage Select</span><span class="ctls"><b>_</b><b>□</b><b>×</b></span></div>
+      <div class="win-body">
+        <h2>Six <em>Stages</em> to a Full Desk.</h2>
+        <p>Bentoo streamlines the classic Gentoo install with signed stage3 tarballs and curated USE flags. A rolling distro that ships a working session in under 60 minutes.</p>
+        <div class="stage-list">
+          <div class="row"><span class="n">STAGE 1</span><span class="d">Download signed stage3<em>wget · sha256 · gpg</em></span><span class="t">2 min</span></div>
+          <div class="row"><span class="n">STAGE 2</span><span class="d">Partition, mount, chroot<em>parted · genfstab</em></span><span class="t">5 min</span></div>
+          <div class="row"><span class="n">STAGE 3</span><span class="d">Choose your profile<em>desktop · server · minimal</em></span><span class="t">1 min</span></div>
+          <div class="row"><span class="n">STAGE 4</span><span class="d">Rebuild @world<em>emerge -avuDN @world</em></span><span class="t">42 min</span></div>
+          <div class="row"><span class="n">STAGE 5</span><span class="d">Install desktop session<em>sddm · plasma6</em></span><span class="t">8 min</span></div>
+          <div class="row"><span class="n">STAGE 6</span><span class="d">Boot first session<em>rc-service display-manager</em></span><span class="t">★ WIN</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="win term-win">
+      <div class="win-bar blue"><span class="title">Command Prompt — emerge @world</span><span class="ctls"><b>_</b><b>□</b><b>×</b></span></div>
+      <div class="term">
+<span class="cmt">REM STAGE 1 — DOWNLOAD</span><br>
+<span class="kw">C:\&gt; wget</span> -c <span class="str">https://obentoo.org/stage3-latest.tar.xz</span><br><br>
+<span class="cmt">REM STAGE 2 — EXTRACT &amp; CHROOT</span><br>
+<span class="kw">C:\&gt; tar</span> xpf stage3-latest.tar.xz -C /mnt/gentoo<br>
+<span class="kw">C:\&gt; chroot</span> /mnt/gentoo /bin/bash<br><br>
+<span class="cmt">REM STAGE 3 — SYNC &amp; PROFILE</span><br>
+<span class="kw">C:\&gt; emerge</span> --sync<br>
+<span class="kw">C:\&gt; eselect</span> profile set <span class="str">bentoo/desktop/plasma</span><br><br>
+<span class="cmt">REM STAGE 4 — BUILD WORLD</span><br>
+<span class="kw">C:\&gt; emerge</span> -avuDN <span class="str">@world</span><br>
+<span class="ok">321 packages · 42:18 · zero failures</span><br><br>
+<span class="cmt">REM STAGE 5 — BOOT DESKTOP</span><br>
+<span class="kw">C:\&gt; rc-service</span> display-manager start<br>
+<span class="ok">WELCOME TO BENTOO</span><br><br>
+<span class="ps">C:\&gt;</span><span class="cur"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOWNLOADS / file browser -->
+  <div class="win dl-win" id="download">
+    <div class="win-bar"><span class="title">Package Manager — \\bentoo\releases\2026.04</span><span class="ctls"><b>_</b><b>□</b><b>×</b></span></div>
+    <div class="win-menu"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span><span><u>T</u>ools</span><span><u>H</u>elp</span></div>
+    <div class="win-body">
+      <div class="file-list">
+        <div class="file-head"><span></span><span>NAME</span><span>COMMENT</span><span>SIZE</span><span>MODIFIED</span><span>TYPE</span></div>
+        <a class="file-row" href="#">
+          <span class="ico">D</span>
+          <span>stage3-desktop.tar.xz<em>SystemD · KDE · x64</em></span>
+          <span>Full curated desktop. SystemD + KDE Plasma. The easy path.</span>
+          <span class="v">1.24 GB</span>
+          <span>2026-04-17</span>
+          <span>ISO</span>
+        </a>
+        <a class="file-row" href="#">
+          <span class="ico">S</span>
+          <span>stage3-server.tar.xz<em>OpenRC · hardened</em></span>
+          <span>No graphical stack. Built for uptime and audits.</span>
+          <span class="v">682 MB</span>
+          <span>2026-04-17</span>
+          <span>ISO</span>
+        </a>
+        <a class="file-row" href="#">
+          <span class="ico">M</span>
+          <span>stage3-minimal.tar.xz<em>no-init · BYO</em></span>
+          <span>Absolute minimum. Compose your own stack on top.</span>
+          <span class="v">318 MB</span>
+          <span>2026-04-17</span>
+          <span>ISO</span>
+        </a>
+        <a class="file-row" href="#">
+          <span class="ico">L</span>
+          <span>bentoo-live.iso<em>bootable · TUI installer</em></span>
+          <span>Bootable. Stage3 bundled. Fastest path from zero to desktop.</span>
+          <span class="v">2.08 GB</span>
+          <span>2026-04-17</span>
+          <span>ISO</span>
+        </a>
+        <a class="file-row" href="#">
+          <span class="ico">☒</span>
+          <span>SHA256SUMS.gpg<em>signature · 0xB3E7 00A4</em></span>
+          <span>gpg --verify SHA256SUMS — check before extracting.</span>
+          <span class="v">4 KB</span>
+          <span>2026-04-17</span>
+          <span>GPG</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="win foot-win">
+    <div class="win-bar"><span class="title">About bentoo — README.TXT</span><span class="ctls"><b>_</b><b>□</b><b>×</b></span></div>
+    <div class="win-body">
+      <div class="foot-grid">
+        <div>
+          <div class="logo">BENTOO<small>source-based linux · v2026.04</small></div>
+          <p style="margin-top:10px">A source-based Linux desktop. Gentoo DNA, curated defaults, signed overlay. One ebuild at a time. Compiled from src.</p>
+          <p><b>Release v2026.04</b> · CC BY-SA 4.0</p>
+        </div>
+        <div>
+          <h5>Project</h5>
+          <ul><li><a href="#">About</a></li><li><a href="#">News</a></li><li><a href="#">Roadmap</a></li><li><a href="#">Contribute</a></li></ul>
+        </div>
+        <div>
+          <h5>Docs</h5>
+          <ul><li><a href="#">Handbook</a></li><li><a href="#">Wiki</a></li><li><a href="#">Packages</a></li><li><a href="#">Overlay</a></li></ul>
+        </div>
+        <div>
+          <h5>Connect</h5>
+          <ul><li><a href="#">IRC · Matrix</a></li><li><a href="#">Discord</a></li><li><a href="#">Forum</a></li><li><a href="#">GitHub</a></li></ul>
+        </div>
+      </div>
+      <div class="status-bar">
+        <span>© 2026 BENTOO.ORG · COMPILED FROM SRC · GENTOO IS A TRADEMARK OF GENTOO FOUNDATION</span>
+        <span class="ok">READY</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- START BAR -->
+<div class="start-bar">
+  <button class="start-btn"><span class="logo-dot"></span>Start</button>
+  <div class="task active"><span class="ico">B</span>bentoo — install.exe</div>
+  <div class="task"><span class="ico">C</span>Command Prompt</div>
+  <div class="task"><span class="ico">R</span>README.TXT</div>
+  <div class="task"><span class="ico">P</span>Package Manager</div>
+  <div class="tray">
+    <span class="ic">♪</span>
+    <span class="ic r">⚡</span>
+    <span class="ic g">★</span>
+    <span>15:23</span>
+  </div>
+</div>
+
+</body>
+</html>

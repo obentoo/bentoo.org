@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bentoo — loading</title>
+  <meta name="description" content="Bentoo is a user-friendly Stage5 of Gentoo Linux.">
+  <link rel="icon" type="image/svg+xml" href="../bentoo-logo.svg">
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #fff; color: #1a1a2e; }
+    .loader {
+      height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+      font-size: 11px;
+      color: #5f5fd3;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadein .6s .3s forwards;
+    }
+    @keyframes fadein { to { opacity: 1; } }
+    .loader .dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #5f5fd3;
+      margin: 0 2px;
+      animation: bounce 1.2s ease-in-out infinite;
+    }
+    .loader .dot:nth-child(2) { background: #a69ff6; animation-delay: .15s; }
+    .loader .dot:nth-child(3) { background: #bc002d; animation-delay: .3s; }
+    @keyframes bounce {
+      0%, 70%, 100% { transform: translateY(0); opacity: .7; }
+      35%           { transform: translateY(-4px); opacity: 1; }
+    }
+    noscript { display: block; padding: 40px; text-align: center; font-family: system-ui; }
+    noscript a { color: #5f5fd3; }
+  </style>
+  <script>
+    (function () {
+      // ============================================================
+      //  bentoo — variant rotator
+      //  Picks one of N styles per visitor; sticky for 24h.
+      //  Override with ?v=<variant> in the URL.
+      // ============================================================
+      var variants = [
+        'v4', 'v3', 'v3a', 'v3b', 'v3c',
+        'v3e', 'v3f', 'v3h', 'v3i', 'v3j',
+        'v3-vaporwave', 'synthwave', 'beos',
+        'severance-v2', 'death-stranding-v3',
+        'mario', 'castlevania', 'matrix', '2001',
+        'breaking-bad', 'minecraft'
+      ];
+      var TTL      = 24 * 60 * 60 * 1000;
+      var KEY_V    = 'bentoo-variant';
+      var KEY_EXP  = 'bentoo-variant-expires';
+
+      try {
+        var url      = new URL(window.location.href);
+        var forced   = url.searchParams.get('v');
+        var now      = Date.now();
+        var variant  = null;
+
+        if (forced && variants.indexOf(forced) !== -1) {
+          variant = forced;
+        } else {
+          var stored   = localStorage.getItem(KEY_V);
+          var expires  = parseInt(localStorage.getItem(KEY_EXP) || '0', 10);
+          if (stored && variants.indexOf(stored) !== -1 && now < expires) {
+            variant = stored;
+          } else {
+            variant = variants[Math.floor(Math.random() * variants.length)];
+            localStorage.setItem(KEY_V, variant);
+            localStorage.setItem(KEY_EXP, String(now + TTL));
+          }
+        }
+        window.location.replace('./' + variant + '/' + url.search);
+      } catch (e) {
+        window.location.replace('./v4/');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="loader">
+    <span>bentoo<span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+  </div>
+  <noscript>
+    <p>JavaScript disabled. Please visit one of:
+      <a href="./v4/">v4</a> · <a href="./v3/">v3</a> · <a href="./v3a/">v3a</a> · <a href="./v3b/">v3b</a> · <a href="./v3c/">v3c</a> ·
+      <a href="./v3e/">v3e</a> · <a href="./v3f/">v3f</a> · <a href="./v3h/">v3h</a> · <a href="./v3i/">v3i</a> · <a href="./v3j/">v3j</a> ·
+      <a href="./v3-vaporwave/">v3-vaporwave</a> · <a href="./synthwave/">synthwave</a> · <a href="./beos/">beos</a> ·
+      <a href="./severance-v2/">severance-v2</a> · <a href="./death-stranding-v3/">death-stranding-v3</a> ·
+      <a href="./mario/">mario</a> · <a href="./castlevania/">castlevania</a> · <a href="./matrix/">matrix</a> ·
+      <a href="./2001/">2001</a> · <a href="./breaking-bad/">breaking-bad</a> · <a href="./minecraft/">minecraft</a>
+    </p>
+  </noscript>
+</body>
+</html>

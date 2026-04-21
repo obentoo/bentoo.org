@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bentoo — world 1-1 · stage5</title>
+  <meta name="description" content="Bentoo — a user-friendly Stage5 of Gentoo Linux. World 1-1.">
+  <link rel="icon" type="image/svg+xml" href="../../bentoo-logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --sky:     #5b94fc;
+      --sky-2:   #3a7cdb;
+      --brick:   #b53e20;
+      --brick-d: #7e2913;
+      --brick-m: #e48358;
+      --dirt:    #7a3a14;
+      --dirt-d:  #4a1f08;
+      --pipe:    #44aa22;
+      --pipe-d:  #1b8a00;
+      --pipe-l:  #77cc66;
+      --coin:    #f7d048;
+      --coin-d:  #d9941c;
+      --block:   #f3a020;
+      --block-d: #c06000;
+      --mario-r: #e52521;
+      --mario-b: #013ca6;
+      --cloud:   #ffffff;
+      --bush:    #04a72e;
+      --bush-d:  #017a10;
+      --text-d:  #ffffff;
+    }
+
+    html, body { height: 100%; }
+    body {
+      background: var(--sky);
+      color: var(--text-d);
+      font-family: 'Press Start 2P', monospace;
+      overflow-x: hidden;
+      image-rendering: pixelated;
+      -webkit-font-smoothing: none;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* sky gradient */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(180deg, #6ca9ff 0%, var(--sky) 35%, var(--sky-2) 100%);
+      z-index: 0;
+    }
+
+    /* ============== HUD ============== */
+    .hud {
+      position: relative;
+      z-index: 10;
+      padding: 22px 34px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 18px;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      color: var(--text-d);
+      text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+    }
+    .hud-grp {
+      display: flex; gap: 14px; align-items: center;
+    }
+    .hud-grp .num { color: #fff; }
+    .hud-grp .lab { color: #fdf6e3; opacity: .85; font-size: 11px; }
+
+    .mini-coin {
+      width: 22px; height: 22px;
+      background:
+        radial-gradient(circle, var(--coin) 0 40%, var(--coin-d) 42% 48%, var(--coin) 50% 100%);
+      border: 2px solid #000;
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin 1s steps(4) infinite;
+    }
+    @keyframes spin {
+      0%,100% { transform: scaleX(1); }
+      25%     { transform: scaleX(.3); }
+      50%     { transform: scaleX(.1) ; background: var(--coin-d); }
+      75%     { transform: scaleX(.3); }
+    }
+
+    .mini-mario {
+      width: 24px; height: 24px;
+      display: inline-block;
+      background:
+        linear-gradient(#000,#000) 8px 0/8px 2px no-repeat,
+        linear-gradient(#000,#000) 6px 2px/12px 2px no-repeat,
+        linear-gradient(var(--mario-r),var(--mario-r)) 6px 2px/12px 4px no-repeat,
+        linear-gradient(#000,#000) 4px 6px/4px 2px no-repeat,
+        linear-gradient(#000,#000) 16px 6px/4px 2px no-repeat,
+        linear-gradient(#e6b897,#e6b897) 8px 6px/8px 4px no-repeat,
+        linear-gradient(#000,#000) 12px 8px/2px 2px no-repeat,
+        linear-gradient(var(--mario-r),var(--mario-r)) 6px 10px/12px 4px no-repeat,
+        linear-gradient(var(--mario-b),var(--mario-b)) 6px 14px/12px 6px no-repeat,
+        linear-gradient(#8b4513,#8b4513) 4px 20px/6px 3px no-repeat,
+        linear-gradient(#8b4513,#8b4513) 14px 20px/6px 3px no-repeat;
+    }
+
+    /* ============== PLAY FIELD ============== */
+    .play {
+      position: relative;
+      z-index: 5;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 12px 20px 0;
+      overflow: hidden;
+    }
+
+    /* Clouds */
+    .cloud {
+      position: absolute;
+      background:
+        radial-gradient(circle at 25% 55%, var(--cloud) 0 22%, transparent 24%),
+        radial-gradient(circle at 50% 40%, var(--cloud) 0 28%, transparent 30%),
+        radial-gradient(circle at 75% 55%, var(--cloud) 0 22%, transparent 24%);
+      box-shadow:
+        inset -3px -3px 0 #d6e7ff;
+      filter: drop-shadow(0 0 0 #000);
+      animation: drift 60s linear infinite;
+    }
+    .cloud.c1 { top: 22%; left: 8%;  width: 140px; height: 60px; animation-delay: -10s; }
+    .cloud.c2 { top: 30%; right: 12%; width: 120px; height: 54px; animation-delay: -25s; }
+    .cloud.c3 { top: 14%; left: 60%; width: 100px; height: 44px; animation-delay: -40s; }
+    @keyframes drift {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-20px); }
+    }
+
+    /* Hills/bushes silhouettes */
+    .hill {
+      position: absolute;
+      bottom: 220px;
+      background:
+        radial-gradient(circle at 20% 100%, var(--bush) 0 20%, transparent 22%),
+        radial-gradient(circle at 50% 80%, var(--bush) 0 30%, transparent 32%),
+        radial-gradient(circle at 80% 100%, var(--bush) 0 20%, transparent 22%);
+    }
+    .hill.h1 { left: 5%;  width: 180px; height: 50px; }
+    .hill.h2 { right: 8%; width: 220px; height: 60px; }
+
+    /* ============== WORDMARK BLOCK ============== */
+    .wordmark-wrap {
+      position: relative;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .wordmark {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(2.6rem, 8vw, 5.8rem);
+      letter-spacing: 0.04em;
+      color: var(--block);
+      text-shadow:
+        -3px -3px 0 #000,
+        3px -3px 0 #000,
+        -3px 3px 0 #000,
+        3px 3px 0 #000,
+        0 6px 0 var(--block-d),
+        0 8px 0 #000,
+        0 0 20px rgba(255,180,60,.4);
+      animation: bob 2.2s ease-in-out infinite;
+    }
+    @keyframes bob {
+      0%,100% { transform: translateY(0); }
+      50%     { transform: translateY(-5px); }
+    }
+
+    .tagline {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(.65rem, 1.5vw, 1.05rem);
+      color: #fff;
+      text-shadow: 2px 2px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .q-block {
+      display: inline-block;
+      width: 28px; height: 28px;
+      background:
+        linear-gradient(#000,#000) 0 0/28px 3px no-repeat,
+        linear-gradient(#000,#000) 0 25px/28px 3px no-repeat,
+        linear-gradient(#000,#000) 0 0/3px 28px no-repeat,
+        linear-gradient(#000,#000) 25px 0/3px 28px no-repeat,
+        linear-gradient(var(--block),var(--block));
+      position: relative;
+      animation: pulse 1s steps(3) infinite;
+    }
+    .q-block::after {
+      content: '?';
+      position: absolute;
+      inset: 0;
+      display: grid; place-items: center;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 14px;
+      color: #000;
+    }
+    @keyframes pulse {
+      0%,100% { background-color: var(--block); }
+      50%     { background-color: #f9b548; }
+    }
+
+    /* ============== BUTTONS ============== */
+    .menu {
+      margin-top: 12px;
+      display: flex;
+      gap: 50px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .menu a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #fff;
+      text-shadow: 2px 2px 0 #000;
+      font-size: 12px;
+    }
+    .menu a .lbl {
+      font-family: 'Press Start 2P', monospace;
+      letter-spacing: 0.06em;
+      color: #fff;
+      text-shadow: 2px 2px 0 #000;
+    }
+    .menu a .sub {
+      font-size: 8px;
+      color: #ffe0a0;
+      letter-spacing: 0.1em;
+      text-shadow: 1px 1px 0 #000;
+    }
+    .menu a:hover .q { transform: translateY(-6px); }
+    .q {
+      position: relative;
+      width: 72px; height: 72px;
+      background: var(--block);
+      box-shadow:
+        inset 0 0 0 4px #000,
+        inset 0 0 0 8px var(--block),
+        inset 0 0 0 10px var(--block-d);
+      display: grid; place-items: center;
+      transition: transform .15s steps(2);
+      image-rendering: pixelated;
+    }
+    .q::before {
+      content: '?';
+      font-family: 'Press Start 2P', monospace;
+      font-size: 36px;
+      color: #fff;
+      text-shadow: 3px 3px 0 var(--block-d);
+    }
+    .q::after {
+      content: '';
+      position: absolute;
+      top: 10px; left: 10px;
+      width: 6px; height: 6px;
+      background: rgba(255,255,255,.6);
+    }
+
+    /* Notify form */
+    .notify {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .notify label {
+      font-family: 'VT323', monospace;
+      font-size: 18px;
+      color: #fff;
+      text-shadow: 2px 2px 0 #000;
+      letter-spacing: 0.08em;
+    }
+    .notify-row { display: flex; }
+    .notify-row input {
+      padding: 12px 14px;
+      border: 3px solid #000;
+      background: #fff;
+      color: #000;
+      font-family: 'VT323', monospace;
+      font-size: 16px;
+      outline: none;
+      width: 220px;
+    }
+    .notify-row button {
+      padding: 12px 18px;
+      border: 3px solid #000;
+      border-left: none;
+      background: var(--mario-r);
+      color: #fff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      text-shadow: 2px 2px 0 #7d1a15;
+      transition: background .15s;
+    }
+    .notify-row button:hover { background: #ff3a35; }
+
+    /* ============== GROUND ============== */
+    .ground {
+      position: relative;
+      z-index: 6;
+      margin-top: 36px;
+      height: 230px;
+      overflow: hidden;
+    }
+    .ground-row {
+      display: flex;
+      height: 30px;
+    }
+    .brick-tile {
+      flex: 0 0 30px;
+      height: 30px;
+      background:
+        linear-gradient(var(--brick-d),var(--brick-d)) 0 0/30px 2px no-repeat,
+        linear-gradient(var(--brick-d),var(--brick-d)) 0 14px/30px 2px no-repeat,
+        linear-gradient(var(--brick-d),var(--brick-d)) 14px 2px/2px 12px no-repeat,
+        linear-gradient(var(--brick-d),var(--brick-d)) 0 16px/30px 2px no-repeat,
+        linear-gradient(var(--brick-d),var(--brick-d)) 8px 18px/2px 12px no-repeat,
+        linear-gradient(var(--brick-d),var(--brick-d)) 22px 18px/2px 12px no-repeat,
+        linear-gradient(var(--brick-m),var(--brick-m)) 0 2px/30px 2px no-repeat,
+        linear-gradient(var(--brick-m),var(--brick-m)) 0 18px/30px 2px no-repeat,
+        var(--brick);
+    }
+    .dirt-tile {
+      flex: 0 0 30px;
+      height: 30px;
+      background:
+        radial-gradient(circle at 25% 40%, var(--dirt-d) 0 2px, transparent 3px),
+        radial-gradient(circle at 72% 72%, var(--dirt-d) 0 2px, transparent 3px),
+        radial-gradient(circle at 55% 18%, var(--dirt-d) 0 1.5px, transparent 2.5px),
+        var(--dirt);
+      border-top: 2px solid #3a1808;
+    }
+
+    /* Pipe */
+    .pipe {
+      position: absolute;
+      bottom: 60px;
+      width: 90px; height: 120px;
+      z-index: 7;
+    }
+    .pipe.p1 { right: 16%; }
+    .pipe-top {
+      position: absolute;
+      left: -8px; top: 0;
+      width: 106px; height: 40px;
+      background:
+        linear-gradient(90deg, var(--pipe-l) 0 20%, var(--pipe) 20% 60%, var(--pipe-d) 60% 100%);
+      border: 3px solid #000;
+    }
+    .pipe-body {
+      position: absolute;
+      top: 40px; left: 0;
+      width: 90px; height: 80px;
+      background: linear-gradient(90deg, var(--pipe-l) 0 20%, var(--pipe) 20% 60%, var(--pipe-d) 60% 100%);
+      border: 3px solid #000;
+      border-top: none;
+    }
+
+    /* Coins above pipe */
+    .coin-pile {
+      position: absolute;
+      right: 8%;
+      bottom: 200px;
+      display: flex; gap: 6px;
+      z-index: 7;
+    }
+    .coin {
+      width: 22px; height: 28px;
+      background:
+        radial-gradient(ellipse at center, var(--coin) 0 50%, var(--coin-d) 55% 80%, #000 90% 100%);
+      border: 2px solid #000;
+      animation: spin .8s steps(4) infinite;
+    }
+
+    /* Running Mario sprite */
+    .mario {
+      position: absolute;
+      bottom: 60px;
+      left: 25%;
+      width: 48px; height: 48px;
+      z-index: 7;
+      animation: run 10s linear infinite;
+      image-rendering: pixelated;
+    }
+    .mario svg { width: 100%; height: 100%; }
+    @keyframes run {
+      0%   { left: -50px; }
+      100% { left: calc(100% + 50px); }
+    }
+
+    /* Goomba */
+    .goomba {
+      position: absolute;
+      bottom: 60px;
+      right: 10%;
+      width: 36px; height: 36px;
+      z-index: 7;
+    }
+    .goomba svg { width: 100%; height: 100%; }
+
+    /* Footer info */
+    footer {
+      position: relative;
+      z-index: 15;
+      padding: 12px 28px 14px;
+      background: #000;
+      color: #fff;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    }
+    footer b { color: var(--coin); }
+    footer a { color: #fff; text-decoration: underline; }
+
+    @media (max-width: 700px) {
+      .hud { padding: 16px 18px 12px; gap: 10px; font-size: 10px; }
+      .menu { gap: 24px; }
+      .q { width: 56px; height: 56px; }
+      .q::before { font-size: 28px; }
+      .pipe.p1 { right: 4%; }
+      .cloud.c3 { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-grp">
+      <div><div class="lab">WORLD</div><div class="num">1-1</div></div>
+      <div><div class="lab">TIME</div><div class="num">400</div></div>
+    </div>
+    <div class="hud-grp">
+      <span class="mini-coin"></span>
+      <div><div class="lab">COINS</div><div class="num">×100</div></div>
+    </div>
+    <div class="hud-grp">
+      <span class="mini-mario"></span>
+      <div><div class="lab">LIVES</div><div class="num">×03</div></div>
+    </div>
+    <div class="hud-grp">
+      <div><div class="lab">BUILD</div><div class="num">STG-5</div></div>
+    </div>
+  </div>
+
+  <!-- PLAY -->
+  <div class="play">
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+    <div class="hill h1"></div>
+    <div class="hill h2"></div>
+
+    <div class="wordmark-wrap">
+      <div class="wordmark">BENTOO</div>
+      <div class="tagline">
+        A USER-FRIENDLY STAGE5 OF GENTOO LINUX
+        <span class="q-block"></span>
+      </div>
+    </div>
+
+    <div class="menu">
+      <a href="https://github.com/obentoo" target="_blank" rel="noopener">
+        <span class="lbl">GITHUB</span>
+        <span class="q"></span>
+        <span class="sub">[SOURCE]</span>
+      </a>
+      <a href="mailto:contact@obentoo.org">
+        <span class="lbl">CONTACT</span>
+        <span class="q"></span>
+        <span class="sub">[COMMUNITY]</span>
+      </a>
+      <a href="#notify">
+        <span class="lbl">NOTIFY ME</span>
+        <span class="q"></span>
+        <span class="sub">[UPDATES]</span>
+      </a>
+    </div>
+
+    <form class="notify" id="notify" onsubmit="event.preventDefault(); this.querySelector('button').textContent='1-UP!'; this.querySelector('input').value='';">
+      <label>&gt; PRESS START TO RECEIVE UPDATES</label>
+      <div class="notify-row">
+        <input type="email" placeholder="player@mario.world" required>
+        <button type="submit">NOTIFY</button>
+      </div>
+    </form>
+
+    <!-- Ground area -->
+    <div class="ground" style="width:100%">
+      <div class="pipe p1">
+        <div class="pipe-top"></div>
+        <div class="pipe-body"></div>
+      </div>
+      <div class="coin-pile">
+        <div class="coin"></div>
+        <div class="coin" style="animation-delay:.2s"></div>
+        <div class="coin" style="animation-delay:.4s"></div>
+      </div>
+
+      <!-- Mario -->
+      <div class="mario">
+        <svg viewBox="0 0 48 48" shape-rendering="crispEdges">
+          <!-- Hat -->
+          <rect x="16" y="2"  width="16" height="4" fill="#000"/>
+          <rect x="12" y="6"  width="24" height="4" fill="var(--mario-r)"/>
+          <rect x="12" y="2"  width="4"  height="4" fill="var(--mario-r)"/>
+          <rect x="32" y="2"  width="4"  height="4" fill="var(--mario-r)"/>
+          <!-- Face -->
+          <rect x="12" y="10" width="4"  height="6" fill="#000"/>
+          <rect x="32" y="10" width="4"  height="6" fill="#000"/>
+          <rect x="16" y="10" width="16" height="6" fill="#e6b897"/>
+          <rect x="20" y="12" width="3"  height="3" fill="#000"/>
+          <rect x="28" y="12" width="3"  height="3" fill="#000"/>
+          <!-- Mustache -->
+          <rect x="16" y="16" width="16" height="3" fill="#4a2a10"/>
+          <rect x="14" y="16" width="2"  height="3" fill="#e6b897"/>
+          <rect x="32" y="16" width="2"  height="3" fill="#e6b897"/>
+          <!-- Body red -->
+          <rect x="10" y="20" width="28" height="10" fill="var(--mario-r)"/>
+          <rect x="14" y="22" width="2"  height="2" fill="#000"/>
+          <rect x="32" y="22" width="2"  height="2" fill="#000"/>
+          <!-- Overalls -->
+          <rect x="10" y="28" width="28" height="10" fill="var(--mario-b)"/>
+          <rect x="18" y="24" width="3"  height="8" fill="var(--mario-b)"/>
+          <rect x="27" y="24" width="3"  height="8" fill="var(--mario-b)"/>
+          <circle cx="18" cy="31" r="1.5" fill="#f7d048"/>
+          <circle cx="30" cy="31" r="1.5" fill="#f7d048"/>
+          <!-- Shoes -->
+          <rect x="8"  y="38" width="14" height="8" fill="#4a2a10"/>
+          <rect x="26" y="38" width="14" height="8" fill="#4a2a10"/>
+        </svg>
+      </div>
+
+      <!-- Goomba -->
+      <div class="goomba">
+        <svg viewBox="0 0 36 36" shape-rendering="crispEdges">
+          <rect x="6" y="4"  width="24" height="4" fill="#4a2a10"/>
+          <rect x="2" y="8"  width="32" height="10" fill="#8b4513"/>
+          <rect x="2" y="18" width="32" height="6" fill="#c58b4f"/>
+          <rect x="8" y="11" width="4" height="4" fill="#fff"/>
+          <rect x="10" y="12" width="2" height="2" fill="#000"/>
+          <rect x="24" y="11" width="4" height="4" fill="#fff"/>
+          <rect x="24" y="12" width="2" height="2" fill="#000"/>
+          <rect x="12" y="17" width="12" height="2" fill="#000"/>
+          <rect x="2"  y="24" width="12" height="6" fill="#4a2a10"/>
+          <rect x="22" y="24" width="12" height="6" fill="#4a2a10"/>
+        </svg>
+      </div>
+
+      <!-- Ground -->
+      <div class="ground-row" style="position:absolute;bottom:30px;left:0;right:0">
+        <!-- 60 tiles roughly; we render enough to cover -->
+        <!-- generated via repeat -->
+      </div>
+      <div class="ground-row" style="position:absolute;bottom:0;left:0;right:0">
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2018 – 2026 <b>BENTOO</b> · HANDCRAFTED · SOURCE-FIRST</span>
+    <span>PRESS <b>START</b> · <a href="../hub/">ALL VARIANTS</a></span>
+  </footer>
+
+  <script>
+    // Fill ground with brick + dirt tiles dynamically
+    (function(){
+      const rows = document.querySelectorAll('.ground-row');
+      const wid = window.innerWidth;
+      const cnt = Math.ceil(wid/30) + 4;
+      const tiles = ['brick-tile','dirt-tile'];
+      rows.forEach((r,i) => {
+        const cls = tiles[i];
+        for (let k=0; k<cnt; k++) {
+          const d = document.createElement('div');
+          d.className = cls;
+          r.appendChild(d);
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>

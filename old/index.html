@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bentoo — operating system design explorations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+JP:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Syncopate:wght@400;700&family=Orbitron:wght@700;900&family=Zen+Kaku+Gothic+Antique:wght@700;900&family=Cinzel:wght@500;600;700&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@700;900&family=Plus+Jakarta+Sans:wght@800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #fafaf5;
+      --paper-2: #f0eee5;
+      --rule: #d0cdc0;
+      --ink: #5f5fd3;
+      --ink-light: #a69ff6;
+      --sumi: #1a1a2e;
+      --sakura: #e8375f;
+      --gold: #e8b954;
+      --matcha: #7ba654;
+      --text: #1a1a2e;
+      --text-soft: #5a5468;
+      --text-dim: #8a8598;
+      --font-display: 'Fraunces', 'Noto Serif JP', serif;
+      --font-jp: 'Noto Serif JP', serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: 16px;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    ::selection { background: var(--sakura); color: var(--paper); }
+
+    a { color: var(--ink); text-decoration: none; }
+    a:hover { color: var(--sakura); }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.25;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.45 0 0 0 0 0.35 0 0 0 0.14 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+      mix-blend-mode: multiply;
+    }
+
+    .wrap {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 0 40px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      padding: 48px 0 0;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      margin-bottom: 80px;
+    }
+
+    .top-bar .left {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .top-bar .logo-mini {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .top-bar .logo-mini img {
+      width: 36px;
+      height: auto;
+    }
+
+    .top-bar .logo-mini span {
+      font-family: var(--font-jp);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+      letter-spacing: 0.1em;
+    }
+
+    .top-bar .right {
+      display: flex;
+      gap: 20px;
+    }
+
+    .top-bar .right a {
+      color: var(--text-soft);
+      transition: color 0.15s;
+    }
+
+    .top-bar .right a:hover { color: var(--sakura); }
+
+    /* ===== HERO ===== */
+    .hero {
+      padding: 40px 0 120px;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .hero-eyebrow .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--sakura);
+      border-radius: 50%;
+    }
+
+    .hero-eyebrow .tag {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-dim);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+
+    .hero-eyebrow .jp {
+      font-family: var(--font-jp);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--sakura);
+      letter-spacing: 0.2em;
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(3rem, 7vw, 6.5rem);
+      line-height: 0.95;
+      letter-spacing: -0.035em;
+      color: var(--text);
+      margin-bottom: 40px;
+      max-width: 1000px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--ink);
+    }
+
+    .hero h1 .jp-accent {
+      font-family: var(--font-jp);
+      font-weight: 700;
+      font-style: normal;
+      color: var(--sakura);
+      font-size: 0.85em;
+      margin: 0 0.1em;
+    }
+
+    .hero-lede {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      line-height: 1.55;
+      color: var(--text-soft);
+      max-width: 680px;
+      font-weight: 400;
+    }
+
+    .hero-lede em {
+      font-style: italic;
+      color: var(--ink);
+    }
+
+    /* ===== GRID SECTION ===== */
+    .versions {
+      padding: 40px 0 100px;
+    }
+
+    .versions-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 20px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .versions-header h2 {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    .versions-header .meta {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--paper-2);
+      border: 1px solid var(--rule);
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.25s;
+      position: relative;
+      min-height: 420px;
+    }
+
+    .card:hover {
+      transform: translate(-4px, -4px);
+      box-shadow: 10px 10px 0 var(--sumi);
+      border-color: var(--sumi);
+    }
+
+    .card-preview {
+      aspect-ratio: 4 / 3;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--rule);
+      background: var(--paper);
+    }
+
+    .preview {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    /* ===== V1 — Neo-brutalist arcade ===== */
+    .p-v1 {
+      background: #0a0a0a;
+      position: relative;
+    }
+    .p-v1::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 50%, rgba(255,45,123,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 50%, rgba(0,229,255,0.1) 0%, transparent 60%);
+    }
+    .p-v1::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(182,255,0,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(182,255,0,0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    .p-v1 .v1-demo {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+    .p-v1 .v1-demo h4 {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 2rem;
+      color: #b6ff00;
+      text-shadow: 3px 3px 0 #ff2d7b;
+      letter-spacing: 3px;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+    .p-v1 .v1-demo .sub {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.5rem;
+      color: #00e5ff;
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+    }
+    .p-v1 .v1-demo .btn-mini {
+      display: inline-block;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.5rem;
+      color: #0a0a0a;
+      background: #b6ff00;
+      padding: 6px 12px;
+      border: 2px solid #000;
+      box-shadow: 3px 3px 0 #000;
+      letter-spacing: 1px;
+    }
+
+    /* ===== V2 — Arcade brutalist refined ===== */
+    .p-v2 {
+      background: #08080c;
+      position: relative;
+    }
+    .p-v2::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 50%, rgba(200,255,0,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 50%, rgba(255,45,123,0.12) 0%, transparent 60%);
+    }
+    .p-v2 .v2-demo {
+      position: relative;
+      z-index: 2;
+    }
+    .p-v2 .v2-demo .arcade-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 900;
+      font-size: 2.8rem;
+      color: #c8ff00;
+      letter-spacing: -0.02em;
+      line-height: 0.9;
+      text-shadow: 0 0 20px rgba(200,255,0,0.3);
+    }
+    .p-v2 .v2-demo .arcade-title .o {
+      color: #ff2d7b;
+    }
+    .p-v2 .v2-demo .arcade-sub {
+      font-size: 9px;
+      color: #ff2d7b;
+      letter-spacing: 0.3em;
+      margin-top: 6px;
+      font-family: var(--font-mono);
+    }
+
+    /* ===== V3 — Cyberpunk asian ===== */
+    .p-v3 {
+      background: #05030c;
+      position: relative;
+      overflow: hidden;
+    }
+    .p-v3 .cyber-bg {
+      position: absolute;
+      inset: 0;
+      background: url('./assets/gen/v3-cyberpunk-hero.png') center/cover;
+      opacity: 0.5;
+    }
+    .p-v3::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(5,3,12,0.4), rgba(5,3,12,0.85));
+    }
+    .p-v3 .v3-demo {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+    .p-v3 .v3-demo h4 {
+      font-family: 'Fraunces', serif;
+      font-weight: 900;
+      font-size: 2.2rem;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      color: #ece8ff;
+      text-shadow:
+        -3px 0 0 #e8375f,
+         3px 0 0 #00f2ea;
+      margin-bottom: 10px;
+    }
+    .p-v3 .v3-demo .jp {
+      font-family: 'Noto Serif JP', serif;
+      font-weight: 900;
+      font-size: 1rem;
+      color: #e8375f;
+      text-shadow: 0 0 14px rgba(232,55,95,0.6);
+      letter-spacing: 0.2em;
+    }
+
+    /* ===== V4 — Desktop OS / brand colours ===== */
+    .p-v4 {
+      background:
+        linear-gradient(135deg, #2d2d8f 0%, #5f5fd3 50%, #a69ff6 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .p-v4::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 40%, rgba(232,55,95,0.24) 0%, transparent 58%),
+        radial-gradient(ellipse at 80% 85%, rgba(232,185,84,0.18) 0%, transparent 55%);
+    }
+    .p-v4::after {
+      content: '弁当';
+      position: absolute;
+      right: -12px;
+      bottom: -18px;
+      font-family: 'Noto Serif JP', serif;
+      font-weight: 900;
+      font-size: 6rem;
+      color: rgba(255,255,255,0.1);
+      line-height: 0.85;
+      pointer-events: none;
+    }
+    .p-v4 .v4-demo {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+    .p-v4 .v4-demo h4 {
+      font-family: 'Fraunces', serif;
+      font-weight: 900;
+      font-size: 2.6rem;
+      line-height: 0.9;
+      letter-spacing: -0.04em;
+      color: #fff;
+      text-shadow:
+        -3px 0 0 #e8375f,
+         3px 0 0 #a69ff6;
+      margin-bottom: 10px;
+    }
+    .p-v4 .v4-demo .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(250,250,245,0.14);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      backdrop-filter: blur(6px);
+    }
+    .p-v4 .v4-demo .pill .dot {
+      width: 6px;
+      height: 6px;
+      background: #7ba654;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #7ba654;
+    }
+    .p-v4 .v4-demo .pill .tag { color: #ffc8d4; font-weight: 800; }
+
+    /* ===== V3A — Arcade · logo palette ===== */
+    .p-v3a-arcade {
+      background: #f5efe0;
+      position: relative;
+      overflow: hidden;
+    }
+    .p-v3a-arcade::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(26,26,46,0.05) 3px, rgba(26,26,46,0.05) 4px);
+      pointer-events: none;
+    }
+    .p-v3a-arcade::after {
+      content: '★';
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      font-size: 28px;
+      color: #e8b954;
+      text-shadow: 3px 3px 0 #1a1a2e;
+      line-height: 1;
+      transform: rotate(12deg);
+    }
+    .p-v3a-arcade .v3a-demo {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .p-v3a-arcade .v3a-demo .pixel {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 1.55rem;
+      line-height: 1;
+      color: #e8375f;
+      text-shadow:
+        4px 0 0 #a69ff6,
+        -4px 0 0 #e8b954,
+        0 6px 0 #1a1a2e;
+      letter-spacing: 0.04em;
+    }
+    .p-v3a-arcade .v3a-demo .crt {
+      background: #1a1a2e;
+      color: #8fc257;
+      font-family: 'VT323', monospace;
+      font-size: 0.95rem;
+      padding: 5px 12px;
+      border: 2px solid #1a1a2e;
+      box-shadow: 3px 3px 0 #e8375f;
+      letter-spacing: 0.08em;
+      line-height: 1.1;
+    }
+    .p-v3a-arcade .v3a-demo .crt b { color: #e8b954; font-weight: 400; }
+
+    /* ===== V3A — Vaporwave Desktop OS ===== */
+    .p-v3a-vapor {
+      background: #120033;
+      position: relative;
+      overflow: hidden;
+    }
+    .p-v3a-vapor::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 30%;
+      width: 180px;
+      height: 180px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 45%, #fcee4d 0%, #ff7b5b 45%, #ff2b89 85%);
+      box-shadow: 0 0 60px rgba(255, 110, 199, 0.5);
+    }
+    .p-v3a-vapor::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: -5%;
+      right: -5%;
+      height: 45%;
+      background-image:
+        linear-gradient(0deg, transparent 0, transparent calc(100% - 1px), #ff6ec7 calc(100% - 1px), #ff6ec7 100%),
+        linear-gradient(90deg, transparent 0, transparent calc(100% - 1px), #00ffff calc(100% - 1px), #00ffff 100%);
+      background-size: 100% 20px, 24px 100%;
+      transform: perspective(300px) rotateX(60deg);
+      transform-origin: 50% 0;
+      opacity: 0.6;
+    }
+    .p-v3a-vapor .vapor-a-demo {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .p-v3a-vapor .vapor-a-window {
+      background: #d8d0e8;
+      border: 2px solid #120033;
+      box-shadow:
+        inset -2px -2px 0 #6d5a9a,
+        inset 2px 2px 0 #fff4d6,
+        4px 4px 0 #ff2b89;
+      transform: rotate(-2deg);
+      width: 180px;
+    }
+    .p-v3a-vapor .vapor-a-window .wbar {
+      background: linear-gradient(180deg, #4d1a99, #120033);
+      padding: 4px 8px;
+      display: flex;
+      gap: 4px;
+      border-bottom: 1.5px solid #120033;
+    }
+    .p-v3a-vapor .vapor-a-window .wbar span {
+      width: 9px; height: 9px;
+      border: 1px solid #120033;
+      background: #d8d0e8;
+      border-radius: 2px;
+    }
+    .p-v3a-vapor .vapor-a-window .wbar span:nth-child(1) { background: #ff2b89; }
+    .p-v3a-vapor .vapor-a-window .wbar span:nth-child(2) { background: #fcee4d; }
+    .p-v3a-vapor .vapor-a-window .wbar span:nth-child(3) { background: #00ffff; }
+    .p-v3a-vapor .vapor-a-window .wbody {
+      padding: 14px 8px;
+      font-family: 'Major Mono Display', 'Fraunces', monospace;
+      font-weight: 900;
+      font-size: 1.5rem;
+      color: #120033;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+    .p-v3a-vapor .vapor-a-demo .kat {
+      font-family: 'Major Mono Display', monospace;
+      font-weight: 400;
+      font-size: 0.85rem;
+      color: #fcee4d;
+      text-shadow: 0 0 8px rgba(252,238,77,0.5);
+      letter-spacing: 0.15em;
+      text-transform: lowercase;
+    }
+
+    /* ===== V3-VAPORWAVE ===== */
+    .p-v3-vapor {
+      background: #0a0018;
+      position: relative;
+      overflow: hidden;
+    }
+    .p-v3-vapor::before {
+      content: '';
+      position: absolute;
+      inset: 0 0 48% 0;
+      background:
+        radial-gradient(ellipse 100% 80% at 50% 120%, #fdf65e 0%, #ffb039 20%, #ff3aa8 50%, #2b0a54 85%, #0a0018 100%);
+    }
+    .p-v3-vapor::after {
+      content: '';
+      position: absolute;
+      inset: 52% -4% 0 -4%;
+      background-image:
+        linear-gradient(0deg, transparent 0, transparent calc(100% - 1.5px), #ff6ec7 calc(100% - 1.5px), #ff6ec7 100%),
+        linear-gradient(90deg, transparent 0, transparent calc(100% - 1.5px), #00ffff calc(100% - 1.5px), #00ffff 100%);
+      background-size: 100% 24px, 24px 100%;
+      transform: perspective(400px) rotateX(60deg);
+      transform-origin: 50% 0;
+    }
+    .p-v3-vapor .vapor-demo {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .p-v3-vapor .vapor-demo h4 {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 2.2rem;
+      color: #fff;
+      letter-spacing: 0.04em;
+      text-shadow:
+        -3px 0 0 #ff6ec7,
+         3px 0 0 #00ffff;
+      text-transform: uppercase;
+    }
+    .p-v3-vapor .vapor-demo .kat {
+      font-family: 'Zen Kaku Gothic Antique', sans-serif;
+      font-weight: 900;
+      font-size: 1.3rem;
+      color: #fdf65e;
+      text-shadow: 0 0 10px rgba(253,246,94,0.6);
+      letter-spacing: 0.2em;
+    }
+
+    /* ===== V3 RETRO VARIATIONS (v3a–v3j) — ref-image backed ===== */
+    .p-v3x {
+      background-color: #0a0a0a;
+      background-image: var(--ref);
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .p-v3x::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, transparent 45%, rgba(0,0,0,0.55) 100%),
+        repeating-linear-gradient(0deg, transparent 0 2px, rgba(0,0,0,0.08) 2px 3px);
+      pointer-events: none;
+    }
+    .p-v3x .preview-label {
+      position: absolute;
+      left: 12px;
+      bottom: 10px;
+      z-index: 3;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: #f5efe0;
+      background: rgba(0,0,0,0.6);
+      padding: 3px 8px;
+      border: 1px solid rgba(245,239,224,0.25);
+      backdrop-filter: blur(2px);
+    }
+    .p-v3x .preview-jp {
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      z-index: 3;
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 22px;
+      color: #f5efe0;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+      letter-spacing: 0.08em;
+    }
+
+    /* Tag colors for each variation */
+    .card-tag.t-pc98     { color: #d6338e; border-color: #d6338e; background: rgba(200,200,200,0.92); }
+    .card-tag.t-vn       { color: #ffd340; border-color: #ffd340; background: rgba(26,14,31,0.92); }
+    .card-tag.t-mecha    { color: #d8252c; border-color: #d8252c; background: rgba(240,237,226,0.95); }
+    .card-tag.t-cockpit  { color: #e4a21a; border-color: #e4a21a; background: rgba(12,26,44,0.92); }
+    .card-tag.t-famicase { color: #f2b734; border-color: #f2b734; background: rgba(232,61,42,0.92); }
+    .card-tag.t-snes     { color: #cc2020; border-color: #cc2020; background: rgba(241,232,209,0.95); }
+    .card-tag.t-outrun   { color: #19e6ff; border-color: #19e6ff; background: rgba(5,3,15,0.9); }
+    .card-tag.t-shinjuku { color: #ff3ea8; border-color: #ff3ea8; background: rgba(7,5,9,0.9); }
+    .card-tag.t-beos     { color: #0a246a; border-color: #0a246a; background: rgba(244,209,74,0.95); }
+    .card-tag.t-irix     { color: #ffb13a; border-color: #ffb13a; background: rgba(58,45,58,0.92); }
+
+    /* ===== LOGO card ===== */
+    .p-logo {
+      background: var(--paper);
+    }
+    .p-logo .grid-9 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      width: 100%;
+      height: 100%;
+    }
+    .p-logo .mini {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    .p-logo .mini img { max-width: 88%; height: auto; }
+
+    /* 01 original · svg */
+    .p-logo .m1 { background: var(--paper); }
+
+    /* 02 monochrome */
+    .p-logo .m2 { background: var(--paper); }
+    .p-logo .m2 img { filter: grayscale(1) brightness(0.3); }
+
+    /* 03 inverted · night */
+    .p-logo .m3 {
+      background: var(--sumi);
+      background-image:
+        radial-gradient(circle at 30% 50%, rgba(95,95,211,0.2) 0%, transparent 55%),
+        radial-gradient(circle at 80% 30%, rgba(166,159,246,0.1) 0%, transparent 50%);
+    }
+
+    /* 04 framed badge (icon) */
+    .p-logo .m4 {
+      background: var(--paper-2);
+      padding: 10px;
+    }
+    .p-logo .m4 .iconframe {
+      width: 100%;
+      height: 100%;
+      background: var(--paper);
+      border: 2px solid var(--sumi);
+      box-shadow: 3px 3px 0 var(--sumi);
+      display: grid;
+      place-items: center;
+      padding: 6px;
+    }
+    .p-logo .m4 .iconframe img {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    /* 05 wordmark · fraunces */
+    .p-logo .m5 {
+      background: var(--paper);
+      flex-direction: column;
+      gap: 4px;
+    }
+    .p-logo .m5 img {
+      max-width: 60%;
+      opacity: 0.85;
+    }
+    .p-logo .m5 .word {
+      font-family: 'Fraunces', serif;
+      font-weight: 900;
+      font-size: 0.95rem;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .p-logo .m5 .word em {
+      font-style: italic;
+      color: var(--ink);
+      font-weight: 400;
+    }
+
+    /* 06 rgb offset · tiktok — last 2 chars in purple */
+    .p-logo .m6 {
+      background: #000;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+    .p-logo .m6 .tt-logo-w {
+      position: relative;
+      width: 55%;
+      display: block;
+      line-height: 0;
+    }
+    .p-logo .m6 .tt-logo-w img {
+      width: 100%;
+      position: relative;
+      z-index: 2;
+      max-width: 100%;
+    }
+    .p-logo .m6 .tt-logo-w .g {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: auto;
+      mix-blend-mode: screen;
+    }
+    .p-logo .m6 .tt-logo-w .g-pink {
+      filter: brightness(0) saturate(100%) invert(30%) sepia(90%) saturate(3000%) hue-rotate(320deg);
+      transform: translateX(-2px);
+    }
+    .p-logo .m6 .tt-logo-w .g-ink {
+      filter: brightness(0) saturate(100%) invert(40%) sepia(50%) saturate(1500%) hue-rotate(235deg);
+      transform: translateX(2px);
+    }
+    .p-logo .m6 .tt {
+      font-family: 'Fraunces', serif;
+      font-weight: 900;
+      color: #fff;
+      font-size: 0.85rem;
+      text-shadow: -2px 0 0 #ff0050, 2px 0 0 #00f2ea;
+      line-height: 1;
+    }
+    .p-logo .m6 .tt .tail {
+      color: #a69ff6;
+      text-shadow: -2px 0 0 #ff0050, 2px 0 0 #a69ff6;
+    }
+
+    /* 07 pixel art */
+    .p-logo .m7 { background: #0a0a14; }
+    .p-logo .m7 .grid-px {
+      display: grid;
+      grid-template-columns: repeat(4, 8px);
+      grid-template-rows: repeat(4, 8px);
+      gap: 1px;
+    }
+    .p-logo .m7 .grid-px div { background: #5f5fd3; }
+    .p-logo .m7 .grid-px div:nth-child(6),
+    .p-logo .m7 .grid-px div:nth-child(11) { background: #a69ff6; }
+
+    /* 08 glitch · cyberpunk */
+    .p-logo .m8 {
+      background: #0a0a18;
+      position: relative;
+    }
+    .p-logo .m8::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(0,255,240,0.08) 2px, rgba(0,255,240,0.08) 3px);
+      z-index: 1;
+    }
+    .p-logo .m8 .glitch-w {
+      position: relative;
+      width: 75%;
+      z-index: 2;
+    }
+    .p-logo .m8 .glitch-w img {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+    .p-logo .m8 .glitch-w .g {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      mix-blend-mode: screen;
+    }
+    .p-logo .m8 .glitch-w .g-c {
+      filter: brightness(0) saturate(100%) invert(70%) sepia(90%) saturate(2000%) hue-rotate(140deg);
+      transform: translateX(-2px);
+    }
+    .p-logo .m8 .glitch-w .g-m {
+      filter: brightness(0) saturate(100%) invert(40%) sepia(80%) saturate(3000%) hue-rotate(300deg);
+      transform: translateX(2px);
+    }
+
+    /* 09 hanko stamp */
+    .p-logo .m9 { background: var(--paper); }
+    .p-logo .m9 .stamp {
+      background: var(--sakura);
+      color: var(--paper);
+      font-family: var(--font-jp);
+      font-weight: 900;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      border-radius: 3px;
+      box-shadow: 2px 2px 0 rgba(26,26,46,0.18);
+    }
+
+    /* ===== CARD META ===== */
+    .card-meta {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .card-info { flex: 1; }
+
+    .card-label {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .card-label .num {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--text-dim);
+      letter-spacing: 0.18em;
+      font-weight: 500;
+    }
+
+    .card-label .jp {
+      font-family: var(--font-jp);
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--sakura);
+      letter-spacing: 0.1em;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.3rem;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .card-title em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--ink);
+    }
+
+    .card-desc {
+      font-size: 13.5px;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
+    .card-arrow {
+      font-family: var(--font-jp);
+      font-size: 1.3rem;
+      color: var(--text-dim);
+      transition: all 0.25s;
+    }
+
+    .card:hover .card-arrow {
+      color: var(--sakura);
+      transform: translate(4px, -4px);
+    }
+
+    .card-tag {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 5;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 4px 10px;
+      border: 1.5px solid;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-weight: 500;
+      background: rgba(250, 250, 245, 0.95);
+    }
+
+    .card-tag.t-arcade  { color: #b6ff00; border-color: #b6ff00; background: rgba(5,5,12,0.8); }
+    .card-tag.t-refined { color: #c8ff00; border-color: #c8ff00; background: rgba(5,5,12,0.8); }
+    .card-tag.t-cyber   { color: #e8375f; border-color: #e8375f; background: rgba(5,3,12,0.85); }
+    .card-tag.t-v4      { color: #fff; border-color: rgba(255,255,255,0.4); background: rgba(95,95,211,0.85); }
+    .card-tag.t-vapor   { color: #ff6ec7; border-color: #ff6ec7; background: rgba(10,0,24,0.92); }
+    .card-tag.t-vapor-a { color: #fcee4d; border-color: #fcee4d; background: rgba(18,0,51,0.92); }
+    .card-tag.t-v3a     { color: #1a1a2e; border-color: #1a1a2e; background: rgba(232,55,95,0.28); }
+    .card-tag.t-logo    { color: var(--gold); border-color: var(--gold); background: rgba(250,250,245,0.95); }
+
+    /* ===== FOOTER ===== */
+    footer {
+      border-top: 1px solid var(--rule);
+      padding: 56px 0 40px;
+      background: var(--paper-2);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .footer-brand {
+      max-width: 420px;
+    }
+
+    .footer-brand .jp {
+      font-family: var(--font-jp);
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--text);
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .footer-brand p {
+      color: var(--text-soft);
+      font-size: 14.5px;
+      line-height: 1.65;
+    }
+
+    .footer-meta {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      line-height: 2;
+      text-align: right;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .wrap { padding: 0 24px; }
+      .grid { grid-template-columns: 1fr; gap: 20px; }
+      .top-bar { flex-direction: column; gap: 16px; align-items: flex-start; }
+      .versions-header { flex-direction: column; align-items: flex-start; }
+      .footer-inner { flex-direction: column; }
+      .footer-meta { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    <header>
+      <div class="top-bar">
+        <div class="left">
+          <div class="logo-mini">
+            <img src="./bentoo-logo.svg" alt="Bentoo logo">
+            <span>弁当</span>
+          </div>
+          <span>obentoo.org / design explorations</span>
+        </div>
+        <div class="right">
+          <a href="./logo/">logo ↗</a>
+          <a href="https://github.com">git ↗</a>
+          <a href="#">handbook ↗</a>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-eyebrow">
+        <span class="dot"></span>
+        <span class="jp">弁当リナックス</span>
+        <span class="tag">one operating system · many voices</span>
+      </div>
+      <h1>
+        Many ways to <em>introduce</em><br>
+        <span class="jp-accent">弁当</span> to the world.
+      </h1>
+      <p class="hero-lede">
+        A growing set of <em>design explorations</em> for the Bentoo landing page —
+        from the raw neo-brutalist arcade, through cinematic cyberpunk OS and vaporwave,
+        into a full <em>retro-japanese suite</em> (PC-98, mecha manual, cockpit HUD,
+        famicase, Super Famicom, outrun, Shinjuku 24時, BeOS, IRIX). Same operating system,
+        different voice.
+      </p>
+    </section>
+
+    <section class="versions">
+      <div class="versions-header">
+        <h2>fifteen explorations + logo</h2>
+        <span class="meta">v1–v4 · v3a–v3j retro/japanese (pc-98, mecha, famicase, outrun, shinjuku, beos, irix) · v3-vaporwave · logo</span>
+      </div>
+
+      <div class="grid">
+        <!-- V1 Neo-brutalist arcade (original) -->
+        <a href="./v1/" class="card" target="_blank">
+          <span class="card-tag t-arcade">neo-brutalist</span>
+          <div class="card-preview p-v1">
+            <div class="preview">
+              <div class="v1-demo">
+                <h4>BENTOO</h4>
+                <div class="sub">// PRESS START //</div>
+                <div class="btn-mini">DOWNLOAD</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">V1 / ORIGINAL</span>
+                <span class="jp">初</span>
+              </div>
+              <h3 class="card-title">Neo-brutalist <em>arcade</em></h3>
+              <p class="card-desc">The original: scanlines, CRT cabinet, pixel stars, HP bars, INSERT COIN. Raw maximalism.</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- V2 Arcade brutalist refined -->
+        <a href="./v2/" class="card" target="_blank">
+          <span class="card-tag t-refined">refined</span>
+          <div class="card-preview p-v2">
+            <div class="preview">
+              <div class="v2-demo">
+                <div class="arcade-title"><span class="o">B</span>ENT<span class="o">OO</span></div>
+                <div class="arcade-sub">// CYBERPUNK EDITION //</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">V2 / REFINED</span>
+                <span class="jp">戦</span>
+              </div>
+              <h3 class="card-title">Arcade <em>brutalism</em></h3>
+              <p class="card-desc">The skill-refined v1 — bolder typography, perspective grid, glitch logo, pixel-perfect composition.</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- V3 Cyberpunk OS -->
+        <a href="./v3/" class="card" target="_blank">
+          <span class="card-tag t-cyber">cyberpunk · os</span>
+          <div class="card-preview p-v3">
+            <div class="cyber-bg"></div>
+            <div class="preview">
+              <div class="v3-demo">
+                <h4>BENTOO</h4>
+                <div class="jp">弁当 · OS</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">V3 / GLITCH OS</span>
+                <span class="jp">電</span>
+              </div>
+              <h3 class="card-title">Ghost in the <em>Shell</em></h3>
+              <p class="card-desc">Cinematic cyberpunk reframed as an operating system. Holographic desktop, system HUD, app showcase, release specs. Glitch RGB on the mark.</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- V3A — PC-98 app window -->
+        <a href="./v3a/" class="card" target="_blank">
+          <span class="card-tag t-pc98">pc-98 · dos workstation</span>
+          <div class="card-preview p-v3x" style="--ref: url('./ref-v3b-pc98.png')">
+            <span class="preview-label">V3A · PC-98 APP</span>
+            <span class="preview-jp">98</span>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">V3A / PC-98</span>
+                <span class="jp">窓</span>
+              </div>
+              <h3 class="card-title">PC-98 <em>workstation</em></h3>
+              <p class="card-desc">Authentic NEC PC-98 16-color DOS aesthetic. Cyan title bars, dithered bento, katakana menu, xterm 「A:\> emerge world」. Start bar included.</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- V3B — Visual Novel title screen -->
+        <a href="./v3b/" class="card" target="_blank">
+          <span class="card-tag t-vn">visual novel · pc-98</span>
+          <div class="card-preview p-v3x" style="--ref: url('./ref-v3b-pc98-v2.png')">
+            <span class="preview-label">V3B · TOKIMEKI</span>
+            <span class="preview-jp">♥</span>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">V3B / VISUAL NOVEL</span>
+                <span class="jp">恋</span>
+              </div>
+              <h3 class="card-title">Visual <em>novel</em></h3>
+              <p class="card-desc">1994 Japanese dating-sim title screen on PC-9821. Portage-chan character portrait, pink menu buttons, story dialog box, save slots. "PRESS SPACE TO BEGIN".</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- V3C — Mecha blueprint -->
+        <a href="./v3c/" class="card" target="_blank">
+          <span class="card-tag t-mecha">blueprint · 機密</span>
+          <div class="card-preview p-v3x" style="--ref: url('./ref-v3c-mecha.png')">
+            <span class="preview-label">V3C · TECH MANUAL</span>
+            <span class="preview-jp" style="color:#d8252c">機</span>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">V3C / BLUEPRINT</span>
+                <span class="jp">図</span>
+              </div>
+              <h3 class="card-title">Mecha <em>blueprint</em></h3>
+              <p class="card-desc">1985 Gundam/Patlabor technical manual. Cream paper, hinomaru red, isometric SVG schematic with katakana callouts, spec tables, 機密·CLASSIFIED stamp.</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- V3D — Mecha cockpit HUD -->
+        <a href="./v3d/" class="card" target="_blank">
+          <span class="card-tag t-cockpit">cockpit · obentoo-01</span>
+          <div class="card-preview p-v3x" style="--ref: url('./ref-v3c-mecha-v2.png')">
+            <span class="preview-label">V3D · COCKPIT HUD</span>
+            <span class="preview-jp" style="color:#e4a21a">起</span>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">V3D / COCKPIT</span>
+                <span class="jp">操</span>
+              </div>
+              <h3 class="card-title">Mecha <em>cockpit</em></h3>
+              <p class="card-desc">Votoms/Gundam 0083 cockpit HUD. Navy + amber monospace. Radar sweep, reticle target lock on bento, package telemetry 起動/武装/推進. "COMPILING... DO NOT EJECT".</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- V3E — Famicase cartridge label -->
+        <a href="./v3e/" class="card" target="_blank">
+          <span class="card-tag t-famicase">famicase · cartridge</span>
+          <div class="card-preview p-v3x" style="--ref: url('./ref-v3d-famicase.png')">
+            <span class="preview-label">V3E · FAMICASE</span>
+            <span class="preview-jp">ベ</span>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">V3E / FAMICASE</span>
+                <span class="jp">帶</span>
+              </div>
+              <h3 class="card-title">Cartridge <em>label</em></h3>
+              <p class="card-desc">My Famicase-style cartridge. Flat vermillion/mustard/cream palette, pixel bento SVG, giant ベントー katakana, chunky offset shadows. Register bar + barcode.</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- V3F — Super Famicom box art -->
+        <a href="./v3f/" class="card" target="_blank">
+          <span class="card-tag t-snes">super famicom · 1993</span>
+          <div class="card-preview p-v3x" style="--ref: url('./ref-v3d-famicase-v2.png')">
+            <span class="preview-label">V3F · SFC BOX</span>
+            <span class="preview-jp" style="color:#cc2020">終</span>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">V3F / SUPER FAMICOM</span>
+                <span class="jp">箱</span>
+              </div>
+              <h3 class="card-title">Super Famicom <em>box</em></h3>
+              <p class="card-desc">1993 Super Famicom box art catalog. Vertical painted box with heroic anime chef, purple SFC band, price ¥1,500 sticker, receipt header, pixel sprites.</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- V3G — Synthwave Outrun -->
+        <a href="./v3g/" class="card" target="_blank">
+          <span class="card-tag t-outrun">outrun · insert coin</span>
+          <div class="card-preview p-v3x" style="--ref: url('./ref-v3e-synthwave.png')">
+            <span class="preview-label">V3G · OUTRUN</span>
+            <span class="preview-jp" style="color:#19e6ff">★</span>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">V3G / OUTRUN</span>
+                <span class="jp">走</span>
+              </div>
+              <h3 class="card-title">Synthwave <em>outrun</em></h3>
+              <p class="card-desc">1984 Miami/Outrun arcade marquee. Chrome BENTOO gradient, perspective grid floor pink/cyan, striped sun, palms, CRT scanlines. "INSERT COIN TO COMPILE".</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- V3H — Shinjuku cyberpunk -->
+        <a href="./v3h/" class="card" target="_blank">
+          <span class="card-tag t-shinjuku">shinjuku · 24時</span>
+          <div class="card-preview p-v3x" style="--ref: url('./ref-v3e-synthwave-v2.png')">
+            <span class="preview-label">V3H · 新宿 24時</span>
+            <span class="preview-jp" style="color:#ff3ea8">時</span>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">V3H / SHINJUKU</span>
+                <span class="jp">夜</span>
+              </div>
+              <h3 class="card-title">Shinjuku <em>cyberpunk</em></h3>
+              <p class="card-desc">1988 Kabukichō neon alley. Rainy asphalt, vertical katakana signs ベントー/ソース/24時, izakaya lanterns, vending machines as downloads. Akira/Blade Runner Tokyo.</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- V3I — BeOS / Win9x -->
+        <a href="./v3i/" class="card" target="_blank">
+          <span class="card-tag t-beos">beos · win9x</span>
+          <div class="card-preview p-v3x" style="--ref: url('./ref-v3f-beos.png')">
+            <span class="preview-label">V3I · INSTALL.EXE</span>
+            <span class="preview-jp" style="color:#f4d14a">☒</span>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">V3I / BEOS · WIN9X</span>
+                <span class="jp">窓</span>
+              </div>
+              <h3 class="card-title">BeOS <em>install wizard</em></h3>
+              <p class="card-desc">1998 skeuomorphic desktop. Teal checker background, yellow-striped title bars, beveled 3D buttons, progress bar 47%, file browser downloads, working start bar.</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- V3J — IRIX / CDE workstation -->
+        <a href="./v3j/" class="card" target="_blank">
+          <span class="card-tag t-irix">irix · cde motif</span>
+          <div class="card-preview p-v3x" style="--ref: url('./ref-v3f-beos-v2.png')">
+            <span class="preview-label">V3J · IRIX 6.5</span>
+            <span class="preview-jp" style="color:#ffb13a">✓</span>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">V3J / IRIX · CDE</span>
+                <span class="jp">端</span>
+              </div>
+              <h3 class="card-title">IRIX <em>workstation</em></h3>
+              <p class="card-desc">1996 SGI Indigo² workstation. Purple-grey desktop, teal Motif title bars, CDE front panel with workspaces, xterm emerge log, file manager. For the serious operator.</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- V3-VAPORWAVE (original) -->
+        <a href="./v3-vaporwave/" class="card" target="_blank">
+          <span class="card-tag t-vapor">vaporwave · shibuya 89</span>
+          <div class="card-preview p-v3-vapor">
+            <div class="preview">
+              <div class="vapor-demo">
+                <h4>BENTOO</h4>
+                <div class="kat">ベントー</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">V3 / VAPOR</span>
+                <span class="jp">蒸</span>
+              </div>
+              <h3 class="card-title">Shibuya <em>1989</em></h3>
+              <p class="card-desc">Neon sun rising over a retrofuturist grid. Katakana, CRT scanlines, palm trees, mixtape cards, push play.</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- V4 Desktop OS in brand colors -->
+        <a href="./v4/" class="card" target="_blank">
+          <span class="card-tag t-v4">desktop · brand</span>
+          <div class="card-preview p-v4">
+            <div class="preview">
+              <div class="v4-demo">
+                <h4>BENTOO</h4>
+                <div class="pill">
+                  <span class="dot"></span>
+                  <span class="tag">LIVE</span>
+                  <span>弁.desktop</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">V4 / DESKTOP</span>
+                <span class="jp">机</span>
+              </div>
+              <h3 class="card-title">Desktop OS <em>brand</em></h3>
+              <p class="card-desc">Modern desktop OS presentation in the Bentoo palette. RGB offset in sakura/ink, curated desktop mockup with dock, apps, meters. Light + refined.</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- Logo -->
+        <a href="./logo/" class="card" target="_blank">
+          <span class="card-tag t-logo">logo</span>
+          <div class="card-preview p-logo">
+            <div class="grid-9">
+              <!-- 01 original -->
+              <div class="mini m1"><img src="./bentoo-logo.svg" alt="original"></div>
+              <!-- 02 monochrome -->
+              <div class="mini m2"><img src="./bentoo-logo.svg" alt="monochrome"></div>
+              <!-- 03 inverted · night -->
+              <div class="mini m3"><img src="./bentoo-logo.svg" alt="inverted night"></div>
+              <!-- 04 framed badge -->
+              <div class="mini m4">
+                <div class="iconframe"><img src="./bentoo-logo.svg" alt="framed"></div>
+              </div>
+              <!-- 05 wordmark · fraunces -->
+              <div class="mini m5">
+                <img src="./bentoo-logo.svg" alt="wordmark">
+                <span class="word">bent<em>oo</em>.</span>
+              </div>
+              <!-- 06 rgb offset · tiktok (last 2 chars purple) -->
+              <div class="mini m6">
+                <span class="tt-logo-w">
+                  <img class="g g-pink" src="./bentoo-logo.svg" alt="" aria-hidden="true">
+                  <img class="g g-ink"  src="./bentoo-logo.svg" alt="" aria-hidden="true">
+                  <img src="./bentoo-logo.svg" alt="tiktok">
+                </span>
+                <span class="tt">BENT<span class="tail">OO</span></span>
+              </div>
+              <!-- 07 pixel art -->
+              <div class="mini m7">
+                <div class="grid-px">
+                  <div></div><div></div><div></div><div></div>
+                  <div></div><div></div><div></div><div></div>
+                  <div></div><div></div><div></div><div></div>
+                  <div></div><div></div><div></div><div></div>
+                </div>
+              </div>
+              <!-- 08 glitch · cyberpunk -->
+              <div class="mini m8">
+                <span class="glitch-w">
+                  <img class="g g-c" src="./bentoo-logo.svg" alt="" aria-hidden="true">
+                  <img class="g g-m" src="./bentoo-logo.svg" alt="" aria-hidden="true">
+                  <img src="./bentoo-logo.svg" alt="glitch">
+                </span>
+              </div>
+              <!-- 09 hanko -->
+              <div class="mini m9"><div class="stamp">弁</div></div>
+            </div>
+          </div>
+          <div class="card-meta">
+            <div class="card-info">
+              <div class="card-label">
+                <span class="num">LOGO / 09 VARIATIONS</span>
+                <span class="jp">印</span>
+              </div>
+              <h3 class="card-title"><em>Logo</em> variations</h3>
+              <p class="card-desc">Nine explorations of the Bentoo mark — original, monochrome, inverted · night, wordmark · fraunces, rgb offset · tiktok (last two chars in ink), pixel, glitch · cyberpunk, hanko.</p>
+            </div>
+            <span class="card-arrow">↗</span>
+          </div>
+        </a>
+
+        <!-- Info card -->
+        <div class="card" style="cursor: default; min-height: auto;">
+          <div style="padding: 28px 24px; flex: 1; display: flex; flex-direction: column; gap: 18px;">
+            <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); letter-spacing: 0.2em; text-transform: uppercase;">how to pick</div>
+            <h3 style="font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; line-height: 1.3; letter-spacing: -0.01em;">
+              Same content. <em style="font-style: italic; color: var(--ink);">Different voice.</em>
+            </h3>
+            <p style="color: var(--text-soft); font-size: 13.5px; line-height: 1.65;">
+              Each version tells the same story about Bentoo. The goal is to compare <em style="font-style: italic;">how</em>
+              design can speak — raw, refined, cinematic, or viral — without changing <em style="font-style: italic;">what</em> is said.
+            </p>
+            <div style="padding: 16px; background: var(--paper); border: 1px solid var(--rule); margin-top: auto;">
+              <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 10px;">// palette</div>
+              <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; border: 1px solid var(--rule);">
+                <div style="aspect-ratio: 1; background: #5f5fd3;"></div>
+                <div style="aspect-ratio: 1; background: #a69ff6;"></div>
+                <div style="aspect-ratio: 1; background: #e8375f;"></div>
+                <div style="aspect-ratio: 1; background: #e8b954;"></div>
+                <div style="aspect-ratio: 1; background: #7ba654;"></div>
+                <div style="aspect-ratio: 1; background: #f5efe0;"></div>
+                <div style="aspect-ratio: 1; background: #1a1a2e;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="jp">弁当リナックス</span>
+          <p>A Gentoo-based Linux distribution. <em>Bentoo</em> is the polite form of the Japanese word for a boxed meal — small, complete, deliberately arranged.</p>
+        </div>
+        <div class="footer-meta">
+          <p>© 2026 obentoo.org</p>
+          <p>released under cc by-sa 4.0</p>
+          <p>gentoo foundation trademark</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+</body>
+</html>

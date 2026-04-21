@@ -1,0 +1,1 @@
+- [coming-soon-structure](coming-soon_structure.md) — bentoo coming-soon: 21 variants, each self-contained HTML with inline `<style>` + inline `<script>` handler; all reference `../../bentoo-logo.svg` and Google Fonts; rotator in `coming-soon/index.html` uses localStorage keys `bentoo-variant` / `bentoo-variant-expires`.

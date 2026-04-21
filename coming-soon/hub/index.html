@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bentoo — coming soon · hub</title>
+  <meta name="description" content="Preview every coming-soon variation of obentoo.org — chooser for A/B testing and design review.">
+  <link rel="icon" type="image/svg+xml" href="../../bentoo-logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Serif+JP:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --ink:        #5f5fd3;
+      --ink-2:      #4b4bc4;
+      --lavender:   #a69ff6;
+      --sakura:     #e8375f;
+      --hinomaru:   #bc002d;
+      --gold:       #e8b954;
+      --matcha:     #7ba654;
+
+      --paper:      #fafaf5;
+      --paper-2:    #f3f1e8;
+      --washi:      #f5efe0;
+      --sumi:       #1a1a2e;
+      --rule:       #d4d0bf;
+      --rule-soft:  #e3dfcc;
+
+      --text:       #1a1a2e;
+      --text-soft:  #4a4668;
+      --text-dim:   #7d7999;
+      --text-faint: #b4afcc;
+
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-sans:    'Inter', -apple-system, sans-serif;
+      --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+      --font-jp:      'Noto Serif JP', serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      background: var(--paper);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    ::selection { background: var(--ink); color: var(--paper); }
+    a { color: var(--ink); text-decoration: none; transition: color .15s; }
+    a:hover { color: var(--sakura); }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.28;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.45 0 0 0 0 0.35 0 0 0 0.1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+      mix-blend-mode: multiply;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      position: relative;
+      z-index: 5;
+      padding: 22px 44px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--rule-soft);
+      background: rgba(250, 250, 245, 0.9);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+    }
+    .brand {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.7rem;
+      letter-spacing: -0.035em;
+      color: var(--text);
+      line-height: 1;
+      display: inline-flex;
+      align-items: baseline;
+    }
+    .brand em { font-style: italic; font-weight: 400; color: var(--ink); }
+    .brand .period { color: var(--hinomaru); font-weight: 900; }
+
+    .breadcrumb {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .breadcrumb .slash { color: var(--text-faint); }
+    .breadcrumb .here { color: var(--ink); font-weight: 700; }
+    .breadcrumb a { color: var(--text-soft); }
+
+    .header-right {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn-chip {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 7px 13px;
+      border: 1px solid var(--rule);
+      color: var(--text);
+      border-radius: 100px;
+      transition: all .2s;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-chip:hover {
+      background: var(--sumi);
+      color: var(--paper);
+      border-color: var(--sumi);
+    }
+    .btn-chip.pri {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
+    }
+    .btn-chip.pri:hover { background: var(--sumi); border-color: var(--sumi); color: var(--paper); }
+
+    /* ===== INTRO ===== */
+    .intro-wrap {
+      padding: 72px 44px 48px;
+      max-width: 1320px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink);
+      font-weight: 600;
+      margin-bottom: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .eyebrow::before {
+      content: '';
+      width: 24px; height: 1px;
+      background: var(--ink);
+    }
+    h1.title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(2.6rem, 5vw, 4.2rem);
+      line-height: 0.95;
+      letter-spacing: -0.035em;
+      color: var(--text);
+      margin-bottom: 22px;
+      max-width: 18ch;
+    }
+    h1.title em {
+      font-style: italic;
+      font-weight: 500;
+      color: var(--ink);
+    }
+    h1.title .count {
+      color: var(--hinomaru);
+      font-weight: 900;
+      font-style: normal;
+    }
+    p.lede {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(1.1rem, 1.45vw, 1.25rem);
+      line-height: 1.55;
+      color: var(--text-soft);
+      max-width: 68ch;
+      margin-bottom: 28px;
+    }
+    p.lede em { font-style: italic; color: var(--ink); font-weight: 500; }
+    p.lede code {
+      font-family: var(--font-mono);
+      background: var(--paper-2);
+      padding: 2px 8px;
+      font-size: 0.85em;
+      border: 1px solid var(--rule-soft);
+      border-radius: 3px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding-top: 22px;
+      border-top: 1px dashed var(--rule);
+    }
+    .meta-row b { color: var(--text-soft); font-weight: 700; }
+    .meta-row .live { color: var(--matcha); }
+    .meta-row .live::before {
+      content: '';
+      display: inline-block;
+      width: 7px; height: 7px;
+      background: var(--matcha);
+      border-radius: 50%;
+      margin-right: 6px;
+      box-shadow: 0 0 0 3px rgba(123, 166, 84, 0.2);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    /* ===== GRID ===== */
+    .grid-wrap {
+      padding: 0 44px 100px;
+      max-width: 1320px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+    .grid {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    }
+
+    /* ===== CARD ===== */
+    .card {
+      background: var(--paper);
+      border: 1.5px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all .3s cubic-bezier(.2, .7, .2, 1);
+      overflow: hidden;
+    }
+    .card:hover {
+      border-color: var(--sumi);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 36px rgba(26, 26, 46, 0.1);
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--rule-soft);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      background: var(--paper-2);
+    }
+    .card-head .id {
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .card-head .num {
+      color: var(--hinomaru);
+      font-weight: 700;
+    }
+
+    .preview {
+      position: relative;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      background: var(--paper-2);
+      border-bottom: 1px solid var(--rule-soft);
+    }
+    .preview iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 1440px;
+      height: 900px;
+      border: 0;
+      pointer-events: none;
+      transform-origin: 0 0;
+      transform: scale(0.3);
+      /* fallback for browsers computing card width: */
+    }
+    /* Adjust iframe scale responsively via container width. */
+    @media (min-width: 1100px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .preview-tag {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: var(--sumi);
+      color: var(--paper);
+      padding: 4px 10px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+      z-index: 3;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .preview-tag .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--matcha);
+      box-shadow: 0 0 0 2px rgba(123, 166, 84, 0.3);
+    }
+
+    .card-body {
+      padding: 18px 22px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .card-body h2 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.25rem;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .card-body h2 em {
+      font-style: italic;
+      font-weight: 500;
+      color: var(--ink);
+    }
+    .card-body h2 .sub {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-dim);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .card-body p {
+      font-family: var(--font-display);
+      font-size: 14.5px;
+      line-height: 1.55;
+      color: var(--text-soft);
+      font-weight: 400;
+    }
+    .card-body p em {
+      font-style: italic;
+      color: var(--ink);
+    }
+
+    .tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .tags span {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      padding: 3px 9px;
+      border: 1px solid var(--rule);
+      background: var(--paper);
+      border-radius: 100px;
+      font-weight: 500;
+    }
+    .tags .t-ink { color: var(--ink); border-color: rgba(95,95,211,0.3); }
+    .tags .t-red { color: var(--hinomaru); border-color: rgba(188,0,45,0.3); }
+    .tags .t-dark { background: var(--sumi); color: var(--paper); border-color: var(--sumi); }
+
+    .card-foot {
+      padding: 12px 18px;
+      border-top: 1px solid var(--rule-soft);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--paper-2);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+    }
+    .card-foot .path {
+      color: var(--text-dim);
+    }
+    .card-foot .open {
+      color: var(--sumi);
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+    .card-foot .open .arr {
+      color: var(--hinomaru);
+      transition: transform .2s;
+    }
+    .card:hover .card-foot .open .arr { transform: translateX(3px); }
+
+    /* Ribbon for current sticky variant */
+    .ribbon {
+      position: absolute;
+      top: 0; right: 0;
+      z-index: 4;
+      background: var(--hinomaru);
+      color: var(--paper);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 5px 12px;
+      box-shadow: 0 2px 6px rgba(188,0,45,0.3);
+    }
+
+    /* ===== DEV UTILITIES ===== */
+    .dev-tools {
+      margin-top: 56px;
+      padding: 28px 32px;
+      border: 1.5px dashed var(--rule);
+      background: var(--paper-2);
+      display: flex;
+      gap: 22px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .dev-tools .dt-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .dev-tools .dt-block { flex: 1; min-width: 260px; }
+    .dev-tools p {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-soft);
+      margin-bottom: 10px;
+    }
+    .dev-tools p code {
+      font-family: var(--font-mono);
+      background: var(--paper);
+      padding: 1px 6px;
+      border: 1px solid var(--rule-soft);
+      font-size: 12px;
+      border-radius: 3px;
+    }
+    .dev-tools .dt-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      position: relative;
+      z-index: 3;
+      padding: 24px 44px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-top: 1px solid var(--rule-soft);
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+    footer em {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: normal;
+      text-transform: none;
+      font-size: 13px;
+    }
+    footer b {
+      color: var(--hinomaru);
+      font-weight: 600;
+    }
+
+    @media (max-width: 720px) {
+      header { padding: 16px 22px; flex-wrap: wrap; gap: 12px; }
+      .brand { font-size: 1.4rem; }
+      .breadcrumb { font-size: 10px; gap: 8px; }
+      .intro-wrap { padding: 48px 22px 32px; }
+      .grid-wrap { padding: 0 22px 60px; }
+      .grid { grid-template-columns: 1fr; }
+      .dev-tools { flex-direction: column; padding: 22px; }
+      footer { padding: 18px 22px 22px; flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a class="brand" href="../../" aria-label="bentoo home">
+      bent<em>oo</em><span class="period">.</span>
+    </a>
+    <div class="breadcrumb">
+      <a href="../../">obentoo.org</a>
+      <span class="slash">/</span>
+      <a href="../">coming-soon</a>
+      <span class="slash">/</span>
+      <span class="here">hub</span>
+    </div>
+    <div class="header-right">
+      <a class="btn-chip" href="../" title="Use the rotator — picks one variant and sticks for 24h">🎲 rotator</a>
+      <a class="btn-chip pri" href="#variations">↓ variations</a>
+    </div>
+  </header>
+
+  <section class="intro-wrap">
+    <div class="eyebrow">Design chooser · internal</div>
+    <h1 class="title">
+      <em>coming-soon</em> in <span class="count">21</span> different moods.
+    </h1>
+    <p class="lede">
+      One page, twenty-one aesthetics. Each variation tells the same story — <em>Bentoo is a
+      user-friendly Stage5 of Gentoo Linux</em> — in a completely different visual language,
+      from editorial paper to retrofuturist chrome, cyberpunk Shinjuku to Outrun sunset,
+      Severance cubicle to Albuquerque desert. The <code>/coming-soon/</code> rotator picks
+      one per visitor and keeps it sticky for <b>24 hours</b>; this page lets you preview and
+      jump between them.
+    </p>
+    <div class="meta-row">
+      <span><span class="live">live</span> · 21 variations · sticky 24h</span>
+      <span>rotator · <b>/coming-soon/</b></span>
+      <span>override · <b>?v=&lt;variant&gt;</b></span>
+      <span>reset storage · <b>bentoo-variant</b></span>
+    </div>
+  </section>
+
+  <section class="grid-wrap" id="variations">
+    <div class="grid">
+
+      <!-- v4 — editorial centered -->
+      <a class="card" href="../v4/" title="Open variant v4">
+        <div class="card-head">
+          <span class="id">id · v4</span>
+          <span class="num">01 / 21</span>
+        </div>
+        <div class="preview">
+          <iframe src="../v4/" loading="lazy" title="preview v4" aria-hidden="true"></iframe>
+          <span class="preview-tag"><span class="dot"></span> live</span>
+        </div>
+        <div class="card-body">
+          <h2>
+            Editorial <em>paper / ink</em>
+            <span class="sub">Fraunces · Inter · grain</span>
+          </h2>
+          <p>
+            A quiet, centered composition — logo floating, Fraunces wordmark with hinomaru dot,
+            black ticker. The calm, refined default.
+          </p>
+          <div class="tags">
+            <span class="t-ink">paper</span>
+            <span class="t-red">hinomaru</span>
+            <span>fraunces</span>
+            <span>centered</span>
+          </div>
+        </div>
+        <div class="card-foot">
+          <span class="path">/coming-soon/v4/</span>
+          <span class="open">Open <span class="arr">→</span></span>
+        </div>
+      </a>
+
+      <!-- v3i — PC-98 -->
+      <a class="card" href="../v3i/" title="Open variant v3i">
+        <div class="card-head">
+          <span class="id">id · v3i</span>
+          <span class="num">02 / 21</span>
+        </div>
+        <div class="preview">
+          <iframe src="../v3i/" loading="lazy" title="preview v3i" aria-hidden="true"></iframe>
+          <span class="preview-tag"><span class="dot"></span> live</span>
+        </div>
+        <div class="card-body">
+          <h2>
+            PC-98 <em>install.exe</em>
+            <span class="sub">DotGothic16 · VT323 · chrome</span>
+          </h2>
+          <p>
+            Windows 9x throwback — chrome window with tiger-yellow title bar, pixel fonts,
+            progress bar, CRT terminal, fake taskbar. Authentically retro.
+          </p>
+          <div class="tags">
+            <span class="t-dark">retro</span>
+            <span>pixel</span>
+            <span>win9x</span>
+            <span>chrome</span>
+          </div>
+        </div>
+        <div class="card-foot">
+          <span class="path">/coming-soon/v3i/</span>
+          <span class="open">Open <span class="arr">→</span></span>
+        </div>
+      </a>
+
+      <!-- v3j — IRIX -->
+      <a class="card" href="../v3j/" title="Open variant v3j">
+        <div class="card-head">
+          <span class="id">id · v3j</span>
+          <span class="num">03 / 21</span>
+        </div>
+        <div class="preview">
+          <iframe src="../v3j/" loading="lazy" title="preview v3j" aria-hidden="true"></iframe>
+          <span class="preview-tag"><span class="dot"></span> live</span>
+        </div>
+        <div class="card-body">
+          <h2>
+            IRIX 6.5 <em>Motif</em>
+            <span class="sub">IBM Plex · teal gradient · xterm</span>
+          </h2>
+          <p>
+            Unix workstation vibes — purple desk, Motif chrome with teal title bars, CDE
+            top bar with load meters, and a real xterm block rendering emerge --info.
+          </p>
+          <div class="tags">
+            <span class="t-dark">unix</span>
+            <span>motif</span>
+            <span>xterm</span>
+            <span>scanlines</span>
+          </div>
+        </div>
+        <div class="card-foot">
+          <span class="path">/coming-soon/v3j/</span>
+          <span class="open">Open <span class="arr">→</span></span>
+        </div>
+      </a>
+
+      <!-- v3c — Technical Manual -->
+      <a class="card" href="../v3c/" title="Open variant v3c">
+        <div class="card-head"><span class="id">id · v3c</span><span class="num">04 / 21</span></div>
+        <div class="preview"><iframe src="../v3c/" loading="lazy" title="preview v3c" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Technical <em>Manual</em><span class="sub">Oswald · Shippori Mincho · blueprint</span></h2>
+          <p>Editorial blueprint document — Oswald uppercase, red stamps, crosshair corners, spec tables, CLASSIFIED banner.</p>
+          <div class="tags"><span class="t-red">blueprint</span><span>mecha</span><span>oswald</span><span>classified</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/v3c/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- v3 — arcade cream -->
+      <a class="card" href="../v3/" title="Open variant v3">
+        <div class="card-head"><span class="id">id · v3</span><span class="num">05 / 21</span></div>
+        <div class="preview"><iframe src="../v3/" loading="lazy" title="preview v3" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Arcade <em>source-based</em><span class="sub">Archivo Black · magenta · cream</span></h2>
+          <p>Chunky arcade-meets-editorial: bold display type, magenta shadows, insert-coin vibe on a warm cream paper.</p>
+          <div class="tags"><span class="t-red">arcade</span><span>chunky</span><span>cream</span><span>magenta</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/v3/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- v3a — neo-brutalist arcade -->
+      <a class="card" href="../v3a/" title="Open variant v3a">
+        <div class="card-head"><span class="id">id · v3a</span><span class="num">06 / 21</span></div>
+        <div class="preview"><iframe src="../v3a/" loading="lazy" title="preview v3a" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Neo-brutalist <em>arcade</em><span class="sub">DotGothic16 · PC-98 chrome · dithered</span></h2>
+          <p>Chunky pixel wordmark with RGB split, PC-98 window chrome on dithered desktop, boxy spec rows.</p>
+          <div class="tags"><span class="t-dark">brutalist</span><span>pixel</span><span>dithered</span><span>pc98</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/v3a/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- v3b — arcade brutalism dark -->
+      <a class="card" href="../v3b/" title="Open variant v3b">
+        <div class="card-head"><span class="id">id · v3b</span><span class="num">07 / 21</span></div>
+        <div class="preview"><iframe src="../v3b/" loading="lazy" title="preview v3b" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Arcade <em>brutalism</em><span class="sub">dark purple · magenta · cyan</span></h2>
+          <p>Deep purple night with neon magenta/cyan RGB-offset wordmark, 4-color stat grid, hard brutalist blocks.</p>
+          <div class="tags"><span class="t-dark">dark</span><span>neon</span><span>brutalist</span><span>pixel</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/v3b/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- v3e — cartridge label -->
+      <a class="card" href="../v3e/" title="Open variant v3e">
+        <div class="card-head"><span class="id">id · v3e</span><span class="num">08 / 21</span></div>
+        <div class="preview"><iframe src="../v3e/" loading="lazy" title="preview v3e" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Cartridge <em>label</em><span class="sub">Bebas Neue · vermillion · cream</span></h2>
+          <p>Retro game cartridge layout — vermillion header label, mustard accents, barcode stripes, catalog SKU.</p>
+          <div class="tags"><span class="t-red">cartridge</span><span>bebas</span><span>cream</span><span>label</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/v3e/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- v3f — Super Famicom box -->
+      <a class="card" href="../v3f/" title="Open variant v3f">
+        <div class="card-head"><span class="id">id · v3f</span><span class="num">09 / 21</span></div>
+        <div class="preview"><iframe src="../v3f/" loading="lazy" title="preview v3f" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Super Famicom <em>box</em><span class="sub">purple header · box art · catalog</span></h2>
+          <p>SFC retail box: purple gradient header with gold SFC badge, central box art, licensed product ribbon, spec grid.</p>
+          <div class="tags"><span class="t-red">sfc</span><span>purple</span><span>box-art</span><span>catalog</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/v3f/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- v3h — Shinjuku cyberpunk -->
+      <a class="card" href="../v3h/" title="Open variant v3h">
+        <div class="card-head"><span class="id">id · v3h</span><span class="num">10 / 21</span></div>
+        <div class="preview"><iframe src="../v3h/" loading="lazy" title="preview v3h" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Shinjuku <em>cyberpunk</em><span class="sub">Audiowide · Michroma · neon</span></h2>
+          <p>24時 新宿 neon — glowing chrome wordmark, RGB split, multi-color stat cells, deep cyberpunk night.</p>
+          <div class="tags"><span class="t-dark">cyberpunk</span><span>neon</span><span>shinjuku</span><span>chrome</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/v3h/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- v3-vaporwave — Shibuya 1989 -->
+      <a class="card" href="../v3-vaporwave/" title="Open variant v3-vaporwave">
+        <div class="card-head"><span class="id">id · v3-vaporwave</span><span class="num">11 / 21</span></div>
+        <div class="preview"><iframe src="../v3-vaporwave/" loading="lazy" title="preview v3-vaporwave" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Shibuya <em>1989</em><span class="sub">Monoton · pastel sun · grid floor</span></h2>
+          <p>Vaporwave sunset — melting chromatic wordmark, pastel gradient sky, perspective teal grid floor.</p>
+          <div class="tags"><span class="t-red">vaporwave</span><span>shibuya</span><span>pastel</span><span>grid</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/v3-vaporwave/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- synthwave — Outrun -->
+      <a class="card" href="../synthwave/" title="Open variant synthwave">
+        <div class="card-head"><span class="id">id · synthwave</span><span class="num">12 / 21</span></div>
+        <div class="preview"><iframe src="../synthwave/" loading="lazy" title="preview synthwave" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Synthwave <em>Outrun</em><span class="sub">Orbitron · sunset gradient · stars</span></h2>
+          <p>Outrun highway: sunset sun with scan stripes, stars, infinite grid, Orbitron gradient wordmark.</p>
+          <div class="tags"><span class="t-red">synthwave</span><span>outrun</span><span>sunset</span><span>neon</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/synthwave/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- beos — BeOS install wizard -->
+      <a class="card" href="../beos/" title="Open variant beos">
+        <div class="card-head"><span class="id">id · beos</span><span class="num">13 / 21</span></div>
+        <div class="preview"><iframe src="../beos/" loading="lazy" title="preview beos" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>BeOS <em>install wizard</em><span class="sub">yellow deskbar · blue · BFS</span></h2>
+          <p>BeOS Tracker deskbar fixed top-right, yellow tabbed window with install-wizard steps, BFS volume select.</p>
+          <div class="tags"><span class="t-ink">beos</span><span>yellow-tab</span><span>deskbar</span><span>retro</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/beos/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- severance-v2 — Lumon MDR -->
+      <a class="card" href="../severance-v2/" title="Open variant severance-v2">
+        <div class="card-head"><span class="id">id · severance-v2</span><span class="num">14 / 21</span></div>
+        <div class="preview"><iframe src="../severance-v2/" loading="lazy" title="preview severance-v2" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Severance <em>MDR</em><span class="sub">IBM Plex · VT323 · teal cubicle</span></h2>
+          <p>Lumon office: CRT with Macrodata Refinement numbers, beige keyboard, Bentoo ID badge, lunch pail. Mysterious and important.</p>
+          <div class="tags"><span class="t-ink">lumon</span><span>crt</span><span>corporate</span><span>mdr</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/severance-v2/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- death-stranding-v3 — BB pod -->
+      <a class="card" href="../death-stranding-v3/" title="Open variant death-stranding-v3">
+        <div class="card-head"><span class="id">id · death-stranding-v3</span><span class="num">15 / 21</span></div>
+        <div class="preview"><iframe src="../death-stranding-v3/" loading="lazy" title="preview death-stranding-v3" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Death Stranding <em>BB Pod</em><span class="sub">Chakra Petch · cave · rain</span></h2>
+          <p>Dark cave with falling rain, ghost hands, jellyfish floaters and a golden BB pod. Chirp-glitch wordmark with strike.</p>
+          <div class="tags"><span class="t-dark">cave</span><span>rain</span><span>bb</span><span>glitch</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/death-stranding-v3/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- mario — Super Mario Bros -->
+      <a class="card" href="../mario/" title="Open variant mario">
+        <div class="card-head"><span class="id">id · mario</span><span class="num">16 / 21</span></div>
+        <div class="preview"><iframe src="../mario/" loading="lazy" title="preview mario" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Super Mario <em>World 1-1</em><span class="sub">Press Start 2P · pixel · sky blue</span></h2>
+          <p>SMB: HUD with world/coin/lives, pixel BENTOO wordmark, ? blocks for nav, running Mario, pipes, goomba, brick ground.</p>
+          <div class="tags"><span class="t-red">pixel</span><span>mario</span><span>arcade</span><span>nes</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/mario/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- castlevania — Symphony of the Source -->
+      <a class="card" href="../castlevania/" title="Open variant castlevania">
+        <div class="card-head"><span class="id">id · castlevania</span><span class="num">17 / 21</span></div>
+        <div class="preview"><iframe src="../castlevania/" loading="lazy" title="preview castlevania" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Castlevania <em>SotN</em><span class="sub">Cinzel Decor · gold · wine</span></h2>
+          <p>Gothic cathedral: red curtains, chandeliers, stained-glass cross, bats and Alucard silhouette. Golden ornate BENTOO.</p>
+          <div class="tags"><span class="t-red">gothic</span><span>gold</span><span>alucard</span><span>night</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/castlevania/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- matrix — Wake up Gentoo -->
+      <a class="card" href="../matrix/" title="Open variant matrix">
+        <div class="card-head"><span class="id">id · matrix</span><span class="num">18 / 21</span></div>
+        <div class="preview"><iframe src="../matrix/" loading="lazy" title="preview matrix" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Matrix <em>wake up</em><span class="sub">Orbitron · katakana rain · neon</span></h2>
+          <p>Falling katakana rain, phosphor-green BENTOO with glow, blue/red pill menu — Stay Gentoo or Choose Bentoo. Shell prompt footer.</p>
+          <div class="tags"><span class="t-dark">matrix</span><span>terminal</span><span>neo</span><span>pill</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/matrix/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- 2001 — Space Odyssey -->
+      <a class="card" href="../2001/" title="Open variant 2001">
+        <div class="card-head"><span class="id">id · 2001</span><span class="num">19 / 21</span></div>
+        <div class="preview"><iframe src="../2001/" loading="lazy" title="preview 2001" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>2001 <em>HAL 9000</em><span class="sub">Archivo Black · starfield · void</span></h2>
+          <p>Pulsing HAL eye against a starfield, massive white BENTOO, red-outlined square buttons. Minimalist, cinematic, cold.</p>
+          <div class="tags"><span class="t-dark">hal</span><span>space</span><span>minimal</span><span>red</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/2001/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- breaking-bad — periodic elements -->
+      <a class="card" href="../breaking-bad/" title="Open variant breaking-bad">
+        <div class="card-head"><span class="id">id · breaking-bad</span><span class="num">20 / 21</span></div>
+        <div class="preview"><iframe src="../breaking-bad/" loading="lazy" title="preview breaking-bad" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Breaking Bad <em>Say my name</em><span class="sub">Walt · Jesse · Saul · Gus · blue crystals</span></h2>
+          <p>Periodic BENTOO letters, character quotes (Heisenberg / Pinkman / Goodman / Fring), 99.1% news ticker, Crystal Ship RV, fly in the lab.</p>
+          <div class="tags"><span class="t-red">hazmat</span><span>periodic</span><span>blue-sky</span><span>heisenberg</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/breaking-bad/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+      <!-- minecraft — block world -->
+      <a class="card" href="../minecraft/" title="Open variant minecraft">
+        <div class="card-head"><span class="id">id · minecraft</span><span class="num">21 / 21</span></div>
+        <div class="preview"><iframe src="../minecraft/" loading="lazy" title="preview minecraft" aria-hidden="true"></iframe><span class="preview-tag"><span class="dot"></span> live</span></div>
+        <div class="card-body">
+          <h2>Minecraft <em>survival</em><span class="sub">6-mob bestiary · crafting · hotbar</span></h2>
+          <p>F3 debug, grass-block wordmark, 3×3 crafting for diamond pickaxe, mob bestiary (Creeper/Zombie/Enderman/Villager/Piglin), HUD hearts+food+XP, hotbar with items.</p>
+          <div class="tags"><span class="t-ink">block</span><span>crafting</span><span>creeper</span><span>hotbar</span></div>
+        </div>
+        <div class="card-foot"><span class="path">/coming-soon/minecraft/</span><span class="open">Open <span class="arr">→</span></span></div>
+      </a>
+
+    </div>
+
+    <div class="dev-tools">
+      <div class="dt-block">
+        <div class="dt-label">Rotator behaviour</div>
+        <p>
+          Visiting <code>/coming-soon/</code> picks a random variant, stores it in
+          <code>localStorage.bentoo-variant</code> with a <code>24h</code> expiry, and
+          redirects. Subsequent visits within the window stick to the same variant.
+        </p>
+        <p>
+          Force a specific variant for preview with <code>?v=v3i</code> — this is a
+          one-shot override that doesn't persist.
+        </p>
+      </div>
+      <div class="dt-block">
+        <div class="dt-label">Quick actions</div>
+        <div class="dt-actions">
+          <a class="btn-chip" href="../" title="run rotator">🎲 run rotator</a>
+          <a class="btn-chip" href="../?v=v4">?v=v4</a>
+          <a class="btn-chip" href="../?v=v3">?v=v3</a>
+          <a class="btn-chip" href="../?v=v3a">?v=v3a</a>
+          <a class="btn-chip" href="../?v=v3b">?v=v3b</a>
+          <a class="btn-chip" href="../?v=v3c">?v=v3c</a>
+          <a class="btn-chip" href="../?v=v3e">?v=v3e</a>
+          <a class="btn-chip" href="../?v=v3f">?v=v3f</a>
+          <a class="btn-chip" href="../?v=v3h">?v=v3h</a>
+          <a class="btn-chip" href="../?v=v3i">?v=v3i</a>
+          <a class="btn-chip" href="../?v=v3j">?v=v3j</a>
+          <a class="btn-chip" href="../?v=v3-vaporwave">?v=v3-vaporwave</a>
+          <a class="btn-chip" href="../?v=synthwave">?v=synthwave</a>
+          <a class="btn-chip" href="../?v=beos">?v=beos</a>
+          <a class="btn-chip" href="../?v=severance-v2">?v=severance-v2</a>
+          <a class="btn-chip" href="../?v=death-stranding-v3">?v=ds-v3</a>
+          <a class="btn-chip" href="../?v=mario">?v=mario</a>
+          <a class="btn-chip" href="../?v=castlevania">?v=castlevania</a>
+          <a class="btn-chip" href="../?v=matrix">?v=matrix</a>
+          <a class="btn-chip" href="../?v=2001">?v=2001</a>
+          <a class="btn-chip" href="../?v=breaking-bad">?v=breaking-bad</a>
+          <a class="btn-chip" href="../?v=minecraft">?v=minecraft</a>
+          <button class="btn-chip" type="button" onclick="localStorage.removeItem('bentoo-variant');localStorage.removeItem('bentoo-variant-expires');this.textContent='✓ cleared'" title="clear sticky selection">↺ reset sticky</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2018 – 2026 <em>bentoo</em> · <b>handcrafted</b>, source-first</span>
+    <span>hub · internal chooser · <a href="../">rotator</a> · <a href="../../">main hub</a></span>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BENTOO LINUX — Compile Your Reality</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Syne:wght@400;700;800&family=IBM+Plex+Mono:wght@400;500;700&family=Anybody:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* ===== RESET ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --magenta: #ff2d7b;
+      --cyan: #00fff0;
+      --lime: #c8ff00;
+      --yellow: #ffe600;
+      --orange: #ff6b2b;
+      --violet: #b44aff;
+      --surface: #08080c;
+      --surface-1: #101018;
+      --surface-2: #1a1a28;
+      --surface-3: #252538;
+      --text: #e8e8f0;
+      --text-dim: #7a7a90;
+      --border-w: 5px;
+      --font-display: 'Anybody', 'Syne', sans-serif;
+      --font-pixel: 'Press Start 2P', monospace;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --font-body: 'Syne', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--surface);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* ===== SCANLINES + NOISE ===== */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0,0,0,0.12) 2px,
+        rgba(0,0,0,0.12) 4px
+      );
+      pointer-events: none;
+      z-index: 10000;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.03;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 10001;
+    }
+
+    ::selection {
+      background: var(--magenta);
+      color: var(--surface);
+    }
+
+    a { cursor: pointer; }
+
+    /* ===== NAV ===== */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(8, 8, 12, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: var(--border-w) solid var(--magenta);
+    }
+
+    .nav-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.6rem;
+      color: var(--lime);
+      text-decoration: none;
+      letter-spacing: -1px;
+      position: relative;
+    }
+
+    .logo::after {
+      content: 'LINUX';
+      font-family: var(--font-pixel);
+      font-size: 0.4rem;
+      color: var(--magenta);
+      position: absolute;
+      bottom: -2px;
+      right: -38px;
+      letter-spacing: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--font-pixel);
+      font-size: 0.55rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: 10px 18px;
+      border: 2px solid transparent;
+      transition: all 0.08s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .nav-links a:hover {
+      color: var(--surface);
+      background: var(--cyan);
+      border-color: var(--surface);
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 var(--surface);
+    }
+
+    .nav-cta {
+      border-color: var(--lime) !important;
+      color: var(--lime) !important;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+    }
+    .hamburger span {
+      width: 28px;
+      height: 3px;
+      background: var(--lime);
+      display: block;
+    }
+
+    /* ===== TICKER ===== */
+    .ticker {
+      margin-top: 64px;
+      background: var(--lime);
+      border-bottom: var(--border-w) solid var(--surface);
+      overflow: hidden;
+      padding: 10px 0;
+      position: relative;
+    }
+
+    .ticker::before, .ticker::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 80px;
+      height: 100%;
+      z-index: 2;
+    }
+    .ticker::before { left: 0; background: linear-gradient(90deg, var(--lime), transparent); }
+    .ticker::after { right: 0; background: linear-gradient(-90deg, var(--lime), transparent); }
+
+    .ticker-track {
+      display: flex;
+      animation: marquee 25s linear infinite;
+      width: max-content;
+    }
+
+    .ticker-track span {
+      font-family: var(--font-pixel);
+      font-size: 0.6rem;
+      color: var(--surface);
+      padding: 0 40px;
+      white-space: nowrap;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .ticker-track .sep {
+      color: var(--magenta);
+      padding: 0 16px;
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 80% 60% at 25% 50%, rgba(200, 255, 0, 0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 80% at 75% 40%, rgba(0, 255, 240, 0.04) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 50% 80%, rgba(255, 45, 123, 0.05) 0%, transparent 70%),
+        var(--surface);
+    }
+
+    /* Perspective grid floor */
+    .hero::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: -20%;
+      right: -20%;
+      height: 55%;
+      background:
+        linear-gradient(rgba(0, 255, 240, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 240, 0.08) 1px, transparent 1px);
+      background-size: 60px 60px;
+      transform: perspective(500px) rotateX(55deg);
+      transform-origin: bottom center;
+      mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 80%);
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 80%);
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 140px 32px 100px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 64px;
+      align-items: center;
+    }
+
+    /* Floating pixel decorations */
+    .pixel-float {
+      position: absolute;
+      z-index: 1;
+      animation: floaty 6s ease-in-out infinite;
+    }
+
+    .pixel-float:nth-child(1) { top: 18%; left: 6%; animation-delay: 0s; }
+    .pixel-float:nth-child(2) { top: 12%; right: 12%; animation-delay: -2s; }
+    .pixel-float:nth-child(3) { bottom: 25%; left: 10%; animation-delay: -4s; }
+    .pixel-float:nth-child(4) { bottom: 15%; right: 6%; animation-delay: -1.5s; }
+    .pixel-float:nth-child(5) { top: 45%; left: 48%; animation-delay: -3s; }
+
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-18px) rotate(5deg); }
+    }
+
+    /* Pixel cross shape */
+    .px-cross {
+      width: 6px;
+      height: 6px;
+    }
+    .px-cross::before, .px-cross::after {
+      content: '';
+      position: absolute;
+      background: currentColor;
+    }
+    .px-cross::before { width: 18px; height: 6px; top: 0; left: -6px; }
+    .px-cross::after { width: 6px; height: 18px; top: -6px; left: 0; }
+
+    .px-cross.c-magenta { color: var(--magenta); }
+    .px-cross.c-cyan { color: var(--cyan); }
+    .px-cross.c-lime { color: var(--lime); }
+    .px-cross.c-yellow { color: var(--yellow); }
+    .px-cross.c-violet { color: var(--violet); }
+
+    /* Diamond pixel shape */
+    .px-diamond {
+      width: 8px;
+      height: 8px;
+      transform: rotate(45deg);
+    }
+
+    .hero-left h1 {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      line-height: 0.9;
+      letter-spacing: -3px;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .hero-left h1 .o {
+      color: var(--lime);
+      text-shadow: 0 0 40px rgba(200,255,0,0.3);
+    }
+
+    .hero-sub {
+      font-family: var(--font-pixel);
+      font-size: clamp(0.6rem, 1.2vw, 0.8rem);
+      color: var(--magenta);
+      margin-bottom: 32px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero-sub::before {
+      content: '//';
+      color: var(--cyan);
+      margin-right: 8px;
+    }
+
+    .hero-desc {
+      font-family: var(--font-body);
+      font-size: 1.15rem;
+      line-height: 1.7;
+      color: var(--text-dim);
+      max-width: 520px;
+      margin-bottom: 40px;
+    }
+
+    .hero-desc strong {
+      color: var(--yellow);
+      font-weight: 700;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      font-family: var(--font-pixel);
+      font-size: 0.65rem;
+      padding: 18px 32px;
+      border: var(--border-w) solid;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      transition: transform 0.06s, box-shadow 0.06s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      transform: translate(-5px, -5px);
+      box-shadow: 5px 5px 0 currentColor;
+    }
+
+    .btn:active {
+      transform: translate(0, 0);
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: var(--lime);
+      color: var(--surface);
+      border-color: var(--surface);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 5px 5px 0 var(--surface);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--cyan);
+      border-color: var(--cyan);
+    }
+
+    .btn-ghost:hover {
+      background: var(--cyan);
+      color: var(--surface);
+    }
+
+    /* Hero version badge */
+    .version-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      padding: 8px 16px;
+      border: 2px solid var(--surface-3);
+      background: var(--surface-1);
+    }
+
+    .version-badge .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--lime);
+      border-radius: 50%;
+      animation: dotpulse 2s ease-in-out infinite;
+    }
+
+    @keyframes dotpulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(200,255,0,0.4); }
+      50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(200,255,0,0); }
+    }
+
+    /* ===== ARCADE MONITOR ===== */
+    .arcade-monitor {
+      position: relative;
+      perspective: 800px;
+    }
+
+    .monitor-bezel {
+      background: var(--surface-2);
+      border: var(--border-w) solid #2a2a40;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow:
+        12px 12px 0 rgba(0,0,0,0.5),
+        0 0 60px rgba(0, 255, 240, 0.05);
+      position: relative;
+      transform: rotateY(-2deg) rotateX(1deg);
+    }
+
+    /* LED indicators on bezel */
+    .bezel-leds {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .bezel-led {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .bezel-led.on { background: var(--lime); box-shadow: 0 0 8px var(--lime); }
+    .bezel-led.warn { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); animation: dotpulse 1.5s ease-in-out infinite; }
+    .bezel-led.off { background: #333; }
+
+    .crt-screen {
+      background: #050510;
+      border: 3px solid #1a1a30;
+      border-radius: 6px;
+      padding: 24px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: var(--lime);
+      min-height: 300px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* CRT curvature + glow */
+    .crt-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 6px;
+      background:
+        radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Phosphor glow */
+    .crt-screen::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 8px;
+      box-shadow: inset 0 0 30px rgba(0, 255, 240, 0.03);
+      pointer-events: none;
+    }
+
+    .t-line { margin-bottom: 2px; position: relative; z-index: 1; }
+    .t-prompt { color: var(--magenta); font-weight: 700; }
+    .t-cmd { color: var(--cyan); }
+    .t-dim { color: #4a4a60; }
+    .t-ok { color: var(--lime); }
+    .t-warn { color: var(--yellow); }
+    .t-hl { color: var(--orange); }
+
+    .cursor {
+      display: inline-block;
+      width: 9px;
+      height: 15px;
+      background: var(--lime);
+      animation: blink 1s step-end infinite;
+      vertical-align: text-bottom;
+      box-shadow: 0 0 6px rgba(200,255,0,0.5);
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* Arcade controls panel */
+    .controls-panel {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 8px;
+      background: var(--surface-2);
+      border: 3px solid #2a2a40;
+      border-radius: 0 0 10px 10px;
+      margin-top: -3px;
+    }
+
+    .dpad {
+      display: grid;
+      grid-template-columns: repeat(3, 20px);
+      grid-template-rows: repeat(3, 20px);
+      gap: 2px;
+    }
+
+    .dpad-btn {
+      background: #333;
+      border: 2px solid #444;
+      border-radius: 2px;
+    }
+
+    .dpad-btn.active { background: var(--surface-3); }
+    .dpad-center { background: #444; border-color: #555; border-radius: 2px; }
+
+    .action-btns {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .a-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 3px solid var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-pixel);
+      font-size: 0.5rem;
+      color: var(--surface);
+      font-weight: bold;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.3);
+      transition: transform 0.05s, box-shadow 0.05s;
+      cursor: pointer;
+    }
+
+    .a-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.3);
+    }
+
+    .a-btn.btn-a { background: var(--magenta); }
+    .a-btn.btn-b { background: var(--cyan); margin-bottom: 8px; }
+    .a-btn.btn-x { background: var(--yellow); margin-bottom: 16px; }
+
+    .coin-slot {
+      font-family: var(--font-pixel);
+      font-size: 0.45rem;
+      color: var(--text-dim);
+      text-align: center;
+      padding: 6px 14px;
+      border: 2px solid var(--surface-3);
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      animation: coinpulse 3s ease-in-out infinite;
+    }
+
+    @keyframes coinpulse {
+      0%, 100% { border-color: var(--surface-3); color: var(--text-dim); }
+      50% { border-color: var(--yellow); color: var(--yellow); }
+    }
+
+    /* ===== DIVIDER ===== */
+    .divider {
+      height: var(--border-w);
+      background: var(--magenta);
+      position: relative;
+    }
+
+    .divider.cyan { background: var(--cyan); }
+    .divider.lime { background: var(--lime); }
+
+    .divider-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--surface);
+      padding: 4px 24px;
+      font-family: var(--font-pixel);
+      font-size: 0.5rem;
+      color: inherit;
+      border: 3px solid currentColor;
+      white-space: nowrap;
+    }
+
+    /* ===== STATS RIBBON ===== */
+    .stats {
+      background: var(--surface-1);
+      border-bottom: var(--border-w) solid var(--surface-3);
+      padding: 0;
+    }
+
+    .stats-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .stat {
+      padding: 32px;
+      border-right: 3px solid var(--surface-3);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat:last-child { border-right: none; }
+
+    .stat::before {
+      content: attr(data-idx);
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 6rem;
+      position: absolute;
+      top: -10px;
+      right: -5px;
+      color: var(--surface-2);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .stat-val {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat:nth-child(1) .stat-val { color: var(--magenta); }
+    .stat:nth-child(2) .stat-val { color: var(--lime); }
+    .stat:nth-child(3) .stat-val { color: var(--cyan); }
+    .stat:nth-child(4) .stat-val { color: var(--yellow); }
+
+    .stat-lbl {
+      font-family: var(--font-pixel);
+      font-size: 0.5rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== FEATURES / CHARACTER SELECT ===== */
+    .features {
+      padding: 120px 0;
+      position: relative;
+      background:
+        radial-gradient(ellipse 50% 50% at 50% 0%, rgba(255,45,123,0.04) 0%, transparent 70%),
+        var(--surface);
+    }
+
+    .section-head {
+      max-width: 1400px;
+      margin: 0 auto 72px;
+      padding: 0 32px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .section-tag {
+      font-family: var(--font-pixel);
+      font-size: 0.55rem;
+      display: inline-block;
+      padding: 6px 20px;
+      border: 3px solid;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+
+    .section-tag.tag-magenta { border-color: var(--magenta); color: var(--magenta); background: rgba(255,45,123,0.08); }
+    .section-tag.tag-cyan { border-color: var(--cyan); color: var(--cyan); background: rgba(0,255,240,0.08); }
+    .section-tag.tag-lime { border-color: var(--lime); color: var(--lime); background: rgba(200,255,0,0.08); }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.05;
+      letter-spacing: -2px;
+    }
+
+    .section-count {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 5rem;
+      color: var(--surface-2);
+      line-height: 1;
+      flex-shrink: 0;
+      letter-spacing: -4px;
+    }
+
+    /* Feature cards: asymmetric bento grid */
+    .feat-grid {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 20px;
+    }
+
+    .feat-card {
+      background: var(--surface-1);
+      border: var(--border-w) solid var(--surface-3);
+      padding: 36px;
+      position: relative;
+      transition: transform 0.08s, box-shadow 0.08s, border-color 0.15s;
+      overflow: hidden;
+    }
+
+    .feat-card:hover {
+      transform: translate(-4px, -4px);
+      box-shadow: 8px 8px 0 rgba(0,0,0,0.4);
+    }
+
+    /* Card 1 spans 2 cols */
+    .feat-card:nth-child(1) { grid-column: span 2; }
+
+    /* Card color accents */
+    .feat-card:nth-child(1):hover { border-color: var(--magenta); }
+    .feat-card:nth-child(2):hover { border-color: var(--cyan); }
+    .feat-card:nth-child(3):hover { border-color: var(--lime); }
+    .feat-card:nth-child(4):hover { border-color: var(--yellow); }
+
+    .feat-icon {
+      width: 56px;
+      height: 56px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid;
+      position: relative;
+    }
+
+    .feat-card:nth-child(1) .feat-icon { border-color: var(--magenta); color: var(--magenta); }
+    .feat-card:nth-child(2) .feat-icon { border-color: var(--cyan); color: var(--cyan); }
+    .feat-card:nth-child(3) .feat-icon { border-color: var(--lime); color: var(--lime); }
+    .feat-card:nth-child(4) .feat-icon { border-color: var(--yellow); color: var(--yellow); }
+
+    .feat-card h3 {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.3rem;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .feat-card:nth-child(1) h3 { color: var(--magenta); }
+    .feat-card:nth-child(2) h3 { color: var(--cyan); }
+    .feat-card:nth-child(3) h3 { color: var(--lime); }
+    .feat-card:nth-child(4) h3 { color: var(--yellow); }
+
+    .feat-card p {
+      color: var(--text-dim);
+      line-height: 1.65;
+      font-size: 0.95rem;
+    }
+
+    /* XP bar */
+    .xp-bar {
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .xp-track {
+      flex: 1;
+      height: 10px;
+      background: var(--surface-3);
+      border: 2px solid #333;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .xp-fill {
+      height: 100%;
+      position: relative;
+    }
+
+    .xp-fill::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 8px,
+        rgba(0,0,0,0.25) 8px,
+        rgba(0,0,0,0.25) 10px
+      );
+    }
+
+    .feat-card:nth-child(1) .xp-fill { background: var(--magenta); width: 95%; }
+    .feat-card:nth-child(2) .xp-fill { background: var(--cyan); width: 88%; }
+    .feat-card:nth-child(3) .xp-fill { background: var(--lime); width: 100%; }
+    .feat-card:nth-child(4) .xp-fill { background: var(--yellow); width: 92%; }
+
+    .xp-label {
+      font-family: var(--font-pixel);
+      font-size: 0.45rem;
+      color: var(--text-dim);
+      min-width: 50px;
+      text-align: right;
+    }
+
+    /* Rank badge on cards */
+    .rank {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-family: var(--font-pixel);
+      font-size: 0.45rem;
+      padding: 4px 10px;
+      border: 2px solid;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .rank-s { border-color: var(--yellow); color: var(--yellow); }
+    .rank-a { border-color: var(--lime); color: var(--lime); }
+    .rank-ss { border-color: var(--magenta); color: var(--magenta); }
+
+    /* ===== INSTALL / CODE SECTION ===== */
+    .install {
+      padding: 120px 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 30% 50%, rgba(0,255,240,0.03) 0%, transparent 70%),
+        var(--surface-1);
+      border-top: var(--border-w) solid var(--surface-3);
+      border-bottom: var(--border-w) solid var(--surface-3);
+    }
+
+    .install-grid {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    .code-window {
+      background: var(--surface);
+      border: var(--border-w) solid var(--surface-3);
+      box-shadow: 10px 10px 0 rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+
+    .code-chrome {
+      background: var(--surface-2);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 3px solid var(--surface-3);
+    }
+
+    .chrome-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid rgba(0,0,0,0.3);
+    }
+
+    .chrome-dot:nth-child(1) { background: var(--magenta); }
+    .chrome-dot:nth-child(2) { background: var(--yellow); }
+    .chrome-dot:nth-child(3) { background: var(--lime); }
+
+    .chrome-title {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-left: auto;
+    }
+
+    .code-body {
+      padding: 28px 24px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.85;
+      color: var(--text-dim);
+      overflow-x: auto;
+      counter-reset: line;
+    }
+
+    .code-line {
+      display: block;
+      padding-left: 40px;
+      position: relative;
+    }
+
+    .code-line::before {
+      counter-increment: line;
+      content: counter(line);
+      position: absolute;
+      left: 0;
+      width: 28px;
+      text-align: right;
+      color: var(--surface-3);
+      font-size: 0.7rem;
+    }
+
+    .c-comment { color: #3a3a50; font-style: italic; }
+    .c-kw { color: var(--magenta); }
+    .c-str { color: var(--lime); }
+    .c-fn { color: var(--cyan); }
+    .c-flag { color: var(--yellow); }
+    .c-op { color: var(--orange); }
+
+    .install-info {
+      padding-top: 16px;
+    }
+
+    .install-info h3 {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.8rem;
+      color: var(--cyan);
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+    }
+
+    .install-info > p {
+      color: var(--text-dim);
+      line-height: 1.7;
+      margin-bottom: 28px;
+      font-size: 1rem;
+    }
+
+    .stage-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .stage-item {
+      padding: 14px 0;
+      border-bottom: 2px solid var(--surface-3);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--text);
+      font-size: 0.95rem;
+      transition: padding-left 0.15s;
+    }
+
+    .stage-item:hover {
+      padding-left: 8px;
+    }
+
+    .stage-num {
+      font-family: var(--font-pixel);
+      font-size: 0.5rem;
+      color: var(--surface);
+      background: var(--cyan);
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ===== DOWNLOAD CTA ===== */
+    .download {
+      padding: 140px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      background:
+        conic-gradient(from 180deg at 50% 120%, rgba(200,255,0,0.04) 0deg, transparent 120deg, rgba(255,45,123,0.04) 240deg, transparent 360deg),
+        var(--surface);
+    }
+
+    .download-frame {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 32px;
+      position: relative;
+    }
+
+    .continue-screen {
+      background: var(--surface-1);
+      border: var(--border-w) solid var(--magenta);
+      box-shadow: 14px 14px 0 rgba(0,0,0,0.4), 0 0 80px rgba(255,45,123,0.08);
+      padding: 60px 48px;
+      position: relative;
+    }
+
+    .continue-screen::before {
+      content: 'CONTINUE?';
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-pixel);
+      font-size: 0.65rem;
+      background: var(--yellow);
+      color: var(--surface);
+      padding: 6px 28px;
+      border: 3px solid var(--surface);
+      letter-spacing: 2px;
+      animation: continueblink 2.5s ease-in-out infinite;
+    }
+
+    @keyframes continueblink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .continue-screen h2 {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 16px;
+      letter-spacing: -2px;
+    }
+
+    .continue-screen h2 .hl { color: var(--lime); }
+
+    .continue-screen > p {
+      color: var(--text-dim);
+      max-width: 500px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .dl-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .dl-card {
+      background: var(--surface);
+      border: 4px solid var(--surface-3);
+      padding: 28px 20px;
+      text-align: left;
+      text-decoration: none;
+      transition: all 0.08s;
+      position: relative;
+    }
+
+    .dl-card:hover {
+      transform: translate(-3px, -3px);
+      box-shadow: 6px 6px 0 rgba(0,0,0,0.3);
+    }
+
+    .dl-card:nth-child(1):hover { border-color: var(--magenta); }
+    .dl-card:nth-child(2):hover { border-color: var(--cyan); }
+    .dl-card:nth-child(3):hover { border-color: var(--lime); }
+
+    .dl-type {
+      font-family: var(--font-pixel);
+      font-size: 0.55rem;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .dl-card:nth-child(1) .dl-type { color: var(--magenta); }
+    .dl-card:nth-child(2) .dl-type { color: var(--cyan); }
+    .dl-card:nth-child(3) .dl-type { color: var(--lime); }
+
+    .dl-meta {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+
+    .dl-init {
+      font-family: var(--font-pixel);
+      font-size: 0.4rem;
+      color: var(--surface-3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .credits {
+      margin-top: 32px;
+      font-family: var(--font-pixel);
+      font-size: 0.45rem;
+      color: var(--surface-3);
+      letter-spacing: 1px;
+    }
+
+    .credits span {
+      color: var(--text-dim);
+      animation: credflick 4s ease-in-out infinite;
+    }
+
+    @keyframes credflick {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--surface-1);
+      border-top: var(--border-w) solid var(--lime);
+      padding: 56px 0 0;
+    }
+
+    .footer-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2.5fr 1fr 1fr 1fr;
+      gap: 40px;
+      padding-bottom: 48px;
+    }
+
+    .footer-brand p {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-top: 16px;
+      max-width: 320px;
+    }
+
+    .footer-col h4 {
+      font-family: var(--font-pixel);
+      font-size: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+
+    .footer-col:nth-of-type(1) h4 { color: var(--magenta); }
+    .footer-col:nth-of-type(2) h4 { color: var(--cyan); }
+    .footer-col:nth-of-type(3) h4 { color: var(--lime); }
+
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 10px; }
+
+    .footer-col a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.1s, padding-left 0.15s;
+      display: inline-block;
+    }
+
+    .footer-col a:hover {
+      color: var(--text);
+      padding-left: 6px;
+    }
+
+    .footer-bottom {
+      border-top: 2px solid var(--surface-3);
+      padding: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-bottom p {
+      font-family: var(--font-pixel);
+      font-size: 0.4rem;
+      color: var(--surface-3);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .footer-bottom .heart {
+      color: var(--magenta);
+      display: inline-block;
+      animation: heartpump 1.2s ease-in-out infinite;
+    }
+
+    @keyframes heartpump {
+      0%, 100% { transform: scale(1); }
+      15% { transform: scale(1.3); }
+      30% { transform: scale(1); }
+      45% { transform: scale(1.2); }
+    }
+
+    /* ===== SCROLL REVEAL ===== */
+    @keyframes revealUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      animation: revealUp 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    .reveal.in-view { animation-play-state: running; }
+
+    .reveal-delay-1 { animation-delay: 0.1s; }
+    .reveal-delay-2 { animation-delay: 0.2s; }
+    .reveal-delay-3 { animation-delay: 0.3s; }
+    .reveal-delay-4 { animation-delay: 0.4s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { animation: none; opacity: 1; }
+      .glitch::before, .glitch::after { animation: none; }
+    }
+
+    /* ===== GLITCH TEXT ===== */
+    .glitch {
+      position: relative;
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .glitch::before {
+      color: var(--cyan);
+      animation: glitch-1 3s infinite linear;
+      clip-path: inset(0 0 80% 0);
+    }
+
+    .glitch::after {
+      color: var(--magenta);
+      animation: glitch-2 3s infinite linear;
+      clip-path: inset(80% 0 0 0);
+    }
+
+    @keyframes glitch-1 {
+      0%, 92%, 100% { transform: translate(0); }
+      93% { transform: translate(-4px, 2px); }
+      95% { transform: translate(3px, -1px); }
+      97% { transform: translate(-2px, 1px); }
+    }
+
+    @keyframes glitch-2 {
+      0%, 90%, 100% { transform: translate(0); }
+      91% { transform: translate(3px, -2px); }
+      93% { transform: translate(-3px, 1px); }
+      96% { transform: translate(2px, -1px); }
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1000px) {
+      .hero-inner { grid-template-columns: 1fr; text-align: center; padding-top: 120px; }
+      .hero-desc { margin: 0 auto 40px; }
+      .hero-actions { justify-content: center; }
+      .version-badge { justify-content: center; }
+      .arcade-monitor { max-width: 480px; margin: 0 auto; }
+      .monitor-bezel { transform: none; }
+      .feat-grid { grid-template-columns: 1fr 1fr; }
+      .feat-card:nth-child(1) { grid-column: span 2; }
+      .install-grid { grid-template-columns: 1fr; }
+      .section-head { flex-direction: column; align-items: flex-start; }
+      .section-count { display: none; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: rgba(8,8,12,0.97);
+        backdrop-filter: blur(12px);
+        border-bottom: var(--border-w) solid var(--magenta);
+        padding: 16px 24px;
+        gap: 4px;
+      }
+      .hero-left h1 { font-size: 3rem; letter-spacing: -1px; }
+      .stats-inner { grid-template-columns: 1fr 1fr; }
+      .stat:nth-child(2) { border-right: none; }
+      .stat:nth-child(1), .stat:nth-child(2) { border-bottom: 3px solid var(--surface-3); }
+      .feat-grid { grid-template-columns: 1fr; }
+      .feat-card:nth-child(1) { grid-column: span 1; }
+      .dl-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .continue-screen { padding: 48px 24px; }
+      .pixel-float { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="logo">BENTOO</a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a href="#download">Download</a></li>
+        <li><a href="#">Wiki</a></li>
+        <li><a href="#" class="nav-cta">GitHub</a></li>
+      </ul>
+      <button class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-track">
+      <span>Compile your reality</span><span class="sep">/</span>
+      <span>Gentoo-based</span><span class="sep">/</span>
+      <span>Rolling release</span><span class="sep">/</span>
+      <span>Player 1 ready</span><span class="sep">/</span>
+      <span>USE flags unlocked</span><span class="sep">/</span>
+      <span>Portage power-up</span><span class="sep">/</span>
+      <span>Source-based</span><span class="sep">/</span>
+      <span>Level up your system</span><span class="sep">/</span>
+      <span>Compile your reality</span><span class="sep">/</span>
+      <span>Gentoo-based</span><span class="sep">/</span>
+      <span>Rolling release</span><span class="sep">/</span>
+      <span>Player 1 ready</span><span class="sep">/</span>
+      <span>USE flags unlocked</span><span class="sep">/</span>
+      <span>Portage power-up</span><span class="sep">/</span>
+      <span>Source-based</span><span class="sep">/</span>
+      <span>Level up your system</span><span class="sep">/</span>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="pixel-float"><div class="px-cross c-magenta"></div></div>
+    <div class="pixel-float"><div class="px-cross c-cyan"></div></div>
+    <div class="pixel-float"><div class="px-cross c-lime"></div></div>
+    <div class="pixel-float"><div class="px-cross c-yellow"></div></div>
+    <div class="pixel-float"><div class="px-cross c-violet"></div></div>
+
+    <div class="hero-inner">
+      <div class="hero-left">
+        <h1 class="glitch" data-text="BENTOO">BENT<span class="o">OO</span></h1>
+        <div class="hero-sub">Gentoo-based distro for power users</div>
+        <p class="hero-desc">
+          A <strong>source-based</strong> distribution with curated defaults,
+          sane USE flags, and an opinionated setup. All the raw power of Gentoo
+          without the three-day install quest.
+        </p>
+        <div class="hero-actions">
+          <a href="#download" class="btn btn-primary">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M3 7l4 4 4-4M1 13h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"/></svg>
+            Download
+          </a>
+          <a href="#install" class="btn btn-ghost">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" stroke="currentColor" stroke-width="2"/><path d="M4 4.5h6M4 7h4M4 9.5h5" stroke="currentColor" stroke-width="1.5"/></svg>
+            Read docs
+          </a>
+        </div>
+        <div class="version-badge">
+          <span class="dot"></span>
+          <span>v2026.04 &mdash; kernel 6.19-bentoo &mdash; stable</span>
+        </div>
+      </div>
+
+      <div class="arcade-monitor">
+        <div class="monitor-bezel">
+          <div class="bezel-leds">
+            <div class="bezel-led on"></div>
+            <div class="bezel-led warn"></div>
+            <div class="bezel-led off"></div>
+          </div>
+          <div class="crt-screen" id="crtScreen">
+            <div class="t-line"><span class="t-dim">Bentoo Linux 2026.04 (tty1)</span></div>
+            <div class="t-line">&nbsp;</div>
+            <div class="t-line"><span class="t-prompt">player1@bentoo</span> <span class="t-cmd">~ $</span> emerge <span class="t-hl">--ask</span> @world</div>
+            <div class="t-line"><span class="t-dim">[ebuild  U ] sys-kernel/bentoo-sources-6.19.12</span></div>
+            <div class="t-line"><span class="t-dim">[ebuild  N ] app-misc/bentoo-meta-2026.04</span></div>
+            <div class="t-line"><span class="t-dim">[ebuild  U ] sys-apps/portage-3.0.78</span></div>
+            <div class="t-line"><span class="t-dim">...321 packages (4 new, 12 updates)</span></div>
+            <div class="t-line">&nbsp;</div>
+            <div class="t-line"><span class="t-ok">&gt;&gt;&gt; All 321 packages merged.</span></div>
+            <div class="t-line"><span class="t-warn">*** ACHIEVEMENT UNLOCKED: WORLD DOMINATION</span></div>
+            <div class="t-line">&nbsp;</div>
+            <div class="t-line"><span class="t-prompt">player1@bentoo</span> <span class="t-cmd">~ $</span> <span class="cursor"></span></div>
+          </div>
+        </div>
+        <div class="controls-panel">
+          <div class="dpad">
+            <div></div><div class="dpad-btn"></div><div></div>
+            <div class="dpad-btn"></div><div class="dpad-center"></div><div class="dpad-btn"></div>
+            <div></div><div class="dpad-btn active"></div><div></div>
+          </div>
+          <div class="coin-slot">Insert coin</div>
+          <div class="action-btns">
+            <div class="a-btn btn-x">X</div>
+            <div class="a-btn btn-b">B</div>
+            <div class="a-btn btn-a">A</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stats-inner">
+      <div class="stat" data-idx="01">
+        <div class="stat-val">30K+</div>
+        <div class="stat-lbl">Packages</div>
+      </div>
+      <div class="stat" data-idx="02">
+        <div class="stat-val">100%</div>
+        <div class="stat-lbl">Source-based</div>
+      </div>
+      <div class="stat" data-idx="03">
+        <div class="stat-val">Rolling</div>
+        <div class="stat-lbl">Release model</div>
+      </div>
+      <div class="stat" data-idx="04">
+        <div class="stat-val">x86_64</div>
+        <div class="stat-lbl">Architecture</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="section-head">
+      <div>
+        <div class="section-tag tag-magenta">Select your class</div>
+        <h2 class="section-title">Choose your<br>power-ups</h2>
+      </div>
+      <div class="section-count">04</div>
+    </div>
+
+    <div class="feat-grid">
+      <div class="feat-card reveal">
+        <span class="rank rank-ss">SS</span>
+        <div class="feat-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <rect x="2" y="4" width="24" height="20" rx="1" stroke="currentColor" stroke-width="3"/>
+            <path d="M2 10h24" stroke="currentColor" stroke-width="3"/>
+            <rect x="6" y="14" width="5" height="5" fill="currentColor" opacity="0.6"/>
+          </svg>
+        </div>
+        <h3>Portage Package Manager</h3>
+        <p>The most powerful package manager in Linux. Compile everything from source with custom USE flags tailored to your exact hardware. Your system, your rules, your flags.</p>
+        <div class="xp-bar">
+          <div class="xp-track"><div class="xp-fill"></div></div>
+          <div class="xp-label">LVL 95</div>
+        </div>
+      </div>
+
+      <div class="feat-card reveal reveal-delay-1">
+        <span class="rank rank-s">S</span>
+        <div class="feat-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M14 2L26 8v12l-12 6L2 20V8L14 2z" stroke="currentColor" stroke-width="3" fill="none"/>
+            <path d="M10 14l3 3 5-5" stroke="currentColor" stroke-width="3" stroke-linecap="square"/>
+          </svg>
+        </div>
+        <h3>Hardened Security</h3>
+        <p>SELinux profiles, PIE, SSP, and ASLR out of the box. A fortress from boot to shutdown.</p>
+        <div class="xp-bar">
+          <div class="xp-track"><div class="xp-fill"></div></div>
+          <div class="xp-label">LVL 88</div>
+        </div>
+      </div>
+
+      <div class="feat-card reveal reveal-delay-2">
+        <span class="rank rank-a">A+</span>
+        <div class="feat-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M14 4l2 6h6l-5 4 2 6-5-3-5 3 2-6-5-4h6l2-6z" stroke="currentColor" stroke-width="2.5" fill="none"/>
+          </svg>
+        </div>
+        <h3>Blazing Performance</h3>
+        <p>Every package compiled with YOUR CPU flags. -march=native is a lifestyle. Zero bloat.</p>
+        <div class="xp-bar">
+          <div class="xp-track"><div class="xp-fill"></div></div>
+          <div class="xp-label">MAX</div>
+        </div>
+      </div>
+
+      <div class="feat-card reveal reveal-delay-3">
+        <span class="rank rank-s">S</span>
+        <div class="feat-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <rect x="4" y="4" width="20" height="20" rx="1" stroke="currentColor" stroke-width="3"/>
+            <path d="M4 12h20M12 12v12" stroke="currentColor" stroke-width="2.5"/>
+          </svg>
+        </div>
+        <h3>Curated Defaults</h3>
+        <p>Sane USE flags, pre-configured profiles, and opinionated setups. Gentoo power, no marathon.</p>
+        <div class="xp-bar">
+          <div class="xp-track"><div class="xp-fill"></div></div>
+          <div class="xp-label">LVL 92</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSTALL -->
+  <section class="install" id="install">
+    <div class="section-head" style="max-width:1400px; margin: 0 auto 64px; padding: 0 32px;">
+      <div>
+        <div class="section-tag tag-cyan">Quick start</div>
+        <h2 class="section-title">Boot sequence<br>initiated</h2>
+      </div>
+      <div class="section-count">SH</div>
+    </div>
+
+    <div class="install-grid">
+      <div class="code-window reveal">
+        <div class="code-chrome">
+          <span class="chrome-dot"></span>
+          <span class="chrome-dot"></span>
+          <span class="chrome-dot"></span>
+          <span class="chrome-title">install.sh</span>
+        </div>
+        <div class="code-body">
+          <span class="code-line"><span class="c-comment"># Stage 1: Get the tarball</span></span>
+          <span class="code-line"><span class="c-kw">wget</span> <span class="c-str">https://obentoo.org/releases/latest.tar.xz</span></span>
+          <span class="code-line">&nbsp;</span>
+          <span class="code-line"><span class="c-comment"># Stage 2: Extract &amp; chroot</span></span>
+          <span class="code-line"><span class="c-kw">tar</span> <span class="c-flag">xpf</span> latest.tar.xz <span class="c-flag">-C</span> /mnt/gentoo</span>
+          <span class="code-line"><span class="c-kw">chroot</span> /mnt/gentoo <span class="c-str">/bin/bash</span></span>
+          <span class="code-line">&nbsp;</span>
+          <span class="code-line"><span class="c-comment"># Stage 3: Sync &amp; configure</span></span>
+          <span class="code-line"><span class="c-kw">emerge</span> <span class="c-flag">--sync</span></span>
+          <span class="code-line"><span class="c-kw">eselect</span> profile set <span class="c-str">bentoo/desktop</span></span>
+          <span class="code-line">&nbsp;</span>
+          <span class="code-line"><span class="c-comment"># Stage 4: Build your world</span></span>
+          <span class="code-line"><span class="c-kw">emerge</span> <span class="c-flag">-avuDN</span> <span class="c-str">@world</span></span>
+          <span class="code-line">&nbsp;</span>
+          <span class="code-line"><span class="c-comment"># GAME START!</span></span>
+          <span class="code-line"><span class="c-kw">rc-service</span> display-manager <span class="c-fn">start</span></span>
+        </div>
+      </div>
+
+      <div class="install-info reveal reveal-delay-2">
+        <h3>Ready in 4 stages</h3>
+        <p>Bentoo streamlines the Gentoo installation with pre-configured stage3 tarballs, curated profiles, and sensible defaults.</p>
+        <ul class="stage-list">
+          <li class="stage-item"><span class="stage-num">1</span> Pre-compiled kernel with common drivers</li>
+          <li class="stage-item"><span class="stage-num">2</span> Desktop, server, and minimal profiles</li>
+          <li class="stage-item"><span class="stage-num">3</span> Overlay with exclusive Bentoo packages</li>
+          <li class="stage-item"><span class="stage-num">4</span> Automated USE flag optimization</li>
+          <li class="stage-item"><span class="stage-num">5</span> Installer TUI for guided setup</li>
+          <li class="stage-item"><span class="stage-num">6</span> Full Gentoo compatibility preserved</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section class="download" id="download">
+    <div class="download-frame">
+      <div class="continue-screen reveal">
+        <h2>Ready <span class="hl">Player One</span>?</h2>
+        <p>Choose your stage file and start building. All images include a pre-compiled kernel and the Bentoo overlay.</p>
+        <div class="dl-grid">
+          <a href="#" class="dl-card">
+            <div class="dl-type">Stage3 Desktop</div>
+            <div class="dl-meta">~1.2 GB</div>
+            <div class="dl-init">systemd</div>
+          </a>
+          <a href="#" class="dl-card">
+            <div class="dl-type">Stage3 Server</div>
+            <div class="dl-meta">~680 MB</div>
+            <div class="dl-init">openrc</div>
+          </a>
+          <a href="#" class="dl-card">
+            <div class="dl-type">Live ISO</div>
+            <div class="dl-meta">~2.1 GB</div>
+            <div class="dl-init">try first</div>
+          </a>
+        </div>
+        <div class="credits"><span>9</span> credits remaining</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="logo">BENTOO</a>
+          <p>A Gentoo-based Linux distribution for players who compile their own destiny.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Project</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">News</a></li>
+            <li><a href="#">Roadmap</a></li>
+            <li><a href="#">Contribute</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="#">Wiki</a></li>
+            <li><a href="#">Handbook</a></li>
+            <li><a href="#">Packages</a></li>
+            <li><a href="#">Overlay</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <ul>
+            <li><a href="#">IRC / Matrix</a></li>
+            <li><a href="#">Discord</a></li>
+            <li><a href="#">Forum</a></li>
+            <li><a href="#">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Bentoo Linux &mdash; built with <span class="heart">&hearts;</span> and CFLAGS</p>
+        <p>Gentoo is a trademark of the Gentoo Foundation</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Konami code easter egg
+    const konami = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+    let idx = 0;
+    document.addEventListener('keydown', (e) => {
+      if (e.key === konami[idx]) {
+        idx++;
+        if (idx === konami.length) {
+          document.body.style.filter = 'hue-rotate(180deg)';
+          setTimeout(() => document.body.style.filter = '', 3000);
+          idx = 0;
+        }
+      } else { idx = 0; }
+    });
+  </script>
+</body>
+</html>
