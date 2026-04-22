@@ -1,13 +1,11 @@
 import { defineConfig } from 'astro/config';
-import sitemap from '@astrojs/sitemap';
 
+// Note: @astrojs/sitemap is installed but NOT loaded as integration.
+// The sitemap is authored at src/pages/sitemap.xml.ts for hreflang control
+// (see tasks.md Task 8.1 GOTCHA).
 export default defineConfig({
   site: 'https://bentoo.org',
-  integrations: [
-    sitemap({
-      filter: (page) => /^https:\/\/bentoo\.org\/(pt\/)?$/.test(page),
-    }),
-  ],
+  integrations: [],
   vite: {
     define: {
       'import.meta.env.PUBLIC_IS_PRODUCTION': JSON.stringify(
