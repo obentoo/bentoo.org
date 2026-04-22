@@ -1,0 +1,252 @@
+---
+import VariantLayout from '~/layouts/VariantLayout.astro';
+import { strings } from '~/i18n/pt';
+const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
+---
+<VariantLayout
+  lang="pt"
+  path="/pt/v/synthwave/"
+  title="BENTOO // synthwave outrun"
+  description="Bentoo é um Stage5 amigável do Gentoo Linux."
+  variantSlug="synthwave"
+>
+  <Fragment slot="head-extra">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Audiowide&family=VT323&family=Michroma&display=swap" rel="stylesheet" />
+  </Fragment>
+  <style slot="style">
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --sky:#0a0416; --sky-2:#1a0a2e; --ground:#2a0a3e;
+      --pink:#ff36f0; --magenta:#ff1b9c;
+      --cyan:#14ffec;
+      --orange:#ff7a1a; --yellow:#ffd200;
+      --ink:#050210; --white:#f5eaff;
+      --f-orb:'Orbitron',sans-serif;
+      --f-chrome:'Audiowide',sans-serif;
+      --f-mich:'Michroma',sans-serif;
+      --f-crt:'VT323',monospace;
+    }
+    html,body{background:var(--sky);color:var(--white);font-family:var(--f-orb);font-weight:500;font-size:15px;min-height:100vh;line-height:1.5;display:flex;flex-direction:column;overflow-x:hidden}
+    body{
+      background:
+        linear-gradient(180deg,var(--sky) 0%,#200a3a 40%,#c61473 60%,#ff7a1a 90%,#ffd200 100%);
+      position:relative;
+    }
+    /* Stars */
+    body::before{
+      content:'';position:fixed;top:0;left:0;right:0;height:55%;
+      background-image:
+        radial-gradient(1px 1px at 10% 18%,#fff,transparent),
+        radial-gradient(1px 1px at 25% 42%,#fff,transparent),
+        radial-gradient(1px 1px at 50% 12%,#fff,transparent),
+        radial-gradient(1px 1px at 70% 30%,#fff,transparent),
+        radial-gradient(1px 1px at 88% 48%,#fff,transparent),
+        radial-gradient(1px 1px at 12% 60%,#fff,transparent),
+        radial-gradient(2px 2px at 38% 22%,#fff,transparent),
+        radial-gradient(2px 2px at 82% 12%,#fff,transparent);
+      pointer-events:none;z-index:0;
+    }
+    /* Grid floor */
+    body::after{
+      content:'';position:fixed;left:0;right:0;bottom:0;height:45%;
+      background:
+        linear-gradient(0deg,rgba(10,4,22,.5),transparent 70%),
+        repeating-linear-gradient(0deg,transparent 0 22px,var(--cyan) 22px 23px),
+        repeating-linear-gradient(90deg,transparent 0 22px,var(--cyan) 22px 23px);
+      transform:perspective(520px) rotateX(58deg);
+      transform-origin:bottom center;
+      pointer-events:none;z-index:1;
+      opacity:.55;
+    }
+    .sun{
+      position:fixed;top:18%;left:50%;transform:translateX(-50%);
+      width:360px;height:360px;border-radius:50%;
+      background:linear-gradient(180deg,var(--yellow) 0%,var(--orange) 40%,var(--magenta) 100%);
+      box-shadow:0 0 100px rgba(255,27,156,.4),0 0 180px rgba(255,54,240,.25);
+      clip-path:polygon(0 0,100% 0,100% 55%,96% 57%,100% 59%,92% 61%,100% 63%,86% 65%,100% 67%,80% 69%,100% 71%,60% 73%,100% 75%,0 100%);
+      pointer-events:none;z-index:0;
+    }
+    .scan{
+      position:fixed;inset:0;pointer-events:none;z-index:1000;
+      background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(255,255,255,.04) 2px 3px);
+    }
+    a{color:inherit;text-decoration:none}
+
+    .top-bar{
+      position:relative;z-index:10;
+      background:rgba(10,4,22,.55);backdrop-filter:blur(6px);
+      border-bottom:1px solid var(--pink);
+      padding:10px 28px;
+      display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+      font-family:var(--f-mich);font-size:10px;letter-spacing:.28em;color:var(--cyan);
+    }
+    .top-bar .brand{color:var(--pink)}
+    .top-bar .clk{color:var(--yellow);font-family:var(--f-crt);font-size:15px;letter-spacing:.12em}
+
+    main{flex:1;padding:72px 28px 80px;max-width:1080px;margin:0 auto;width:100%;position:relative;z-index:2;text-align:center}
+
+    .over{
+      font-family:var(--f-mich);font-size:clamp(11px,1vw,14px);
+      letter-spacing:.4em;color:var(--cyan);margin-bottom:18px;
+      text-shadow:0 0 16px var(--cyan);text-transform:uppercase;
+    }
+
+    h1.word{
+      font-family:var(--f-orb);font-weight:900;
+      font-size:clamp(80px,13vw,180px);
+      line-height:.88;letter-spacing:-.02em;color:var(--white);
+      background:linear-gradient(180deg,var(--cyan) 0%,var(--white) 40%,var(--pink) 70%,var(--orange) 100%);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+      text-shadow:0 0 26px rgba(255,54,240,.5);
+      filter:drop-shadow(-2px 0 0 var(--pink)) drop-shadow(2px 0 0 var(--cyan));
+    }
+    h1.word em{font-style:normal}
+    h1.word .dot{-webkit-text-fill-color:var(--yellow);color:var(--yellow)}
+
+    .tagline{
+      display:inline-block;margin-top:18px;padding:12px 28px;
+      font-family:var(--f-chrome);font-size:clamp(13px,1.4vw,17px);letter-spacing:.2em;
+      background:rgba(10,4,22,.7);border:1.5px solid var(--pink);color:var(--white);
+      box-shadow:0 0 28px rgba(255,54,240,.35),inset 0 0 28px rgba(255,54,240,.05);
+      text-transform:uppercase;
+    }
+    .tagline em{color:var(--cyan);font-style:normal;font-weight:400}
+
+    .lede-wrap{max-width:620px;margin:32px auto 40px;color:var(--white);font-family:var(--f-orb);font-size:14.5px;line-height:1.7;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+    .lede-wrap b{color:var(--cyan);font-weight:700;text-shadow:0 0 10px var(--cyan)}
+    .lede-wrap em{color:var(--pink);font-style:normal;font-weight:700;text-shadow:0 0 10px var(--pink)}
+
+    .stripe-band{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:40px;
+      background:rgba(10,4,22,.6);border:1px solid var(--pink);
+    }
+    .stripe-band .c{
+      padding:16px 14px;border-right:1px solid var(--pink);text-align:left;font-family:var(--f-chrome);
+    }
+    .stripe-band .c:last-child{border-right:none}
+    .stripe-band .k{font-family:var(--f-mich);font-size:9px;letter-spacing:.22em;color:var(--cyan);margin-bottom:6px;text-transform:uppercase}
+    .stripe-band .v{font-size:20px;color:var(--white);letter-spacing:.04em}
+    .stripe-band .v em{color:var(--pink);font-style:normal}
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:40px}
+    .btn{
+      padding:14px 26px;font-family:var(--f-chrome);font-size:13px;letter-spacing:.18em;
+      background:rgba(10,4,22,.75);color:var(--white);
+      border:1.5px solid var(--cyan);cursor:pointer;
+      text-transform:uppercase;
+      box-shadow:0 0 16px rgba(20,255,236,.3);
+      transition:all .2s;
+    }
+    .btn:hover{background:var(--cyan);color:var(--sky);box-shadow:0 0 32px rgba(20,255,236,.7)}
+    .btn.pri{border-color:var(--pink);color:var(--pink);box-shadow:0 0 16px rgba(255,54,240,.3)}
+    .btn.pri:hover{background:var(--pink);color:var(--sky);box-shadow:0 0 32px rgba(255,54,240,.7)}
+
+    .notify{
+      max-width:540px;margin:0 auto;padding:22px 24px;
+      background:rgba(10,4,22,.85);border:1.5px solid var(--yellow);
+      box-shadow:0 0 32px rgba(255,210,0,.2);
+    }
+    .notify .lbl{font-family:var(--f-mich);font-size:10px;letter-spacing:.24em;color:var(--yellow);margin-bottom:14px;text-transform:uppercase}
+    .notify .lbl b{color:var(--pink)}
+    .notify form{display:flex;gap:8px}
+    .notify input{
+      flex:1;padding:12px 16px;background:var(--sky-2);color:var(--white);border:1px solid var(--cyan);outline:none;
+      font-family:var(--f-crt);font-size:18px;
+    }
+    .notify input:focus{border-color:var(--pink)}
+    .notify button{
+      padding:0 22px;background:var(--pink);color:var(--sky);border:1px solid var(--pink);
+      font-family:var(--f-chrome);font-size:13px;letter-spacing:.14em;cursor:pointer;text-transform:uppercase;
+    }
+    .notify button:hover{background:var(--yellow);border-color:var(--yellow)}
+
+    .privacy-consent{
+      max-width:540px;margin:12px auto 0;font-family:var(--f-mich);font-size:10px;letter-spacing:.2em;color:var(--cyan);text-transform:uppercase;text-align:center;
+    }
+    .privacy-consent a{color:var(--pink);font-weight:700}
+
+    footer{
+      background:rgba(10,4,22,.85);border-top:1px solid var(--cyan);
+      padding:16px 28px;margin-top:20px;
+      display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+      font-family:var(--f-mich);font-size:10px;letter-spacing:.22em;color:var(--cyan);text-transform:uppercase;
+      position:relative;z-index:10;
+    }
+    footer em{color:var(--pink);font-style:normal}
+    footer a{color:var(--cyan)}
+    footer a:hover{color:var(--pink)}
+
+    @media (max-width:720px){
+      .sun{width:220px;height:220px}
+      .stripe-band{grid-template-columns:1fr 1fr}
+      .notify form{flex-direction:column}
+    }
+  </style>
+
+  <div class="sun"></div>
+  <div class="scan"></div>
+
+  <div class="top-bar">
+    <span><span class="brand">BENTOO//</span> SYNTHWAVE · OUTRUN</span>
+    <span class="clk" id="clk">--:--:--</span>
+  </div>
+
+  <main>
+    <div class="over">◤ OUTRUN · STAGE5 · CHEGANDO EM 2026 ◢</div>
+    <h1 class="word">BENT<em>OO</em><span class="dot">.</span></h1>
+    <div class="tagline">Um <em>Stage5</em> amigável do Gentoo Linux</div>
+
+    <div class="lede-wrap">
+      Um desktop Linux <em>baseado em fontes</em> para a neon highway — <b>Stage5</b> do Gentoo.
+      Pré-compilado, pré-configurado, Portage intacto por baixo. Cruze em x86-64-v3.
+    </div>
+
+    <div class="stripe-band">
+      <div class="c"><span class="k">release</span><span class="v"><em>0.1.0</em> ALPHA</span></div>
+      <div class="c"><span class="k">velocidade</span><span class="v">x86-64-<em>v3</em></span></div>
+      <div class="c"><span class="k">janela</span><span class="v">FIM DE <em>2026</em></span></div>
+      <div class="c"><span class="k">cozinha</span><span class="v">BRASIL · 東京</span></div>
+    </div>
+
+    <div class="actions">
+      <a class="btn pri" href="https://github.com/obentoo" target="_blank" rel="noopener">► CÓDIGO</a>
+      <a class="btn" href="mailto:contact@obentoo.org">✉ CONTATO</a>
+      <a class="btn" href="#notify">⚡ ME AVISE</a>
+    </div>
+
+    <div class="notify" id="notify">
+      <div class="lbl">PING DE LANÇAMENTO · <b>ÚNICO</b> · SEM NEWSLETTER</div>
+      <form
+        data-bentoo-subscribe
+        action={`https://buttondown.com/api/emails/embed-subscribe/${buttondownUser}`}
+        method="post"
+        data-success-msg={strings.successMsg}
+        data-error-msg={strings.errorMsg}
+      >
+        <input type="hidden" name="embed" value="1" />
+        <input type="email" name="email" required placeholder={strings.subscribePlaceholder} />
+        <button type="submit">{strings.subscribeButton}</button>
+      </form>
+    </div>
+    <p class="privacy-consent">
+      {strings.privacyConsent} <a href="/pt/privacy">{strings.privacyLinkLabel}</a>
+    </p>
+  </main>
+
+  <footer>
+    <span>© 2018 – 2026 <em>BENTOO.</em> · FEITO À MÃO, CÓDIGO ABERTO</span>
+    <span><a href="https://github.com/obentoo" target="_blank" rel="noopener">github.com/obentoo</a> · <a href="mailto:contact@obentoo.org">contact@obentoo.org</a></span>
+  </footer>
+
+  <script is:inline>
+    (function(){
+      var c=document.getElementById('clk');
+      if(!c) return;
+      var p=function(n){return String(n).padStart(2,'0');};
+      function t(){var d=new Date();c.textContent=p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());}
+      t();setInterval(t,1000);
+    })();
+  </script>
+</VariantLayout>

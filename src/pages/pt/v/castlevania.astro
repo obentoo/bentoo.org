@@ -1,0 +1,620 @@
+---
+import VariantLayout from '~/layouts/VariantLayout.astro';
+import { strings } from '~/i18n/pt';
+const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
+---
+<VariantLayout
+  lang="pt"
+  path="/pt/v/castlevania/"
+  title="bentoo — sinfonia do código-fonte"
+  description="Bentoo — um Stage5 amigável do Gentoo Linux. Escuridão baseada em código-fonte."
+  variantSlug="castlevania"
+>
+  <Fragment slot="head-extra">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,700;1,400&family=UnifrakturMaguntia&display=swap" rel="stylesheet" />
+  </Fragment>
+  <style is:global slot="style">
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    .v-castlevania {
+      --night:     #100818;
+      --wine:      #2a0b1a;
+      --wine-2:    #411430;
+      --stone:     #3d3450;
+      --stone-l:   #6a5f80;
+      --gold:      #e8b954;
+      --gold-d:    #8a6a20;
+      --gold-l:    #fce2a0;
+      --blood:     #b00020;
+      --blood-d:   #5a0010;
+      --curtain:   #8a0d2a;
+      --candle:    #f6c670;
+      --glass-b:   #1a4870;
+      --glass-p:   #7040a4;
+      --glass-r:   #b01830;
+      --moon:      #f5eed8;
+      --text:      #e4d8b5;
+      --text-dim:  #9d8e6a;
+
+      background: var(--night);
+      color: var(--text);
+      font-family: 'Cormorant Garamond', serif;
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      display: block;
+    }
+
+    /* Gothic interior backdrop */
+    .v-castlevania::before {
+      content: '';
+      position: fixed; inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 45% at 50% 38%, rgba(122,84,190,.18) 0%, transparent 60%),
+        radial-gradient(ellipse 80% 50% at 50% 100%, rgba(138,13,42,.2) 0%, transparent 60%),
+        linear-gradient(180deg, #1b0c26 0%, #0f0616 55%, #06030c 100%);
+    }
+    /* stone column pattern */
+    .v-castlevania::after {
+      content: '';
+      position: fixed; inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: .3;
+      background:
+        repeating-linear-gradient(90deg, transparent 0 60px, rgba(90,70,120,.1) 60px 62px),
+        repeating-linear-gradient(0deg, transparent 0 80px, rgba(90,70,120,.08) 80px 82px);
+    }
+
+    /* Vignette & grain */
+    .v-castlevania .overlay {
+      position: fixed; inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(0,0,0,.85) 100%);
+    }
+    .v-castlevania .grain {
+      position: fixed; inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      opacity: .14;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+
+    /* Red curtains on sides */
+    .v-castlevania .curtain {
+      position: fixed;
+      top: 0; bottom: 0;
+      width: 16%;
+      z-index: 4;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(90deg,
+          var(--curtain) 0 26px,
+          #6a091f 26px 30px,
+          var(--curtain) 30px 60px,
+          #b61838 60px 64px
+        );
+      filter: drop-shadow(0 0 40px rgba(0,0,0,.6));
+    }
+    .v-castlevania .curtain.left  { left: 0;
+      mask: linear-gradient(90deg, #000 0 70%, transparent 100%);
+      -webkit-mask: linear-gradient(90deg, #000 0 70%, transparent 100%);
+    }
+    .v-castlevania .curtain.right { right: 0;
+      mask: linear-gradient(270deg, #000 0 70%, transparent 100%);
+      -webkit-mask: linear-gradient(270deg, #000 0 70%, transparent 100%);
+    }
+    .v-castlevania .curtain::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 28px;
+      background: linear-gradient(180deg, #4a081b 0%, var(--curtain) 100%);
+      box-shadow: inset 0 -2px 0 #f7d278;
+    }
+
+    /* Stained glass window center */
+    .v-castlevania .window {
+      position: fixed;
+      top: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 260px;
+      height: 360px;
+      z-index: 1;
+      opacity: .9;
+      filter: drop-shadow(0 0 40px rgba(160,80,200,.35));
+    }
+    .v-castlevania .window svg { width: 100%; height: 100%; }
+
+    /* Moon behind window */
+    .v-castlevania .moon {
+      position: fixed;
+      top: 140px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, var(--moon) 0%, #c8bfa0 70%, #7a6f4a 100%);
+      box-shadow: 0 0 60px rgba(245,238,216,.2), inset -14px -8px 24px rgba(0,0,0,.2);
+      z-index: 0;
+      opacity: .35;
+    }
+
+    /* Chandelier */
+    .v-castlevania .chandelier {
+      position: fixed;
+      top: 0;
+      z-index: 3;
+      pointer-events: none;
+      animation: castlevania-chandSway 6s ease-in-out infinite;
+      transform-origin: top center;
+    }
+    .v-castlevania .chandelier.left  { left: 18%; }
+    .v-castlevania .chandelier.right { right: 18%; }
+    .v-castlevania .chandelier .rope {
+      width: 2px; height: 80px;
+      margin: 0 auto;
+      background: linear-gradient(180deg, #3a2f12 0%, #6a5420 100%);
+    }
+    .v-castlevania .chandelier .ring {
+      width: 110px; height: 26px;
+      border: 3px solid var(--gold-d);
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, var(--gold) 0%, var(--gold-d) 100%);
+      position: relative;
+      box-shadow: 0 0 20px rgba(232,185,84,.3);
+    }
+    .v-castlevania .chandelier .candles {
+      position: absolute; inset: 0;
+      display: flex; justify-content: space-around; align-items: flex-start;
+      padding-top: -10px;
+    }
+    .v-castlevania .flame {
+      width: 6px; height: 14px;
+      border-radius: 40% 40% 50% 50% / 60% 60% 40% 40%;
+      background: radial-gradient(ellipse at 50% 80%, #fff 0%, var(--candle) 50%, #c87020 100%);
+      position: relative;
+      margin-top: -12px;
+      filter: drop-shadow(0 0 8px rgba(246,198,112,.7));
+      animation: castlevania-flicker .18s steps(2) infinite;
+    }
+    @keyframes castlevania-flicker {
+      0%,100% { transform: scale(1,1); opacity: 1; }
+      50%     { transform: scale(.92,1.08); opacity: .85; }
+    }
+    @keyframes castlevania-chandSway {
+      0%,100% { transform: rotate(-1.2deg); }
+      50%     { transform: rotate(1.2deg); }
+    }
+
+    /* Bats */
+    .v-castlevania .bat {
+      position: fixed;
+      z-index: 3;
+      font-size: 18px;
+      color: #1a0010;
+      animation: castlevania-bat 10s ease-in-out infinite;
+      pointer-events: none;
+      filter: drop-shadow(0 0 4px rgba(0,0,0,.6));
+    }
+    .v-castlevania .bat.b1 { top: 26%; left: 40%; animation-delay: 0s; }
+    .v-castlevania .bat.b2 { top: 48%; left: 60%; animation-delay: -3s; font-size: 14px; }
+    .v-castlevania .bat.b3 { top: 55%; left: 25%; animation-delay: -6s; font-size: 20px; }
+    @keyframes castlevania-bat {
+      0%   { transform: translate(0,0) scaleX(1); }
+      25%  { transform: translate(-40px,-20px) scaleX(-1); }
+      50%  { transform: translate(-80px,10px) scaleX(1); }
+      75%  { transform: translate(-40px,30px) scaleX(-1); }
+      100% { transform: translate(0,0) scaleX(1); }
+    }
+
+    /* ========== HEADER ========== */
+    .v-castlevania header {
+      position: relative;
+      z-index: 10;
+      padding: 24px 68px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'UnifrakturMaguntia', serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.02em;
+    }
+    .v-castlevania header .crest {
+      color: var(--gold);
+      text-shadow: 0 0 14px rgba(232,185,84,.3), 1px 1px 0 #000;
+    }
+    .v-castlevania header .menu {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px;
+      letter-spacing: 0.32em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    /* ========== MAIN ========== */
+    .v-castlevania main {
+      position: relative;
+      z-index: 5;
+      min-height: calc(100vh - 80px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 80px 140px;
+      text-align: center;
+      gap: 22px;
+    }
+
+    .v-castlevania .wordmark-frame {
+      position: relative;
+      padding: 14px 70px;
+      display: inline-block;
+    }
+    .v-castlevania .wordmark-frame::before, .v-castlevania .wordmark-frame::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 56px; height: 28px;
+      transform: translateY(-50%);
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 56 28'><g fill='none' stroke='%23e8b954' stroke-width='1.2'><path d='M2 14 Q14 4 28 14 Q42 24 54 14'/><path d='M2 14 Q14 24 28 14 Q42 4 54 14'/><circle cx='14' cy='9' r='2' fill='%23e8b954'/><circle cx='42' cy='9' r='2' fill='%23e8b954'/><circle cx='28' cy='14' r='3' fill='%23e8b954'/></g></svg>");
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+    .v-castlevania .wordmark-frame::before { left: 0; }
+    .v-castlevania .wordmark-frame::after  { right: 0; transform: translateY(-50%) scaleX(-1); }
+
+    .v-castlevania .wordmark {
+      font-family: 'Cinzel Decorative', serif;
+      font-weight: 900;
+      font-size: clamp(3rem, 9vw, 7rem);
+      line-height: 1;
+      letter-spacing: 0.06em;
+      background: linear-gradient(180deg, #f9e7aa 0%, var(--gold) 40%, #7a5910 80%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter:
+        drop-shadow(0 2px 0 rgba(0,0,0,.6))
+        drop-shadow(0 0 20px rgba(232,185,84,.2));
+      text-shadow: 0 0 30px rgba(232,185,84,.3);
+      position: relative;
+    }
+
+    .v-castlevania .tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: clamp(1.1rem, 2.1vw, 1.6rem);
+      color: var(--gold-l);
+      letter-spacing: 0.03em;
+      margin-top: -8px;
+      text-shadow: 0 2px 4px rgba(0,0,0,.7);
+    }
+    .v-castlevania .tagline em {
+      font-style: normal;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .v-castlevania .ornament {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 14px;
+      color: var(--gold-d);
+      letter-spacing: 0.5em;
+      padding-top: 4px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .v-castlevania .ornament::before, .v-castlevania .ornament::after {
+      content: '';
+      width: 80px; height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--gold-d) 50%, transparent 100%);
+    }
+
+    /* Stone buttons */
+    .v-castlevania .menu-btns {
+      display: flex;
+      gap: 26px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 14px;
+    }
+    .v-castlevania .menu-btns a {
+      position: relative;
+      padding: 16px 44px;
+      min-width: 180px;
+      text-align: center;
+      font-family: 'Cinzel Decorative', serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.24em;
+      color: var(--gold-l);
+      text-decoration: none;
+      background:
+        linear-gradient(180deg, rgba(70,55,90,.95) 0%, rgba(40,28,60,.95) 100%);
+      border: 2px solid var(--gold-d);
+      text-shadow: 0 2px 4px rgba(0,0,0,.8), 0 0 12px rgba(232,185,84,.4);
+      box-shadow:
+        inset 0 1px 0 rgba(255,220,140,.2),
+        inset 0 -2px 0 rgba(0,0,0,.4),
+        0 6px 16px rgba(0,0,0,.6);
+      transition: all .25s;
+    }
+    .v-castlevania .menu-btns a::before, .v-castlevania .menu-btns a::after {
+      content: '✦';
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      color: var(--gold);
+      font-size: 9px;
+      text-shadow: 0 0 6px rgba(232,185,84,.6);
+    }
+    .v-castlevania .menu-btns a::before { left: 14px; }
+    .v-castlevania .menu-btns a::after  { right: 14px; }
+    .v-castlevania .menu-btns a:hover {
+      border-color: var(--gold);
+      background: linear-gradient(180deg, rgba(90,70,120,.95) 0%, rgba(50,35,75,.95) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(232,185,84,.2), inset 0 1px 0 rgba(255,220,140,.3);
+    }
+
+    .v-castlevania .form-block {
+      margin-top: 20px;
+      max-width: 440px;
+      width: 100%;
+    }
+    .v-castlevania .form-block label {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 14px;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      display: block;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .v-castlevania .form-row { display: flex; }
+    .v-castlevania .form-row input[type="email"] {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1.5px solid var(--gold-d);
+      background: rgba(15,6,22,.7);
+      color: var(--gold-l);
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 16px;
+      outline: none;
+    }
+    .v-castlevania .form-row input:focus { border-color: var(--gold); }
+    .v-castlevania .form-row input::placeholder { color: rgba(232,185,84,.35); }
+    .v-castlevania .form-row button {
+      padding: 12px 24px;
+      border: 1.5px solid var(--gold);
+      border-left: none;
+      background: linear-gradient(180deg, #4a2a10 0%, #1a0c08 100%);
+      color: var(--gold-l);
+      font-family: 'Cinzel Decorative', serif;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-shadow: 0 0 8px rgba(232,185,84,.4);
+    }
+
+    .v-castlevania .privacy-consent {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      color: var(--text-dim);
+      margin-top: 10px;
+      text-align: center;
+      max-width: 440px;
+    }
+    .v-castlevania .privacy-consent a { color: var(--gold); text-decoration: underline; }
+
+    /* Alucard silhouette */
+    .v-castlevania .alucard {
+      position: fixed;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      pointer-events: none;
+      width: 140px;
+      height: 180px;
+      filter: drop-shadow(0 -10px 30px rgba(255,255,255,.08));
+    }
+    .v-castlevania .alucard svg { width: 100%; height: 100%; }
+
+    /* Footer */
+    .v-castlevania > footer {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      padding: 14px 80px;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 11px;
+      letter-spacing: 0.28em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,.7) 60%);
+    }
+    .v-castlevania > footer b { color: var(--blood); font-weight: 700; }
+    .v-castlevania > footer .icons { display: flex; gap: 14px; }
+    .v-castlevania > footer .icons a { color: var(--gold-d); text-decoration: none; font-size: 16px; }
+    .v-castlevania > footer .icons a:hover { color: var(--gold); }
+
+    @media (max-width: 780px) {
+      .v-castlevania .curtain { width: 10%; }
+      .v-castlevania .window { width: 180px; height: 260px; top: 6%; }
+      .v-castlevania .moon { top: 100px; width: 110px; height: 110px; }
+      .v-castlevania .chandelier { display: none; }
+      .v-castlevania header { padding: 18px 24px; }
+      .v-castlevania header .menu { display: none; }
+      .v-castlevania main { padding: 20px 30px 160px; }
+      .v-castlevania > footer { padding: 12px 20px; font-size: 9px; }
+      .v-castlevania .wordmark-frame::before, .v-castlevania .wordmark-frame::after { display: none; }
+      .v-castlevania .wordmark-frame { padding: 14px 0; }
+      .v-castlevania .menu-btns a { padding: 14px 22px; min-width: 130px; font-size: 12px; }
+    }
+  </style>
+
+  <div class="v-castlevania">
+    <!-- Moon -->
+    <div class="moon" aria-hidden="true"></div>
+
+    <!-- Stained glass window -->
+    <div class="window" aria-hidden="true">
+      <svg viewBox="0 0 260 360">
+        <defs>
+          <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fff" stop-opacity=".85"/>
+            <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <!-- pointed arch frame -->
+        <path d="M10 360 L10 100 Q10 10 130 10 Q250 10 250 100 L250 360 Z" fill="none" stroke="#2a1f10" stroke-width="5"/>
+        <!-- panes -->
+        <g stroke="#1a0f08" stroke-width="2">
+          <path d="M10 130 L250 130" fill="none"/>
+          <path d="M10 220 L250 220" fill="none"/>
+          <path d="M130 10 L130 360" fill="none"/>
+          <path d="M40 40 Q130 100 220 40" fill="none"/>
+        </g>
+        <!-- colored panes -->
+        <path d="M12 132 Q12 132 12 132 L128 132 L128 218 L12 218 Z" fill="#1a4870" opacity=".7"/>
+        <path d="M132 132 L248 132 L248 218 L132 218 Z" fill="#7040a4" opacity=".7"/>
+        <path d="M12 222 L128 222 L128 356 L12 356 Z" fill="#b01830" opacity=".65"/>
+        <path d="M132 222 L248 222 L248 356 L132 356 Z" fill="#1a4870" opacity=".7"/>
+        <!-- center cross in halo -->
+        <circle cx="130" cy="175" r="40" fill="url(#halo)"/>
+        <path d="M130 150 L130 200 M110 175 L150 175" stroke="#e8b954" stroke-width="3"/>
+        <!-- rays -->
+        <g stroke="rgba(245,238,216,.25)" stroke-width="1">
+          <line x1="130" y1="175" x2="60" y2="40"/>
+          <line x1="130" y1="175" x2="200" y2="40"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Chandeliers -->
+    <div class="chandelier left" aria-hidden="true">
+      <div class="rope"></div>
+      <div class="ring">
+        <div class="candles">
+          <div class="flame"></div>
+          <div class="flame"></div>
+          <div class="flame"></div>
+          <div class="flame"></div>
+          <div class="flame"></div>
+        </div>
+      </div>
+    </div>
+    <div class="chandelier right" aria-hidden="true">
+      <div class="rope"></div>
+      <div class="ring">
+        <div class="candles">
+          <div class="flame"></div>
+          <div class="flame"></div>
+          <div class="flame"></div>
+          <div class="flame"></div>
+          <div class="flame"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Curtains -->
+    <div class="curtain left" aria-hidden="true"></div>
+    <div class="curtain right" aria-hidden="true"></div>
+
+    <!-- Bats -->
+    <div class="bat b1" aria-hidden="true">ᴥ</div>
+    <div class="bat b2" aria-hidden="true">ᴥ</div>
+    <div class="bat b3" aria-hidden="true">ᴥ</div>
+
+    <!-- Overlays -->
+    <div class="overlay"></div>
+    <div class="grain"></div>
+
+    <header>
+      <div class="crest">✦ Bentoo ✦</div>
+      <div class="menu">Prólogo · Código · Castelo</div>
+    </header>
+
+    <main>
+      <div class="wordmark-frame">
+        <div class="wordmark">BENTOO</div>
+      </div>
+      <div class="tagline">Um <em>Stage5</em> amigável do Gentoo Linux</div>
+      <div class="ornament">✧ Sinfonia do Código-Fonte ✧</div>
+
+      <nav class="menu-btns">
+        <a href="https://github.com/obentoo" target="_blank" rel="noopener">GITHUB</a>
+        <a href="mailto:contact@obentoo.org">CONTATO</a>
+        <a href="#notify">ME AVISE</a>
+      </nav>
+
+      <form
+        class="form-block"
+        id="notify"
+        data-bentoo-subscribe
+        action={`https://buttondown.com/api/emails/embed-subscribe/${buttondownUser}`}
+        method="post"
+        data-success-msg={strings.successMsg}
+        data-error-msg={strings.errorMsg}
+      >
+        <label>▸ Receba a convocação quando o castelo abrir ◂</label>
+        <input type="hidden" name="embed" value="1" />
+        <div class="form-row">
+          <input type="email" name="email" required placeholder={strings.subscribePlaceholder} />
+          <button type="submit">{strings.subscribeButton}</button>
+        </div>
+      </form>
+      <p class="privacy-consent">
+        {strings.privacyConsent} <a href="/pt/privacy">{strings.privacyLinkLabel}</a>
+      </p>
+    </main>
+
+    <!-- Alucard silhouette -->
+    <div class="alucard" aria-hidden="true">
+      <svg viewBox="0 0 140 180">
+        <!-- cape -->
+        <path d="M24 80 Q10 140 6 178 L60 178 Q62 130 70 100 Q78 130 80 178 L134 178 Q130 140 116 80 Q102 62 70 62 Q38 62 24 80 Z" fill="#200a0a"/>
+        <path d="M36 90 Q40 150 42 178 M100 90 Q100 150 98 178" fill="none" stroke="#5a0010" stroke-width="1.2" opacity=".7"/>
+        <!-- red cape lining edge -->
+        <path d="M70 62 L70 178" fill="none" stroke="#6a0818" stroke-width=".8"/>
+        <!-- body -->
+        <rect x="58" y="62" width="24" height="56" fill="#0a0606"/>
+        <!-- head with long hair -->
+        <ellipse cx="70" cy="48" rx="14" ry="16" fill="#1a1410"/>
+        <path d="M56 50 L52 90 M84 50 L88 90" stroke="#e4d8b5" stroke-width="2" opacity=".55"/>
+        <!-- sword -->
+        <line x1="36" y1="110" x2="8" y2="178" stroke="#c8c0a0" stroke-width="1.5"/>
+        <circle cx="36" cy="110" r="3" fill="#e8b954"/>
+      </svg>
+    </div>
+
+    <footer>
+      <span>© 2018 – 2026 · <b>BENTOO</b> · ESCURIDÃO BASEADA EM CÓDIGO-FONTE</span>
+      <div class="icons">
+        <a href="https://github.com/obentoo" target="_blank" rel="noopener">◯</a>
+        <a href="mailto:contact@obentoo.org">✉</a>
+      </div>
+    </footer>
+  </div>
+</VariantLayout>

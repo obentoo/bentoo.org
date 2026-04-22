@@ -1,0 +1,421 @@
+---
+import VariantLayout from '~/layouts/VariantLayout.astro';
+import { strings } from '~/i18n/pt';
+const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
+---
+<VariantLayout
+  lang="pt"
+  path="/pt/v/2001/"
+  title="bentoo — 2001 · odisseia no código"
+  description="Bentoo — um Stage5 amigável do Gentoo Linux. Dave, minha mente está indo."
+  variantSlug="2001"
+>
+  <Fragment slot="head-extra">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;500;700&display=swap" rel="stylesheet" />
+  </Fragment>
+  <style is:global slot="style">
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    .v-2001 {
+      --void:   #000000;
+      --void-2: #05050a;
+      --red:    #ff0918;
+      --red-d:  #a00410;
+      --red-g:  #ff3a4a;
+      --white:  #f6f6f6;
+      --silver: #8a8a8a;
+      --carbon: #1a1a1e;
+
+      background: var(--void);
+      color: var(--white);
+      font-family: 'Barlow Condensed', sans-serif;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      display: block;
+    }
+
+    /* starfield */
+    .v-2001::before {
+      content: '';
+      position: fixed; inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 12% 18%, #fff 0 1.2px, transparent 1.6px),
+        radial-gradient(circle at 28% 40%, #fff 0 .8px, transparent 1.2px),
+        radial-gradient(circle at 45% 8%, #fff 0 1px, transparent 1.5px),
+        radial-gradient(circle at 60% 22%, #fff 0 .6px, transparent 1px),
+        radial-gradient(circle at 78% 30%, #fff 0 1.2px, transparent 1.6px),
+        radial-gradient(circle at 88% 12%, #fff 0 .8px, transparent 1.2px),
+        radial-gradient(circle at 15% 62%, #fff 0 .7px, transparent 1.1px),
+        radial-gradient(circle at 32% 80%, #fff 0 1.1px, transparent 1.5px),
+        radial-gradient(circle at 52% 70%, #fff 0 .5px, transparent .9px),
+        radial-gradient(circle at 72% 85%, #fff 0 .9px, transparent 1.3px),
+        radial-gradient(circle at 92% 70%, #fff 0 1.3px, transparent 1.7px),
+        radial-gradient(circle at 8% 92%, #fff 0 .6px, transparent 1px),
+        radial-gradient(circle at 40% 92%, #fff 0 .8px, transparent 1.2px),
+        radial-gradient(circle at 68% 95%, #fff 0 1px, transparent 1.5px),
+        radial-gradient(circle at 84% 52%, #fff 0 .7px, transparent 1.1px),
+        radial-gradient(circle at 22% 50%, #fff 0 .9px, transparent 1.3px),
+        linear-gradient(180deg, #000 0%, #040410 100%);
+      background-size: 100% 100%;
+      opacity: .85;
+    }
+
+    /* twinkle stars */
+    .v-2001::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 35% 25%, rgba(255,255,255,.8) 0 1px, transparent 2px),
+        radial-gradient(circle at 65% 55%, rgba(255,255,255,.8) 0 1px, transparent 2px),
+        radial-gradient(circle at 18% 75%, rgba(255,255,255,.8) 0 1px, transparent 2px);
+      animation: v2001-twinkle 3s ease-in-out infinite;
+    }
+    @keyframes v2001-twinkle {
+      0%,100% { opacity: 1; }
+      50%     { opacity: .3; }
+    }
+
+    /* ========== HEADER ========== */
+    .v-2001 header {
+      position: relative;
+      z-index: 10;
+      padding: 24px 44px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .v-2001 .logo {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 0.22em;
+      color: var(--red);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .v-2001 .logo .sq {
+      width: 18px; height: 18px;
+      background: var(--red);
+      box-shadow: 0 0 10px rgba(255,9,24,.6);
+    }
+    .v-2001 .nav {
+      display: flex;
+      gap: 26px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--silver);
+    }
+    .v-2001 .nav a { color: var(--silver); text-decoration: none; transition: color .2s; }
+    .v-2001 .nav a:hover { color: var(--white); }
+    .v-2001 .nav .url {
+      padding: 4px 10px;
+      border: 1px solid #222;
+      color: var(--silver);
+      background: #0a0a14;
+    }
+
+    /* ========== MAIN ========== */
+    .v-2001 main {
+      position: relative;
+      z-index: 5;
+      min-height: calc(100vh - 90px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 24px 80px;
+      text-align: center;
+      gap: 44px;
+    }
+
+    /* HAL eye */
+    .v-2001 .hal {
+      position: relative;
+      width: 280px; height: 280px;
+      filter: drop-shadow(0 0 80px rgba(255,20,40,.35));
+      animation: v2001-halBreath 4s ease-in-out infinite;
+    }
+    @keyframes v2001-halBreath {
+      0%,100% { filter: drop-shadow(0 0 80px rgba(255,20,40,.35)); }
+      50%     { filter: drop-shadow(0 0 120px rgba(255,40,60,.55)); }
+    }
+    .v-2001 .hal-ring {
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, #0a0a0a 0%, #000 45%, #080808 80%);
+      box-shadow:
+        inset 0 14px 40px rgba(255,255,255,.04),
+        inset 0 -14px 40px rgba(0,0,0,.9),
+        0 30px 60px rgba(0,0,0,.7);
+    }
+    .v-2001 .hal-ring::before {
+      content: '';
+      position: absolute;
+      inset: 18px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, #0c0c10 0%, #000 80%);
+      box-shadow: inset 0 0 30px rgba(0,0,0,.9);
+    }
+    .v-2001 .hal-lens {
+      position: absolute;
+      inset: 46px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 42% 38%,
+        #ffeff0 0%,
+        #ff4050 7%,
+        #ff0818 18%,
+        #b00018 50%,
+        #400006 92%);
+      box-shadow:
+        0 0 40px rgba(255,20,40,.8),
+        0 0 80px rgba(255,20,40,.4),
+        inset 0 0 14px rgba(255,200,200,.3);
+    }
+    .v-2001 .hal-lens::before {
+      content: '';
+      position: absolute;
+      top: 18%; left: 30%;
+      width: 20%; height: 22%;
+      border-radius: 50%;
+      background: rgba(255,255,255,.8);
+      filter: blur(2px);
+    }
+    .v-2001 .hal-lens::after {
+      content: '';
+      position: absolute;
+      inset: 28%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,200,200,.9) 0%, transparent 55%);
+      mix-blend-mode: screen;
+      animation: v2001-irisPulse 2.4s ease-in-out infinite;
+    }
+    @keyframes v2001-irisPulse {
+      0%,100% { transform: scale(.9); opacity: .75; }
+      50%     { transform: scale(1.08); opacity: 1; }
+    }
+
+    /* wordmark */
+    .v-2001 .wordmark {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: clamp(3.8rem, 13vw, 10rem);
+      letter-spacing: -0.02em;
+      color: var(--white);
+      line-height: 0.95;
+      text-shadow: 0 4px 60px rgba(255,255,255,.08);
+    }
+    .v-2001 .sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 500;
+      font-size: clamp(.95rem, 2vw, 1.3rem);
+      letter-spacing: 0.48em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-top: -14px;
+    }
+    .v-2001 .sub b { color: var(--red-g); font-weight: 700; text-shadow: 0 0 10px rgba(255,40,60,.4); }
+
+    /* red-outlined buttons */
+    .v-2001 .cta {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .v-2001 .cta a {
+      position: relative;
+      width: 150px; height: 80px;
+      display: grid; place-items: center;
+      color: var(--white);
+      text-decoration: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 500;
+      font-size: 1rem;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      background: var(--void);
+      border: 1.5px solid var(--red);
+      box-shadow:
+        0 0 20px rgba(255,9,24,.4),
+        inset 0 0 20px rgba(255,9,24,.06);
+      transition: all .22s;
+    }
+    .v-2001 .cta a:hover {
+      background: rgba(255,9,24,.08);
+      box-shadow: 0 0 40px rgba(255,9,24,.8), inset 0 0 30px rgba(255,9,24,.18);
+      color: var(--red-g);
+    }
+    .v-2001 .cta .sep {
+      color: var(--silver);
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+    }
+
+    /* notify */
+    .v-2001 .notify-wrap {
+      margin-top: 4px;
+      width: 100%;
+      max-width: 460px;
+    }
+    .v-2001 .notify-wrap label {
+      font-family: 'Space Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--silver);
+      text-align: center;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .v-2001 .notify-wrap label b { color: var(--red-g); font-weight: 700; }
+    .v-2001 .notify {
+      display: flex;
+      border: 1.5px solid var(--red-d);
+      background: var(--void);
+    }
+    .v-2001 .notify input[type="email"] {
+      flex: 1;
+      padding: 12px 16px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--white);
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+    }
+    .v-2001 .notify input::placeholder { color: rgba(255,255,255,.3); }
+    .v-2001 .notify button {
+      padding: 12px 18px;
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .v-2001 .notify button:hover { background: var(--red-g); }
+
+    .v-2001 .privacy-consent {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--silver);
+      text-align: center;
+      margin-top: 12px;
+      max-width: 460px;
+    }
+    .v-2001 .privacy-consent a { color: var(--red-g); text-decoration: underline; }
+
+    /* Monolith thin line */
+    .v-2001 .monolith {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 54%;
+      background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,.03) 30%, rgba(255,9,24,.08) 90%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* footer */
+    .v-2001 > footer {
+      position: relative;
+      z-index: 5;
+      padding: 18px 44px 22px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--silver);
+      border-top: 1px solid #111;
+    }
+    .v-2001 > footer b { color: var(--red-g); }
+
+    @media (max-width: 700px) {
+      .v-2001 header { padding: 18px 20px; }
+      .v-2001 .nav { display: none; }
+      .v-2001 .hal { width: 180px; height: 180px; }
+      .v-2001 .hal-lens { inset: 30px; }
+      .v-2001 .cta a { width: 110px; height: 62px; font-size: .85rem; letter-spacing: .2em; }
+      .v-2001 main { gap: 28px; padding: 0 16px 60px; }
+      .v-2001 > footer { padding: 14px 20px; font-size: 10px; }
+    }
+  </style>
+
+  <div class="v-2001">
+    <header>
+      <div class="logo"><span class="sq"></span>BENTOO</div>
+      <nav class="nav">
+        <a href="./">início</a>
+        <a href="https://github.com/obentoo" target="_blank" rel="noopener">código</a>
+        <a href="mailto:contact@obentoo.org">contato</a>
+        <span class="url">obentoo.org</span>
+      </nav>
+    </header>
+
+    <main>
+      <div class="hal" aria-hidden="true">
+        <div class="hal-ring"></div>
+        <div class="hal-lens"></div>
+      </div>
+
+      <div>
+        <h1 class="wordmark">BENTOO</h1>
+        <p class="sub">UM <b>STAGE5</b> AMIGÁVEL DO GENTOO LINUX</p>
+      </div>
+
+      <nav class="cta">
+        <a href="https://github.com/obentoo" target="_blank" rel="noopener">GITHUB</a>
+        <span class="sep">·</span>
+        <a href="mailto:contact@obentoo.org">CONTATO</a>
+        <span class="sep">·</span>
+        <a href="#notify">ME AVISE</a>
+      </nav>
+
+      <div class="notify-wrap">
+        <label>▸ MONITORAR · <b>HAL-9000</b> · PROTOCOLO PING-ÚNICO ◂</label>
+        <form
+          class="notify"
+          id="notify"
+          data-bentoo-subscribe
+          action={`https://buttondown.com/api/emails/embed-subscribe/${buttondownUser}`}
+          method="post"
+          data-success-msg={strings.successMsg}
+          data-error-msg={strings.errorMsg}
+        >
+          <input type="hidden" name="embed" value="1" />
+          <input type="email" name="email" required placeholder={strings.subscribePlaceholder} />
+          <button type="submit">{strings.subscribeButton}</button>
+        </form>
+        <p class="privacy-consent">
+          {strings.privacyConsent} <a href="/pt/privacy">{strings.privacyLinkLabel}</a>
+        </p>
+      </div>
+    </main>
+
+    <div class="monolith" aria-hidden="true"></div>
+
+    <footer>
+      <span>© 2018 – 2026 <b>PROJETO BENTOO</b>. TODOS OS DIREITOS RESERVADOS.</span>
+      <span>DISCOVERY ONE · MISSÃO JÚPITER · STAGE5</span>
+    </footer>
+  </div>
+</VariantLayout>
