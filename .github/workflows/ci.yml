@@ -15,18 +15,19 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm run test:unit -- --run
-      - run: npm run build
-      - run: npm run check:js
-      - run: npm run check:og
-      - run: npm run check:forms
-      - run: npm run check:variants-sync
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test:unit -- --run
+      - run: pnpm build
+      - run: pnpm check:js
+      - run: pnpm check:og
+      - run: pnpm check:forms
+      - run: pnpm check:variants-sync
       - uses: actions/upload-artifact@v4
         with:
           name: dist
@@ -39,17 +40,18 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
       - uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
-      - run: npm run test:visual
+      - run: pnpm test:visual
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
@@ -62,17 +64,18 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
       - uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
-      - run: npm run test:integration
+      - run: pnpm test:integration
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
@@ -87,17 +90,18 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
       - uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
-      - run: npx playwright test --project=integration tests/integration/a11y.spec.ts
+      - run: pnpm exec playwright test --project=integration tests/integration/a11y.spec.ts
 
   lighthouse:
     name: lighthouse ci
@@ -105,11 +109,12 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
-      - run: npm ci
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
       - uses: actions/download-artifact@v4
         with:
           name: dist

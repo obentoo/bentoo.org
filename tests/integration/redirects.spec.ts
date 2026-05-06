@@ -15,7 +15,7 @@ const DIST_DIR = path.resolve(process.cwd(), 'dist');
 test.describe('CF Pages _redirects + _headers (static file assertions)', () => {
   test('(1) dist/_redirects contains all 3 rules → / with 301', () => {
     const file = path.join(DIST_DIR, '_redirects');
-    expect(existsSync(file), `missing ${file}; run npm run build first`).toBe(
+    expect(existsSync(file), `missing ${file}; run pnpm build first`).toBe(
       true
     );
     const contents = readFileSync(file, 'utf8');
@@ -28,7 +28,7 @@ test.describe('CF Pages _redirects + _headers (static file assertions)', () => {
 
   test('(2) dist/_headers contains required security headers', () => {
     const file = path.join(DIST_DIR, '_headers');
-    expect(existsSync(file), `missing ${file}; run npm run build first`).toBe(
+    expect(existsSync(file), `missing ${file}; run pnpm build first`).toBe(
       true
     );
     const contents = readFileSync(file, 'utf8');
