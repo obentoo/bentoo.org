@@ -7,9 +7,10 @@
 2. Pick `obentoo/bentoo.org` (install the Cloudflare GitHub app on the org if prompted; scope to this repo only).
 3. Build settings:
    - **Framework preset**: Astro
-   - **Build command**: `npm run build`
+   - **Build command**: `pnpm build`
    - **Build output directory**: `dist`
    - **Root directory**: `/`
+   - **Environment variable**: `PNPM_VERSION=10.30.1` (matches `packageManager` in `package.json`)
 
 ### 2. Environment variables
 In **Settings → Environment variables**, set the same keys in **Production** and **Preview** unless noted:
@@ -67,9 +68,10 @@ No custom script, no blue/green routing — just a single dashboard action.
 
 ## Local dev
 ```
-npm run dev        # astro dev on http://localhost:4321 (Node 22+ required)
-npm run build      # emits dist/
-npm run preview    # serves dist/ via astro preview (what CI tests against)
+pnpm install       # install deps (pnpm 10+ required, see packageManager in package.json)
+pnpm dev           # astro dev on http://localhost:4321 (Node 22+ required)
+pnpm build         # emits dist/
+pnpm preview       # serves dist/ via astro preview (what CI tests against)
 ```
 
 ## CI

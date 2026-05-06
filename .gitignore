@@ -4,7 +4,6 @@
 .playwright-mcp/
 .astro/
 misc/
-docs/
 
 node_modules/
 .pnpm-store/
