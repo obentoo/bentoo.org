@@ -3,6 +3,7 @@ import BaseLayout from './BaseLayout.astro';
 import type { Lang } from '~/utils/getLang';
 import type { VariantSlug } from '~/data/variants';
 import { FORM_HANDLER_JS } from '~/scripts/form-handler.inline';
+import { SHUFFLE_JS } from '~/scripts/shuffle.inline';
 
 export interface Props {
   lang: Lang;
@@ -15,6 +16,8 @@ export interface Props {
 
 const { lang, path, title, description, variantSlug, ogImage } = Astro.props;
 const resolvedOg = ogImage ?? `/og/${variantSlug}.png`;
+const shuffleAria = lang === 'pt' ? 'trocar versão da home' : 'shuffle homepage variant';
+const shuffleTip = lang === 'pt' ? 'trocar visual' : 'shuffle theme';
 ---
 <BaseLayout
   lang={lang}
@@ -36,5 +39,212 @@ const resolvedOg = ogImage ?? `/og/${variantSlug}.png`;
     title="form-submission-sink"
   ></iframe>
   <slot />
+
+  <button
+    type="button"
+    class="bd-shuffle-fab"
+    data-bd-shuffle
+    aria-label={shuffleAria}
+  >
+    <span class="bd-shuffle-cube" aria-hidden="true">
+      <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" focusable="false">
+        <defs>
+          <linearGradient id="bdShuffleTop" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#FFE34D"/>
+            <stop offset="1" stop-color="#E5B800"/>
+          </linearGradient>
+          <linearGradient id="bdShuffleLeft" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#E73554"/>
+            <stop offset="1" stop-color="#9A1024"/>
+          </linearGradient>
+          <linearGradient id="bdShuffleRight" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#2D72D9"/>
+            <stop offset="1" stop-color="#003C8F"/>
+          </linearGradient>
+        </defs>
+
+        <polygon points="30,0 60,15 30,30 0,15" fill="url(#bdShuffleTop)"/>
+        <polygon points="50,10 60,15 50,20 40,15" fill="#F5F5F5"/>
+
+        <polygon points="0,15 30,30 30,60 0,45" fill="url(#bdShuffleLeft)"/>
+        <polygon points="0,25 10,30 10,40 0,35" fill="#FF7A1A"/>
+
+        <polygon points="60,15 30,30 30,60 60,45" fill="url(#bdShuffleRight)"/>
+        <polygon points="40,45 30,50 30,60 40,55" fill="#1FAB6B"/>
+
+        <g stroke="rgba(0,0,0,0.55)" stroke-width="1.1" stroke-linecap="round" fill="none">
+          <path d="M40,5 L10,20 M50,10 L20,25 M20,5 L50,20 M10,10 L40,25"/>
+          <path d="M10,20 L10,50 M20,25 L20,55 M0,25 L30,40 M0,35 L30,50"/>
+          <path d="M50,20 L50,50 M40,25 L40,55 M60,25 L30,40 M60,35 L30,50"/>
+        </g>
+
+        <path d="M30,0 L60,15 L60,45 L30,60 L0,45 L0,15 Z" fill="none"
+              stroke="rgba(0,0,0,0.85)" stroke-width="1.4" stroke-linejoin="round"/>
+        <line x1="30" y1="30" x2="30" y2="60" stroke="rgba(0,0,0,0.7)" stroke-width="1.3" stroke-linecap="round"/>
+        <line x1="30" y1="30" x2="0"  y2="15" stroke="rgba(0,0,0,0.5)" stroke-width="1" stroke-linecap="round"/>
+        <line x1="30" y1="30" x2="60" y2="15" stroke="rgba(0,0,0,0.5)" stroke-width="1" stroke-linecap="round"/>
+
+        <path d="M30,1 L59,15 M30,1 L1,15" fill="none"
+              stroke="rgba(255,255,255,0.22)" stroke-width="0.7" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span class="bd-shuffle-tip" aria-hidden="true">{shuffleTip}</span>
+  </button>
+
+  <style>
+    .bd-shuffle-fab {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      width: 60px;
+      height: 60px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 16px;
+      background:
+        linear-gradient(155deg, rgba(28, 28, 42, 0.78) 0%, rgba(10, 10, 18, 0.94) 100%);
+      backdrop-filter: blur(14px) saturate(1.3);
+      -webkit-backdrop-filter: blur(14px) saturate(1.3);
+      cursor: pointer;
+      z-index: 9999;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        0 12px 32px rgba(0, 0, 0, 0.32),
+        0 4px 10px rgba(0, 0, 0, 0.22);
+      transition:
+        transform .28s cubic-bezier(.2, .8, .2, 1.2),
+        box-shadow .28s ease,
+        border-color .28s ease,
+        background .28s ease;
+      animation: bdShuffleEntry .8s 1.2s cubic-bezier(.2, .8, .2, 1.2) both;
+      font: inherit;
+      color: inherit;
+    }
+
+    .bd-shuffle-cube {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      transition: transform .55s cubic-bezier(.4, .1, .3, 1.4);
+      transform-origin: 50% 50%;
+      will-change: transform;
+    }
+    .bd-shuffle-cube svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+    }
+
+    .bd-shuffle-fab:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.28);
+      background:
+        linear-gradient(155deg, rgba(38, 38, 56, 0.82) 0%, rgba(14, 14, 24, 0.96) 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.24),
+        0 18px 40px rgba(0, 0, 0, 0.42),
+        0 6px 14px rgba(0, 0, 0, 0.30);
+    }
+    .bd-shuffle-fab:hover .bd-shuffle-cube {
+      transform: rotate(-12deg) scale(1.06);
+    }
+
+    .bd-shuffle-fab:active {
+      transform: translateY(0) scale(0.96);
+      transition-duration: .12s;
+    }
+
+    .bd-shuffle-fab.is-spinning .bd-shuffle-cube {
+      animation: bdShuffleSpin .5s cubic-bezier(.6, .05, .4, 1.05) forwards;
+    }
+
+    .bd-shuffle-fab:focus-visible {
+      outline: 2px solid #ffd500;
+      outline-offset: 3px;
+    }
+
+    .bd-shuffle-tip {
+      position: absolute;
+      right: calc(100% + 12px);
+      top: 50%;
+      transform: translateY(-50%) translateX(8px);
+      white-space: nowrap;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(15, 15, 22, 0.94);
+      color: #f5f5f5;
+      font-family: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
+      opacity: 0;
+      pointer-events: none;
+      transition:
+        opacity .25s ease,
+        transform .28s cubic-bezier(.2, .8, .2, 1.2);
+    }
+    .bd-shuffle-tip::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      transform: translateY(-50%) rotate(45deg);
+      background: rgba(15, 15, 22, 0.94);
+      border-right: 1px solid rgba(255, 255, 255, 0.12);
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .bd-shuffle-fab:hover .bd-shuffle-tip,
+    .bd-shuffle-fab:focus-visible .bd-shuffle-tip {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+
+    @keyframes bdShuffleEntry {
+      from { opacity: 0; transform: translateY(20px) scale(.7); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes bdShuffleSpin {
+      0%   { transform: rotate(0deg) scale(1); }
+      35%  { transform: rotate(-180deg) scale(.85); }
+      70%  { transform: rotate(-360deg) scale(1.08); }
+      100% { transform: rotate(-540deg) scale(1); }
+    }
+
+    @media (max-width: 680px) {
+      .bd-shuffle-fab {
+        right: 14px;
+        bottom: 14px;
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+      }
+      .bd-shuffle-cube { width: 30px; height: 30px; }
+      .bd-shuffle-tip { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bd-shuffle-fab,
+      .bd-shuffle-cube,
+      .bd-shuffle-fab.is-spinning .bd-shuffle-cube { animation: none; transition: none; }
+      .bd-shuffle-fab:hover { transform: none; }
+      .bd-shuffle-fab:hover .bd-shuffle-cube { transform: none; }
+    }
+
+    @media print {
+      .bd-shuffle-fab { display: none; }
+    }
+  </style>
+
+  <script is:inline set:html={SHUFFLE_JS} />
   {FORM_HANDLER_JS && <script is:inline set:html={FORM_HANDLER_JS} />}
 </BaseLayout>
