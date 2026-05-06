@@ -35,7 +35,6 @@ Status at end of story 001 implementation (code-complete, launch-pending).
 - Full font self-hosting via Google Webfonts Helper (current: Google Fonts via preconnect, R5.7-compliant)
 - Variant-specific pt-BR translation calibration after visual regression reveals copy-length issues
 - v3i `/hub/` link easter-egg cleanup (currently 404s — R8.6 drops /hub/)
-- TypeScript 6 upgrade (currently 5.9.3 — Astro 6 has not declared peer-compat with TS 6 yet)
 - Unit test coverage for `src/scripts/shuffle.inline.ts` (currently covered only by E2E; rotator-style vitest+jsdom suite would mirror `tests/unit/rotator.test.ts`)
 
 ## Quality-gate table (R1-R8)
