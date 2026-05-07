@@ -1,0 +1,800 @@
+---
+import VariantLayout from '~/layouts/VariantLayout.astro';
+import type { Lang } from '~/utils/getLang';
+import { stringsFor } from '~/i18n';
+import { v3i } from '~/i18n/variants/v3i';
+import { localizedPath } from '~/utils/siteUrl';
+
+export interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const content = v3i[lang];
+const strings = stringsFor(lang);
+const path = localizedPath('/v/v3i/', lang);
+const privacyHref = localizedPath('/privacy', lang);
+const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
+
+// v3i variant-specific script — Windows-9x menus, clock, About dialog,
+// MS-DOS shell. Localized strings injected via JSON.stringify at build time.
+const JOKES_JSON = JSON.stringify(content.jokes);
+const SHELL_JSON = JSON.stringify(content.shell);
+const V3I_SCRIPT = `
+(function(){
+  var clk = document.getElementById('clk');
+  var pad = function(n){ return String(n).padStart(2,'0'); };
+  function tick(){
+    if (!clk) return;
+    var d = new Date();
+    clk.textContent = d.getFullYear() + '/' + pad(d.getMonth()+1) + '/' + pad(d.getDate()) + ' · ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+  tick(); setInterval(tick, 1000);
+
+  var topbar = document.getElementById('topbar');
+  if (!topbar) return;
+  var menus = topbar.querySelectorAll('.menu');
+  function closeAll(){ menus.forEach(function(m){ m.classList.remove('open'); }); }
+  menus.forEach(function(m){
+    m.addEventListener('click', function(e){
+      if (e.target.closest('.dropdown')) return;
+      var isOpen = m.classList.contains('open');
+      closeAll();
+      if (!isOpen) m.classList.add('open');
+      e.stopPropagation();
+    });
+  });
+  document.addEventListener('click', function(e){
+    if (!topbar.contains(e.target)) closeAll();
+  });
+
+  var dlg = document.getElementById('about-dlg');
+  function openDlg(){ if (dlg) dlg.classList.add('open'); }
+  function closeDlg(){ if (dlg) dlg.classList.remove('open'); }
+  if (dlg) {
+    dlg.addEventListener('click', function(e){
+      if (e.target === dlg || e.target.hasAttribute('data-close')) closeDlg();
+    });
+  }
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') closeDlg();
+  });
+
+  var JOKES = ${JOKES_JSON};
+  var I = ${SHELL_JSON};
+  topbar.addEventListener('click', function(e){
+    var link = e.target.closest('[data-action]');
+    if (!link) return;
+    var action = link.getAttribute('data-action');
+    e.preventDefault();
+    closeAll();
+    if (action === 'about'){ openDlg(); return; }
+    var msg = JOKES[action];
+    if (msg) alert(msg);
+  });
+
+  var out = document.getElementById('crt-out');
+  var inp = document.getElementById('cinput');
+  var crt = document.getElementById('crt');
+  if (!out || !inp || !crt) return;
+  var cmdHistory = []; var histIdx = -1;
+  function esc(s){ return String(s).replace(/[&<>]/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+  function render(html){
+    var div = document.createElement('div');
+    // legacy DOS-shell output — author-controlled, no visitor input echoed unescaped.
+    div.innerHTML = String(html).replace(/\\n/g, '<br>');
+    out.appendChild(div);
+    crt.scrollTop = crt.scrollHeight;
+  }
+  function promptLine(cmd){ render('<span class="yel">C:\\\\BENTOO&gt;</span> ' + esc(cmd)); }
+
+  var CMDS = {
+    'help': function(){ return I.helpLines.join('\\n'); },
+    'dir': function(){ return I.dirLines.join('\\n'); },
+    'ver': function(){ return I.ver; },
+    'cd': function(){ return I.cd; },
+    'time': function(){ return I.timePrefix + new Date().toLocaleTimeString(); },
+    'date': function(){ return I.datePrefix + new Date().toLocaleDateString(); },
+    'whoami': function(){ return I.whoami; },
+    'type readme.txt': function(){ return I.readmeLines.join('\\n'); },
+    'type release.ini': function(){ return I.releaseLines.join('\\n'); },
+    'type make.conf': function(){ return I.makeConfLines.join('\\n'); },
+    'emerge --info': function(){ return I.emergeInfoLines.join('\\n'); },
+    'neofetch': function(){ return I.neofetchLines.join('\\n'); },
+    'fortune': function(){ return I.fortuneQuotes[Math.floor(Math.random() * I.fortuneQuotes.length)]; },
+    'banana': function(){ return I.bananaLines.join('\\n'); },
+    'cls': function(){ out.textContent = ''; return null; },
+    'clear': function(){ out.textContent = ''; return null; },
+    'exit': function(){ return I.exitMsg; },
+    'shutdown': function(){ return I.shutdownMsg; },
+    'format c:': function(){ return I.formatMsg; },
+    'del *.*': function(){ return I.delMsg; }
+  };
+
+  function run(raw){
+    var cmd = raw.trim();
+    if (!cmd) return;
+    promptLine(cmd);
+    cmdHistory.push(cmd); histIdx = cmdHistory.length;
+    var key = cmd.toLowerCase();
+    if (key.indexOf('type ') === 0){
+      var file = key;
+      if (CMDS[file]){ render(CMDS[file]()); return; }
+      render(I.fileNotFoundPrefix + esc(cmd.slice(5).toUpperCase()));
+      return;
+    }
+    if (CMDS[key]){
+      var res = CMDS[key]();
+      if (res !== null && res !== undefined) render(res);
+      return;
+    }
+    render(I.badCommand);
+  }
+
+  inp.addEventListener('keydown', function(e){
+    if (e.key === 'Enter'){ run(inp.value); inp.value = ''; }
+    else if (e.key === 'ArrowUp'){ if (histIdx > 0){ histIdx--; inp.value = cmdHistory[histIdx]; } e.preventDefault(); }
+    else if (e.key === 'ArrowDown'){ if (histIdx < cmdHistory.length - 1){ histIdx++; inp.value = cmdHistory[histIdx]; } else { histIdx = cmdHistory.length; inp.value = ''; } e.preventDefault(); }
+    else if (e.ctrlKey && e.key === 'l'){ out.textContent = ''; e.preventDefault(); }
+  });
+})();
+`.trim();
+---
+<VariantLayout
+  lang={lang}
+  path={path}
+  title={content.title}
+  description={content.description}
+  variantSlug="v3i"
+>
+  <Fragment slot="head-extra">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=VT323&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  </Fragment>
+  <style slot="style">
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --desk:#4b7d7d; --desk-2:#3a6363;
+      --chrome:#c0c0c0; --chrome-d:#808080; --chrome-dd:#3a3a3a;
+      --chrome-l:#ffffff; --chrome-ll:#dfdfdf;
+      --title:#0a246a; --title-y:#f4d14a; --title-y2:#e1b832;
+      --ink:#000; --link:#1818d4; --pink:#c8145c; --green:#0b873e;
+      --f-pix:'DotGothic16',monospace;
+      --f-crt:'VT323',monospace;
+      --f-mono:'JetBrains Mono',monospace;
+    }
+    html{image-rendering:pixelated}
+    html,body{background:var(--desk);color:var(--ink);font-family:var(--f-pix);font-size:14px;min-height:100vh;line-height:1.3;display:flex;flex-direction:column}
+    body{
+      background-color:var(--desk);
+      background-image:
+        radial-gradient(rgba(255,255,255,.15) 1px,transparent 1px),
+        radial-gradient(rgba(0,0,0,.15) 1px,transparent 1px);
+      background-size:8px 8px,8px 8px;
+      background-position:0 0,4px 4px;
+      overflow-x:hidden;
+    }
+    a{color:inherit;text-decoration:none}
+
+    .topbar{
+      background:var(--chrome);
+      border-bottom:2px solid var(--chrome-dd);
+      padding:3px 8px;
+      display:flex;gap:4px;align-items:center;
+      font-family:var(--f-pix);font-size:13px;
+      position:sticky;top:0;z-index:40;
+      box-shadow:inset 0 1px 0 var(--chrome-l);
+    }
+    .topbar .menu{position:relative;padding:3px 10px;cursor:pointer;user-select:none}
+    .topbar .menu.brand{font-weight:700;color:var(--title)}
+    .topbar .menu:hover{background:var(--chrome-ll)}
+    .topbar .menu.open{background:var(--title);color:var(--chrome-l)}
+    .topbar .menu.open.brand{color:var(--chrome-l)}
+    .topbar .menu u{text-decoration:underline}
+    .topbar .dropdown{
+      display:none;
+      position:absolute;top:100%;left:0;
+      background:var(--chrome);
+      border-top:2px solid var(--chrome-l);
+      border-left:2px solid var(--chrome-l);
+      border-right:2px solid var(--chrome-dd);
+      border-bottom:2px solid var(--chrome-dd);
+      box-shadow:3px 3px 0 rgba(0,0,0,.3);
+      min-width:200px;
+      z-index:50;
+      padding:2px;
+    }
+    .topbar .menu.open .dropdown{display:block}
+    .topbar .dropdown a, .topbar .dropdown button{
+      display:block;width:100%;text-align:left;
+      padding:5px 12px;
+      font-family:var(--f-pix);font-size:12px;
+      color:var(--ink);background:transparent;border:none;
+      cursor:pointer;
+    }
+    .topbar .dropdown a:hover, .topbar .dropdown button:hover{background:var(--title);color:var(--chrome-l)}
+    .topbar .dropdown hr{border:none;border-top:1px solid var(--chrome-d);margin:2px 4px}
+    .topbar .dropdown a .key, .topbar .dropdown button .key{
+      float:right;color:var(--pink);font-family:var(--f-mono);font-size:10px;margin-left:12px;
+    }
+    .topbar .dropdown a:hover .key, .topbar .dropdown button:hover .key{color:var(--title-y)}
+    .topbar .clk{margin-left:auto;background:var(--chrome-ll);border:1px inset var(--chrome-dd);padding:2px 10px;font-family:var(--f-mono);font-size:11px;cursor:default}
+
+    .dialog-backdrop{
+      display:none;
+      position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;
+      align-items:center;justify-content:center;padding:20px;
+    }
+    .dialog-backdrop.open{display:flex}
+    .dialog{
+      background:var(--chrome);
+      border-top:2px solid var(--chrome-l);
+      border-left:2px solid var(--chrome-l);
+      border-right:2px solid var(--chrome-dd);
+      border-bottom:2px solid var(--chrome-dd);
+      box-shadow:4px 4px 0 rgba(0,0,0,.4);
+      max-width:440px;width:100%;
+    }
+    .dialog .dlg-bar{
+      background:linear-gradient(90deg,var(--title),#1e49b5);
+      color:var(--chrome-l);
+      padding:5px 10px;
+      display:flex;justify-content:space-between;align-items:center;
+      font-family:var(--f-pix);font-size:13px;
+      border-bottom:2px solid var(--chrome-dd);
+    }
+    .dialog .dlg-bar button{
+      background:var(--chrome);
+      border-top:1.5px solid var(--chrome-l);
+      border-left:1.5px solid var(--chrome-l);
+      border-right:1.5px solid var(--chrome-dd);
+      border-bottom:1.5px solid var(--chrome-dd);
+      width:20px;height:18px;padding:0;cursor:pointer;
+      font-family:var(--f-mono);font-size:10px;color:var(--ink);font-weight:700;
+    }
+    .dialog .dlg-body{padding:20px 22px;font-family:var(--f-pix);font-size:13px;line-height:1.5}
+    .dialog .dlg-body h3{font-size:18px;color:var(--title);margin-bottom:8px}
+    .dialog .dlg-body p{margin-bottom:10px}
+    .dialog .dlg-body b{color:var(--title)}
+    .dialog .dlg-body em{font-style:normal;color:var(--pink);font-weight:700}
+    .dialog .dlg-foot{
+      padding:10px 18px;border-top:1px solid var(--chrome-d);background:var(--chrome-ll);
+      text-align:right;
+    }
+
+    .marquee{
+      background:var(--title);
+      color:var(--title-y);
+      padding:4px 0;
+      overflow:hidden;white-space:nowrap;
+      font-family:var(--f-crt);font-size:18px;letter-spacing:.08em;
+      border-top:2px solid var(--chrome-l);
+      border-bottom:2px solid var(--chrome-dd);
+    }
+    .mq{display:inline-flex;gap:42px;animation:scroll 60s linear infinite;padding-left:42px;width:max-content}
+    .mq span{display:inline-flex;gap:10px;align-items:center}
+    .mq i{color:var(--title-y);font-style:normal;font-family:var(--f-pix);font-size:16px}
+    @keyframes scroll{to{transform:translate3d(-50%,0,0)}}
+
+    .win{
+      background:var(--chrome);
+      border-top:2px solid var(--chrome-l);
+      border-left:2px solid var(--chrome-l);
+      border-right:2px solid var(--chrome-dd);
+      border-bottom:2px solid var(--chrome-dd);
+      box-shadow:
+        inset -1px -1px 0 var(--chrome-d),
+        inset 1px 1px 0 var(--chrome-ll),
+        4px 4px 0 rgba(0,0,0,.3);
+    }
+    .win-bar{
+      background:
+        repeating-linear-gradient(90deg,var(--title-y) 0 4px,var(--title-y2) 4px 8px),
+        var(--title-y);
+      padding:5px 7px;
+      display:flex;align-items:center;justify-content:space-between;
+      color:var(--ink);
+      font-family:var(--f-pix);font-size:14px;
+      border-bottom:2px solid var(--chrome-dd);
+      position:relative;
+    }
+    .win-bar::before{
+      content:'';position:absolute;left:4px;right:4px;top:4px;bottom:4px;
+      background:repeating-linear-gradient(90deg,transparent 0 8px,rgba(0,0,0,.2) 8px 10px);
+      z-index:0;pointer-events:none;
+    }
+    .win-bar .title{
+      background:var(--title-y);
+      padding:0 8px;z-index:1;position:relative;
+      font-weight:700;letter-spacing:.02em;
+      display:inline-flex;align-items:center;gap:8px;
+    }
+    .win-bar .title::before{
+      content:'';display:inline-block;width:14px;height:14px;
+      background:
+        linear-gradient(90deg,#e02020 33.33%,#2020e0 33.33% 66.66%,#e0a020 66.66%);
+      border:1px solid var(--ink);
+    }
+    .win-bar .ctls{display:flex;gap:3px;z-index:1;position:relative}
+    .win-bar .ctls b{
+      display:inline-grid;place-items:center;
+      width:22px;height:20px;
+      background:var(--chrome);
+      border-top:1.5px solid var(--chrome-l);
+      border-left:1.5px solid var(--chrome-l);
+      border-right:1.5px solid var(--chrome-dd);
+      border-bottom:1.5px solid var(--chrome-dd);
+      font-family:var(--f-mono);font-size:10px;font-weight:700;color:var(--ink);
+      cursor:pointer;
+    }
+    .win-menu{
+      background:var(--chrome);
+      padding:2px 6px;
+      display:flex;gap:14px;
+      font-family:var(--f-pix);font-size:13px;
+      border-bottom:1px solid var(--chrome-dd);
+    }
+    .win-menu span{padding:2px 6px;cursor:default}
+    .win-menu span u{text-decoration:underline}
+    .win-body{padding:20px 26px}
+
+    main{
+      flex:1;
+      padding:30px 20px 20px;
+      max-width:820px;
+      margin:0 auto;
+      width:100%;
+    }
+
+    .install-win{margin-bottom:14px}
+    .install-win h1{
+      font-family:var(--f-pix);
+      font-size:clamp(44px,7vw,72px);
+      line-height:1;letter-spacing:-.01em;
+      margin-bottom:4px;color:var(--title);
+      text-shadow:3px 3px 0 rgba(10,36,106,.15);
+    }
+    .install-win h1 em{font-style:normal;color:var(--pink)}
+    .install-win h1 .period{color:#bc002d}
+    .install-win .wiz-sub{
+      font-family:var(--f-pix);font-size:15px;color:var(--ink);
+      margin-bottom:4px;
+    }
+    .install-win .wiz-sub em{font-style:normal;color:var(--title);font-weight:700}
+    .install-win .tagline{
+      font-family:var(--f-pix);font-size:18px;color:var(--pink);
+      margin-bottom:16px;letter-spacing:-.01em;
+      padding:6px 0;border-bottom:1px dashed var(--chrome-d);
+    }
+    .install-win .tagline em{font-style:normal;color:var(--title);font-weight:700}
+
+    .install-win .brief{
+      font-family:var(--f-pix);font-size:14px;line-height:1.5;margin-bottom:14px;
+    }
+    .install-win .brief b{color:var(--title)}
+    .install-win .brief em{font-style:normal;color:var(--pink);font-weight:700}
+
+    .box-list{
+      background:var(--chrome-ll);
+      border:1px inset var(--chrome-dd);
+      padding:10px 14px;
+      margin-bottom:16px;
+      font-family:var(--f-pix);font-size:13px;
+    }
+    .box-list .row{
+      display:grid;grid-template-columns:140px 1fr auto;
+      gap:12px;
+      padding:3px 0;
+      border-bottom:1px dotted rgba(0,0,0,.2);
+    }
+    .box-list .row:last-child{border:none}
+    .box-list .k{font-weight:700;color:var(--title);letter-spacing:.02em}
+    .box-list .v{color:var(--ink)}
+    .box-list .t{font-family:var(--f-mono);font-size:10px;color:var(--green);font-weight:700}
+
+    .progress-wrap{margin:12px 0 16px}
+    .progress-label-top{font-family:var(--f-pix);font-size:13px;margin-bottom:4px}
+    .progress-label-top em{font-style:normal;color:var(--title);font-weight:700}
+    .progress{
+      background:var(--chrome-ll);
+      border:1px inset var(--chrome-dd);
+      height:22px;padding:2px;position:relative;
+    }
+    .progress-bar{
+      height:100%;
+      background:
+        repeating-linear-gradient(90deg,var(--title) 0 10px,transparent 10px 14px),
+        linear-gradient(90deg,var(--title),#0d40b5);
+      width:47%;
+      animation:pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse{0%,100%{opacity:.85}50%{opacity:1}}
+    .progress-text{
+      position:absolute;inset:0;display:grid;place-items:center;
+      font-family:var(--f-mono);font-size:11px;color:var(--ink);
+      text-shadow:1px 1px 0 var(--chrome-l);
+      letter-spacing:.02em;
+    }
+
+    .notify-dialog{
+      background:var(--chrome-ll);
+      border:2px inset var(--chrome-dd);
+      padding:14px 14px 12px;
+      margin-bottom:16px;
+    }
+    .notify-dialog .lbl{
+      font-family:var(--f-pix);font-size:13px;margin-bottom:6px;
+      display:flex;justify-content:space-between;align-items:baseline;
+    }
+    .notify-dialog .lbl b{color:var(--title);font-weight:700}
+    .notify-dialog .lbl span{font-family:var(--f-mono);font-size:10px;color:var(--green);letter-spacing:.1em}
+    .notify-row{display:flex;gap:6px}
+    .notify-row input{
+      flex:1;padding:6px 10px;
+      background:var(--chrome-l);
+      border-top:2px solid var(--chrome-dd);
+      border-left:2px solid var(--chrome-dd);
+      border-right:2px solid var(--chrome-l);
+      border-bottom:2px solid var(--chrome-l);
+      font-family:var(--f-mono);font-size:13px;color:var(--ink);
+      outline:none;
+    }
+    .notify-row input:focus{background:#fff}
+
+    .privacy-consent{
+      font-family:var(--f-pix);font-size:12px;color:var(--ink);margin-top:8px;
+    }
+    .privacy-consent a{color:var(--link);text-decoration:underline}
+
+    .btn9x{
+      background:var(--chrome);
+      border-top:2px solid var(--chrome-l);
+      border-left:2px solid var(--chrome-l);
+      border-right:2px solid var(--chrome-dd);
+      border-bottom:2px solid var(--chrome-dd);
+      padding:7px 18px;
+      font-family:var(--f-pix);font-size:13px;color:var(--ink);
+      cursor:pointer;min-width:100px;
+      display:inline-flex;align-items:center;gap:8px;justify-content:center;
+      box-shadow:inset 1px 1px 0 var(--chrome-ll);
+    }
+    .btn9x:hover{box-shadow:inset 1px 1px 0 var(--chrome-ll),0 0 0 1px var(--title)}
+    .btn9x:active{
+      border-top:2px solid var(--chrome-dd);
+      border-left:2px solid var(--chrome-dd);
+      border-right:2px solid var(--chrome-l);
+      border-bottom:2px solid var(--chrome-l);
+      box-shadow:none;
+    }
+    .btn9x.pri{
+      background:linear-gradient(180deg,#e1d9bc,#c7b575);
+      border-top-color:#fff9cc;border-left-color:#fff9cc;
+      font-weight:700;
+    }
+    .btn9x .arr{color:var(--pink)}
+    .btn9x.pri .arr{color:#c8145c}
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+
+    .crt-hint{
+      background:#0d2813;
+      color:#8bff73;
+      padding:10px 12px 6px;
+      font-family:var(--f-crt);font-size:17px;line-height:1.2;
+      border:2px inset var(--chrome-dd);
+      margin-bottom:4px;
+      position:relative;overflow:hidden;
+      min-height:200px;max-height:320px;overflow-y:auto;
+      cursor:text;
+    }
+    .crt-hint::before{
+      content:'';position:absolute;inset:0;
+      background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(0,0,0,.2) 2px 3px);
+      pointer-events:none;z-index:1;
+    }
+    .crt-hint > *{position:relative;z-index:2}
+    .crt-hint .ttl{color:#ffdf6b;margin-bottom:4px;font-size:14px;letter-spacing:.08em}
+    .crt-hint .ok::before{content:'✓ ';color:#8bff73}
+    .crt-hint .cur{display:inline-block;width:8px;height:14px;background:#8bff73;vertical-align:middle;animation:blink 1s step-end infinite;margin-left:2px}
+    @keyframes blink{50%{opacity:0}}
+    .crt-hint .crt-out > div{white-space:pre-wrap}
+    .crt-hint .crt-out .yel{color:#ffdf6b}
+    .crt-hint .crt-out .pink{color:#ff73bc}
+    .crt-hint .crt-out .cyan{color:#73f0ff}
+    .crt-hint .crt-line{display:flex;align-items:center;gap:4px}
+    .crt-hint .crt-line .pmt{color:#8bff73;white-space:nowrap}
+    .crt-hint .crt-line input{
+      flex:1;background:transparent;border:none;outline:none;caret-color:#8bff73;
+      font-family:var(--f-crt);font-size:17px;color:#8bff73;line-height:1.2;padding:0;
+    }
+    .crt-hint .crt-line input::selection{background:#8bff73;color:#0d2813}
+
+    .status-bar{
+      background:var(--chrome);
+      border-top:2px solid var(--chrome-l);
+      padding:4px 10px 4px;
+      margin-top:14px;
+      display:flex;justify-content:space-between;align-items:center;
+      font-family:var(--f-mono);font-size:11px;
+    }
+    .status-bar .ok{
+      background:var(--chrome-ll);border:1px inset var(--chrome-d);
+      padding:2px 10px;color:var(--green);font-weight:700;letter-spacing:.05em;
+    }
+    .status-bar .links{display:flex;gap:12px}
+    .status-bar .links a{color:var(--link);text-decoration:underline;font-family:var(--f-pix);font-size:12px}
+    .status-bar .links a:hover{color:var(--pink)}
+
+    .start-bar{
+      background:var(--chrome);
+      border-top:2px solid var(--chrome-l);
+      padding:3px 6px;
+      display:flex;align-items:center;gap:4px;
+      box-shadow:inset 1px 1px 0 var(--chrome-ll);
+    }
+    .start-btn{
+      background:var(--chrome);
+      border-top:2px solid var(--chrome-l);
+      border-left:2px solid var(--chrome-l);
+      border-right:2px solid var(--chrome-dd);
+      border-bottom:2px solid var(--chrome-dd);
+      padding:5px 14px;
+      display:inline-flex;gap:6px;align-items:center;
+      font-family:var(--f-pix);font-size:13px;font-weight:700;
+      cursor:pointer;
+    }
+    .start-btn .logo-dot{
+      display:inline-block;width:14px;height:14px;
+      background:
+        linear-gradient(90deg,#e02020 33.33%,#2020e0 33.33% 66.66%,#e0a020 66.66%);
+    }
+    .task{
+      padding:4px 10px;min-width:220px;
+      background:var(--chrome);
+      border-top:1.5px solid var(--chrome-dd);
+      border-left:1.5px solid var(--chrome-dd);
+      border-right:1.5px solid var(--chrome-l);
+      border-bottom:1.5px solid var(--chrome-l);
+      background-image:linear-gradient(45deg,rgba(0,0,0,.06) 25%,transparent 25%,transparent 50%,rgba(0,0,0,.06) 50%,rgba(0,0,0,.06) 75%,transparent 75%);
+      background-size:4px 4px;
+      font-family:var(--f-pix);font-size:12px;
+      display:flex;align-items:center;gap:6px;
+    }
+    .task .ico{display:inline-grid;place-items:center;width:16px;height:16px;background:var(--title);color:var(--chrome-l);font-size:10px;font-family:var(--f-mono)}
+    .tray{
+      margin-left:auto;
+      display:flex;align-items:center;gap:10px;padding:3px 8px;
+      border-top:1.5px solid var(--chrome-dd);
+      border-left:1.5px solid var(--chrome-dd);
+      border-right:1.5px solid var(--chrome-l);
+      border-bottom:1.5px solid var(--chrome-l);
+      font-family:var(--f-mono);font-size:11px;
+    }
+    .tray .ic{color:var(--title);cursor:default;font-family:var(--f-pix);font-size:12px}
+    .tray .ic.r{color:var(--pink)}
+    .tray .clk{font-family:var(--f-mono);font-size:11px}
+
+    @media (max-width:640px){
+      main{padding:18px 10px 10px}
+      .install-win .win-body{padding:14px 16px}
+      .install-win h1{font-size:44px}
+      .box-list .row{grid-template-columns:1fr}
+      .notify-row{flex-direction:column}
+      .task{min-width:0;flex:1}
+      .tray .ic{display:none}
+    }
+  </style>
+
+  <div class="topbar" id="topbar">
+    <span class="menu brand" data-menu="bentoo">
+      <u>B</u>entoo
+      <div class="dropdown">
+        <a href="#" data-action="about">{content.helpAbout}</a>
+        <hr />
+        <a href="../">{content.navBack} <span class="key">Alt+R</span></a>
+        <a href="../hub/">{content.navHub} <span class="key">Alt+H</span></a>
+        <hr />
+        <a href="https://github.com/obentoo" target="_blank" rel="noopener">GitHub <span class="key">↗</span></a>
+        <a href="mailto:contact@obentoo.org">Email <span class="key">✉</span></a>
+      </div>
+    </span>
+    <span class="menu" data-menu="file">
+      <u>{content.fileMenuLetter}</u>{content.fileMenuLabel}
+      <div class="dropdown">
+        <a href="#" data-action="new">{content.fileNew} <span class="key">Ctrl+N</span></a>
+        <a href="#" data-action="open">{content.fileOpen} <span class="key">Ctrl+O</span></a>
+        <a href="#" data-action="save">{content.fileSave} <span class="key">Ctrl+S</span></a>
+        <hr />
+        <a href="#" data-action="print">{content.filePrint} <span class="key">Ctrl+P</span></a>
+        <hr />
+        <a href="#" data-action="exit">{content.fileExit} <span class="key">Alt+F4</span></a>
+      </div>
+    </span>
+    <span class="menu" data-menu="edit">
+      <u>{content.editMenuLetter}</u>{content.editMenuLabel}
+      <div class="dropdown">
+        <a href="#" data-action="undo">{content.editUndo} <span class="key">Ctrl+Z</span></a>
+        <a href="#" data-action="redo">{content.editRedo} <span class="key">Ctrl+Y</span></a>
+        <hr />
+        <a href="#" data-action="copy">{content.editCopy} <span class="key">Ctrl+C</span></a>
+        <a href="#" data-action="paste">{content.editPaste} <span class="key">Ctrl+V</span></a>
+        <hr />
+        <a href="#" data-action="find">{content.editFind} <span class="key">Ctrl+F</span></a>
+      </div>
+    </span>
+    <span class="menu" data-menu="view">
+      <u>{content.viewMenuLetter}</u>{content.viewMenuLabel}
+      <div class="dropdown">
+        <a href="#" data-action="view-install">{content.viewInstall} <span class="key">F1</span></a>
+        <a href="#" data-action="view-progress">{content.viewProgress} <span class="key">F2</span></a>
+        <a href="#" data-action="view-terminal">Terminal <span class="key">F3</span></a>
+        <hr />
+        <a href="#" data-action="zoom-in">{content.viewZoomIn} <span class="key">Ctrl+=</span></a>
+        <a href="#" data-action="zoom-out">{content.viewZoomOut} <span class="key">Ctrl+-</span></a>
+      </div>
+    </span>
+    <span class="menu" data-menu="help">
+      <u>{content.helpMenuLetter}</u>{content.helpMenuLabel}
+      <div class="dropdown">
+        <a href="#" data-action="help-topics">{content.helpTopics} <span class="key">F1</span></a>
+        <a href="#" data-action="tips">{content.helpTips}</a>
+        <hr />
+        <a href="https://github.com/obentoo" target="_blank" rel="noopener">{content.helpDocs} <span class="key">↗</span></a>
+        <hr />
+        <a href="#" data-action="about">{content.helpAbout}</a>
+      </div>
+    </span>
+    <span class="clk" id="clk">2026/04/20 · 15:23</span>
+  </div>
+
+  <div class="dialog-backdrop" id="about-dlg">
+    <div class="dialog" role="dialog" aria-labelledby="dlg-title">
+      <div class="dlg-bar">
+        <span id="dlg-title">{content.aboutTitle}</span>
+        <button type="button" data-close aria-label={content.aboutCloseAria}>×</button>
+      </div>
+      <div class="dlg-body">
+        <h3>bentoo — install.exe</h3>
+        <p set:html={content.aboutVersionLineHtml}></p>
+        <p set:html={content.aboutDescriptionHtml}></p>
+        <p set:html={content.aboutCopyrightHtml}></p>
+        <p style="margin-top:14px;padding-top:10px;border-top:1px solid var(--chrome-d);font-size:12px;color:var(--ink)">
+          {content.aboutFooterMsg}
+        </p>
+      </div>
+      <div class="dlg-foot">
+        <button class="btn9x pri" type="button" data-close>OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="mq">
+      <span><i>源</i> source-based linux</span>
+      <span><i>常</i> rolling release</span>
+      <span><i>包</i> 100+ new ebuilds</span>
+      <span><i>守</i> desktop ready</span>
+      <span><i>速</i> -march=x86-64-v3</span>
+      <span><i>自</i> daily driver</span>
+      <span><i>選</i> opinionated defaults</span>
+      <span><i>味</i> gentoo inside</span>
+      <span><i>源</i> source-based linux</span>
+      <span><i>常</i> rolling release</span>
+      <span><i>包</i> 100+ new ebuilds</span>
+      <span><i>守</i> desktop ready</span>
+      <span><i>速</i> -march=x86-64-v3</span>
+      <span><i>自</i> daily driver</span>
+      <span><i>選</i> opinionated defaults</span>
+      <span><i>味</i> gentoo inside</span>
+    </div>
+  </div>
+
+  <main>
+
+    <div class="win install-win">
+      <div class="win-bar">
+        <span class="title">bentoo — install.exe</span>
+        <span class="ctls"><b>_</b><b>□</b><b>×</b></span>
+      </div>
+      <div class="win-menu"><span><u>{content.winMenuFile}</u>{content.fileMenuLabel}</span><span><u>{content.winMenuEdit}</u>{content.editMenuLabel}</span><span><u>{content.winMenuOptions}</u>ptions</span><span><u>{content.winMenuHelp}</u>{content.helpMenuLabel}</span></div>
+      <div class="win-body">
+
+        <div class="wiz-sub" set:html={content.wizWelcomeHtml}></div>
+        <h1>BENT<em>OO</em><span class="period">.</span></h1>
+        <div class="tagline" set:html={content.taglineHtml}></div>
+
+        <p class="brief" set:html={content.ledeHtml}></p>
+
+        <div class="box-list">
+          {content.specs.map((row) => (
+            <div class="row"><span class="k">{row.k}</span><span class="v">{row.v}</span><span class="t">{row.t}</span></div>
+          ))}
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-label-top" set:html={content.progressTopLabelHtml}></div>
+          <div class="progress">
+            <div class="progress-bar"></div>
+            <div class="progress-text">{content.progressText}</div>
+          </div>
+        </div>
+
+        <div class="notify-dialog">
+          <div class="lbl" set:html={content.pingLabelHtml}></div>
+          <form
+            class="notify-row"
+            data-bentoo-subscribe
+            action={`https://buttondown.com/api/emails/embed-subscribe/${buttondownUser}`}
+            method="post"
+            data-success-msg={strings.successMsg}
+            data-error-msg={strings.errorMsg}
+          >
+            <input type="hidden" name="embed" value="1" />
+            <input type="email" name="email" required placeholder={strings.subscribePlaceholder} />
+            <button class="btn9x pri" type="submit">{strings.subscribeButton} <span class="arr">▶</span></button>
+          </form>
+          <p class="privacy-consent">
+            {strings.privacyConsent} <a href={privacyHref}>{strings.privacyLinkLabel}</a>
+          </p>
+        </div>
+
+        <div class="actions">
+          <a class="btn9x" href="https://github.com/obentoo" target="_blank" rel="noopener">GitHub <span class="arr">▶</span></a>
+          <a class="btn9x" href="mailto:contact@obentoo.org">{content.btnContact} <span class="arr">▶</span></a>
+          <button class="btn9x" type="button" data-bentoo-back>{content.btnCancel}</button>
+        </div>
+
+        <div class="crt-hint" id="crt" data-bentoo-focus-input="cinput">
+          <div class="ttl">{content.msdosTitle}</div>
+          <div>(C)Copyright Microsoft Corp 1981-1994. Bentoo Stage5 Extensions 2018-2026.</div>
+          <div>&nbsp;</div>
+          <div set:html={content.msdosHelpHint}></div>
+          <div>&nbsp;</div>
+          <div class="crt-out" id="crt-out"></div>
+          <div class="crt-line">
+            <span class="pmt">C:\BENTOO&gt;</span>
+            <input id="cinput" type="text" autocomplete="off" spellcheck="false" aria-label={content.inputAriaLabel} />
+          </div>
+        </div>
+
+        <div class="status-bar">
+          <span class="ok">{content.statusReady}</span>
+          <div class="links">
+            <a href="https://github.com/obentoo" target="_blank" rel="noopener">github.com/obentoo</a>
+            <a href="mailto:contact@obentoo.org">contact@obentoo.org</a>
+          </div>
+          <span>© 2018 – 2026 bentoo</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="start-bar">
+    <button class="start-btn" type="button"><span class="logo-dot"></span>{content.startBtn}</button>
+    <div class="task"><span class="ico">B</span>bentoo — install.exe</div>
+    <div class="tray">
+      <span class="ic">🖫</span>
+      <span class="ic r">♪</span>
+      <span class="ic">⚡</span>
+      <span class="clk">15:23</span>
+    </div>
+  </div>
+
+  <script is:inline set:html={V3I_SCRIPT}></script>
+  <script is:inline>
+    document.addEventListener('click', function(e){
+      var b = e.target.closest('[data-bentoo-back]');
+      if (b) { history.back(); return; }
+      var f = e.target.closest('[data-bentoo-focus-input]');
+      if (f) {
+        var id = f.getAttribute('data-bentoo-focus-input');
+        var el = id && document.getElementById(id);
+        if (el && typeof el.focus === 'function') el.focus();
+      }
+    });
+  </script>
+</VariantLayout>
+</content>
+</invoke>

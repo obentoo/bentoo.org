@@ -7,7 +7,7 @@ export const strings = {
   errorMsg: 'Please try again in a moment.',
   privacyConsent: 'By subscribing you agree to our privacy policy',
   privacyLinkLabel: 'privacy',
-  languageToggleLabel: 'pt-BR',
+  languageToggleLabel: 'en',
   footerCopyright: 'handcrafted, source-first · © 2026 bentoo.org',
   privacyPageTitle: 'Privacy',
   privacyPageBody: `Bentoo respects your privacy and collects only the minimum data needed to announce the launch.
@@ -23,4 +23,15 @@ localStorage. This site uses two localStorage keys on your device, never synced 
 Contact. For data access, deletion, or any privacy request, write to founder@bentoo.org.`,
   notFoundTitle: 'Not found',
   notFoundBody: 'This page does not exist — return to the landing.',
+  notFoundBackLabel: '← back to the landing',
+  shuffleAria: 'shuffle homepage variant',
+  shuffleTip: 'shuffle theme',
+  languageMenuLabel: 'switch language',
+  noscriptVariantsHint: 'JavaScript disabled. Please visit one of:',
+  loaderAriaLabel: 'loading',
+  indexTitle: 'bentoo — loading',
+  indexDescription: 'Bentoo is a user-friendly Stage5 of Gentoo Linux.',
+  privacyPageDescription:
+    'How Bentoo handles your data on the pre-launch site.',
+  backLink: '← back',
 } as const satisfies Strings;

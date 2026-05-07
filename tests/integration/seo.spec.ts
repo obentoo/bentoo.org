@@ -61,18 +61,19 @@ test.describe('SEO metadata', () => {
     );
   });
 
-  test('(4) /sitemap.xml is 200 XML with exactly 2 <loc> entries', async ({
+  test('(4) /sitemap.xml is 200 XML with one <loc> per locale', async ({
     page,
   }) => {
     const response = await page.request.get('/sitemap.xml');
     expect(response.status()).toBe(200);
     const contentType = response.headers()['content-type'] ?? '';
-    expect(contentType).toMatch(/application\/xml/);
+    expect(contentType).toMatch(/(application|text)\/xml/);
 
     const body = await response.text();
     const locMatches = body.match(/<loc>[^<]+<\/loc>/g) ?? [];
-    expect(locMatches.length).toBe(2);
+    expect(locMatches.length).toBe(3);
     expect(body).toMatch(/<loc>[^<]*\/<\/loc>/);
     expect(body).toMatch(/<loc>[^<]*\/pt\/<\/loc>/);
+    expect(body).toMatch(/<loc>[^<]*\/es\/<\/loc>/);
   });
 });

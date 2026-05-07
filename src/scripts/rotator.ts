@@ -1,10 +1,13 @@
 import { VARIANTS, DEFAULT_VARIANT, isVariant } from '~/data/variants';
+import { DEFAULT_LOCALE, LOCALES, type Lang } from '~/utils/getLang';
 
 const TTL_MS = 24 * 60 * 60 * 1000;
 const VARIANT_KEY = 'bentoo-variant';
 const VARIANT_EXP_KEY = 'bentoo-variant-expires';
 const LANG_KEY = 'bentoo-lang';
 const LANG_EXP_KEY = 'bentoo-lang-expires';
+
+const NON_DEFAULT_LOCALES: Lang[] = LOCALES.filter((l) => l !== DEFAULT_LOCALE);
 
 function safeGet(key: string): string | null {
   try {
@@ -48,11 +51,30 @@ function preservedSearch(url: URL): string {
   return qs ? `?${qs}` : '';
 }
 
+function detectPrefix(pathname: string): string {
+  for (const lang of NON_DEFAULT_LOCALES) {
+    const px = `/${lang}`;
+    if (pathname === px || pathname.startsWith(`${px}/`)) return px;
+  }
+  return '';
+}
+
+function pickRedirectLocale(stored: string | null, navLang: string): Lang | null {
+  for (const lang of NON_DEFAULT_LOCALES) {
+    if (stored === lang) return lang;
+  }
+  if (stored) return null;
+  for (const lang of NON_DEFAULT_LOCALES) {
+    if (navLang.startsWith(lang)) return lang;
+  }
+  return null;
+}
+
 export function runRotator(): void {
   try {
     const url = new URL(window.location.href);
-    const isPtTree = url.pathname === '/pt' || url.pathname.startsWith('/pt/');
-    const prefix = isPtTree ? '/pt' : '';
+    const prefix = detectPrefix(url.pathname);
+    const isDefaultTree = prefix === '';
 
     // (1) ?v=<slug> override
     const vParam = url.searchParams.get('v');
@@ -62,15 +84,14 @@ export function runRotator(): void {
       return;
     }
 
-    // (4) Root /: navigator.language or stored bentoo-lang pt → redirect to /pt/
-    if (!isPtTree) {
+    // (4) Default tree (/): redirect to /<lang>/ if stored bentoo-lang or
+    // navigator.language matches a non-default locale.
+    if (isDefaultTree) {
       const storedLang = readStored(LANG_KEY, LANG_EXP_KEY);
       const navLang = (window.navigator.language || '').toLowerCase();
-      const shouldRedirectPt =
-        storedLang === 'pt' ||
-        (!storedLang && navLang.startsWith('pt'));
-      if (shouldRedirectPt) {
-        window.location.replace(`/pt/${url.search || ''}`);
+      const target = pickRedirectLocale(storedLang, navLang);
+      if (target) {
+        window.location.replace(`/${target}/${url.search || ''}`);
         return;
       }
     }
@@ -90,10 +111,7 @@ export function runRotator(): void {
     // (6) outer catch — deterministic fallback; wrapped in a second try so
     // even a broken window.location can never escape the rotator.
     try {
-      const isPtTree =
-        window.location.pathname === '/pt' ||
-        window.location.pathname.startsWith('/pt/');
-      const prefix = isPtTree ? '/pt' : '';
+      const prefix = detectPrefix(window.location.pathname);
       window.location.replace(`${prefix}/v/${DEFAULT_VARIANT}/`);
     } catch {
       /* swallow */

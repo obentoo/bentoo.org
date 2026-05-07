@@ -5,8 +5,8 @@ test.describe('language routing', () => {
     page,
   }) => {
     await page.goto('/v/v4/');
-    await page.waitForSelector('a[data-bentoo-lang-toggle]');
-    const toggle = page.locator('a[data-bentoo-lang-toggle]').first();
+    await page.waitForSelector('footer a[data-bentoo-lang-toggle]');
+    const toggle = page.locator('footer a[data-bentoo-lang-toggle]').first();
     const targetLang = await toggle.getAttribute('data-target-lang');
     expect(['pt', 'en']).toContain(targetLang);
 
@@ -74,6 +74,28 @@ test.describe('language routing', () => {
     await page.goto('/');
     await page.waitForURL(/\/v\/[^/]+\/$/);
     expect(page.url()).not.toMatch(/\/pt\//);
+
+    const cookies = await page.evaluate(() => document.cookie);
+    expect(cookies).toBe('');
+  });
+
+  test('(4) navigator.language=es-ES + no bentoo-lang redirects / to /es/', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'language', {
+        value: 'es-ES',
+        configurable: true,
+      });
+      Object.defineProperty(navigator, 'languages', {
+        value: ['es-ES', 'es'],
+        configurable: true,
+      });
+    });
+
+    await page.goto('/');
+    await page.waitForURL(/\/es\/v\/[^/]+\/$/);
+    expect(page.url()).toMatch(/\/es\/v\/[^/]+\/$/);
 
     const cookies = await page.evaluate(() => document.cookie);
     expect(cookies).toBe('');

@@ -1,13 +1,12 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
-import { getLang } from '~/utils/getLang';
-import { strings as enStrings } from '~/i18n/en';
-import { strings as ptStrings } from '~/i18n/pt';
+import { getLang, DEFAULT_LOCALE } from '~/utils/getLang';
+import { stringsFor } from '~/i18n';
 
 const lang = getLang(Astro.url.pathname);
-const strings = lang === 'pt' ? ptStrings : enStrings;
-const homePath = lang === 'pt' ? '/pt/' : '/';
-const backLabel = lang === 'pt' ? '← voltar para a página inicial' : '← back to the landing';
+const strings = stringsFor(lang);
+const homePath = lang === DEFAULT_LOCALE ? '/' : `/${lang}/`;
+const backLabel = strings.notFoundBackLabel;
 ---
 <BaseLayout
   lang={lang}

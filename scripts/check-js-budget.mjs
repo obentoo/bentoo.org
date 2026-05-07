@@ -2,8 +2,8 @@
 // CI gate for R5.2 (JS budget).
 //
 // Budget tiers (per inline <script> block, gzip size):
-//   CORE    (rotator on /, /pt/; form-handler on every variant)  <= 1536 B
-//   VARIANT (retro interactive scripts inside a variant page,    <= 4096 B
+//   CORE    (rotator on /, /pt/, /es/; form-handler on every variant)  <= 1536 B
+//   VARIANT (retro interactive scripts inside a variant page,          <= 5120 B
 //            e.g. v3i install.exe shell, v3j IRIX xterm, mario
 //            ground-tile, matrix rain, clocks)
 //
@@ -11,6 +11,9 @@
 // small form handler". Variant-local interactive vanilla-DOM scripts
 // are the variant experience (locked by R8.1 bit-for-bit fidelity) and
 // are budget-capped to keep page weight under the R5.1 CWV budget.
+// VARIANT bumped from 4096B → 5120B when v3i/v3j gained inlined i18n
+// dictionaries (PT/ES shell strings) — adds ~25% headroom for future
+// content without forcing extraction to external files.
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
@@ -20,7 +23,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '..');
 const distDir = resolve(root, 'dist');
 const CORE_MAX = 1536;
-const VARIANT_MAX = 4096;
+const VARIANT_MAX = 5120;
 
 function walk(dir) {
   const out = [];

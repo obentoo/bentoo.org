@@ -9,7 +9,8 @@ export default defineConfig({
   vite: {
     define: {
       'import.meta.env.PUBLIC_IS_PRODUCTION': JSON.stringify(
-        process.env.CF_PAGES_BRANCH === 'main'
+        process.env.CF_PAGES_BRANCH === 'main' ||
+          process.env.PUBLIC_IS_PRODUCTION === 'true'
       ),
     },
   },

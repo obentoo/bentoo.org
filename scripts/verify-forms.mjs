@@ -24,7 +24,9 @@ function walk(dir) {
 
 let failed = 0;
 const variantFiles = walk(distDir).filter((f) =>
-  /\/v\/[^/]+\/index\.html$/.test(f) || /\/pt\/v\/[^/]+\/index\.html$/.test(f)
+  /\/v\/[^/]+\/index\.html$/.test(f) ||
+  /\/pt\/v\/[^/]+\/index\.html$/.test(f) ||
+  /\/es\/v\/[^/]+\/index\.html$/.test(f)
 );
 
 if (variantFiles.length === 0) {
@@ -64,7 +66,8 @@ for (const file of variantFiles) {
   }
 
   const isPt = file.includes('/pt/v/');
-  const expectedPrivacy = isPt ? '/pt/privacy' : '/privacy';
+  const isEs = file.includes('/es/v/');
+  const expectedPrivacy = isPt ? '/pt/privacy' : isEs ? '/es/privacy' : '/privacy';
   if (!html.includes(`href="${expectedPrivacy}"`)) {
     failed++;
     console.error(`fail: ${file} — missing privacy consent link to ${expectedPrivacy}`);

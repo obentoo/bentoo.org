@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { rootUrl, siblingPath, canonicalForVariant } from '../../src/utils/siteUrl';
+import {
+  rootUrl,
+  siblingPath,
+  canonicalForVariant,
+  localizedPath,
+} from '../../src/utils/siteUrl';
 
 describe('rootUrl', () => {
   beforeEach(() => {
@@ -15,6 +20,10 @@ describe('rootUrl', () => {
 
   it('returns /pt/ for pt', () => {
     expect(rootUrl('pt')).toBe('https://bentoo.org/pt/');
+  });
+
+  it('returns /es/ for es', () => {
+    expect(rootUrl('es')).toBe('https://bentoo.org/es/');
   });
 
   it('falls back to https://bentoo.org when PUBLIC_SITE_URL is unset', () => {
@@ -57,6 +66,48 @@ describe('siblingPath', () => {
   it('maps /pt/privacy → /privacy', () => {
     expect(siblingPath('/pt/privacy')).toBe('/privacy');
   });
+
+  it('maps /es/v/mario/ → /v/mario/ (back to default)', () => {
+    expect(siblingPath('/es/v/mario/')).toBe('/v/mario/');
+  });
+
+  it('maps /es/ → / (back to default)', () => {
+    expect(siblingPath('/es/')).toBe('/');
+  });
+});
+
+describe('localizedPath', () => {
+  it('default → pt: /v/mario/ → /pt/v/mario/', () => {
+    expect(localizedPath('/v/mario/', 'pt')).toBe('/pt/v/mario/');
+  });
+
+  it('default → es: /v/mario/ → /es/v/mario/', () => {
+    expect(localizedPath('/v/mario/', 'es')).toBe('/es/v/mario/');
+  });
+
+  it('pt → es: /pt/v/mario/ → /es/v/mario/', () => {
+    expect(localizedPath('/pt/v/mario/', 'es')).toBe('/es/v/mario/');
+  });
+
+  it('es → pt: /es/privacy → /pt/privacy', () => {
+    expect(localizedPath('/es/privacy', 'pt')).toBe('/pt/privacy');
+  });
+
+  it('pt → en (default): /pt/v/mario/ → /v/mario/', () => {
+    expect(localizedPath('/pt/v/mario/', 'en')).toBe('/v/mario/');
+  });
+
+  it('default → default no-op: / → /', () => {
+    expect(localizedPath('/', 'en')).toBe('/');
+  });
+
+  it('default → es root: / → /es/', () => {
+    expect(localizedPath('/', 'es')).toBe('/es/');
+  });
+
+  it('handles /pt (no trailing slash) → /es/', () => {
+    expect(localizedPath('/pt', 'es')).toBe('/es/');
+  });
 });
 
 describe('canonicalForVariant', () => {
@@ -73,5 +124,9 @@ describe('canonicalForVariant', () => {
 
   it('returns language root for pt variant', () => {
     expect(canonicalForVariant('mario', 'pt')).toBe('https://bentoo.org/pt/');
+  });
+
+  it('returns language root for es variant', () => {
+    expect(canonicalForVariant('mario', 'es')).toBe('https://bentoo.org/es/');
   });
 });

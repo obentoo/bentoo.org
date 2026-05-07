@@ -2,20 +2,24 @@
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import { VARIANTS } from '~/data/variants';
 import { ROTATOR_JS } from '~/scripts/rotator.inline';
+import { stringsFor } from '~/i18n';
+
+const lang = 'en' as const;
+const strings = stringsFor(lang);
 ---
 <BaseLayout
-  lang="en"
+  lang={lang}
   path="/"
   title="bentoo — loading"
   description="Bentoo is a user-friendly Stage5 of Gentoo Linux."
   isVariantPage={false}
 >
   <script is:inline set:html={ROTATOR_JS} />
-  <div class="loader" aria-label="loading">
+  <div class="loader" aria-label={strings.loaderAriaLabel}>
     <span>bentoo<span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
   </div>
   <noscript>
-    <p>JavaScript disabled. Please visit one of:
+    <p>{strings.noscriptVariantsHint}
       {VARIANTS.map((slug, i) => (
         <>
           <a href={`/v/${slug}/`}>{slug}</a>

@@ -7,7 +7,7 @@ export const strings = {
   errorMsg: 'Tente novamente em instantes.',
   privacyConsent: 'Ao inscrever-se, você concorda com nossa política de privacidade',
   privacyLinkLabel: 'privacidade',
-  languageToggleLabel: 'en',
+  languageToggleLabel: 'pt-BR',
   footerCopyright: 'feito à mão, código aberto · © 2026 bentoo.org',
   privacyPageTitle: 'Privacidade',
   privacyPageBody: `A Bentoo respeita sua privacidade e coleta apenas o mínimo de dados necessário para anunciar o lançamento.
@@ -23,4 +23,16 @@ localStorage. Este site usa duas chaves de localStorage no seu dispositivo, nunc
 Contato. Para solicitações de acesso, exclusão ou qualquer questão de privacidade, escreva para founder@bentoo.org.`,
   notFoundTitle: 'Página não encontrada',
   notFoundBody: 'Esta página não existe — volte para a página inicial.',
+  notFoundBackLabel: '← voltar para a página inicial',
+  shuffleAria: 'trocar versão da home',
+  shuffleTip: 'trocar visual',
+  languageMenuLabel: 'trocar idioma',
+  noscriptVariantsHint: 'JavaScript desativado. Visite uma das variantes:',
+  loaderAriaLabel: 'carregando',
+  indexTitle: 'bentoo — carregando',
+  indexDescription:
+    'Bentoo é um Gentoo Linux (Stage5) amigável para o usuário.',
+  privacyPageDescription:
+    'Como a Bentoo trata seus dados no site de pré-lançamento.',
+  backLink: '← voltar',
 } as const satisfies Strings;

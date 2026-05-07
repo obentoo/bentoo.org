@@ -1,0 +1,328 @@
+---
+import VariantLayout from '~/layouts/VariantLayout.astro';
+import type { Lang } from '~/utils/getLang';
+import { stringsFor } from '~/i18n';
+import { v3f } from '~/i18n/variants/v3f';
+import { localizedPath } from '~/utils/siteUrl';
+
+export interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const content = v3f[lang];
+const strings = stringsFor(lang);
+const path = localizedPath('/v/v3f/', lang);
+const privacyHref = localizedPath('/privacy', lang);
+const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
+---
+<VariantLayout
+  lang={lang}
+  path={path}
+  title={content.title}
+  description={content.description}
+  variantSlug="v3f"
+>
+  <Fragment slot="head-extra">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=JetBrains+Mono:wght@400;600&family=Shippori+Mincho:wght@700;800&display=swap" rel="stylesheet" />
+  </Fragment>
+  <style slot="style">
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --cream:#f1e8d1; --cream-2:#e4d9b8; --cream-3:#d4c7a0;
+      --ink:#1a1410;
+      --purple:#2a1a42; --purple-2:#3b2760;
+      --red:#cc2020; --red-2:#8f1515;
+      --gold:#c89a3a;
+      --f-disp:'Bebas Neue',sans-serif;
+      --f-jp:'Zen Kaku Gothic New',sans-serif;
+      --f-ser:'Shippori Mincho',serif;
+      --f-mono:'JetBrains Mono',monospace;
+    }
+    html,body{background:var(--cream);color:var(--ink);font-family:var(--f-jp);font-weight:700;font-size:15px;min-height:100vh;line-height:1.45;display:flex;flex-direction:column}
+    body{
+      background:
+        repeating-linear-gradient(0deg,transparent 0 31px,rgba(26,20,16,.04) 31px 32px),
+        repeating-linear-gradient(90deg,transparent 0 31px,rgba(26,20,16,.04) 31px 32px),
+        var(--cream);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:'';position:fixed;top:0;bottom:0;width:32px;
+      background:repeating-linear-gradient(0deg,transparent 0 4px,rgba(204,32,32,.25) 4px 5px);
+      left:0;pointer-events:none;z-index:1;
+    }
+    body::after{
+      content:'';position:fixed;top:0;bottom:0;width:32px;right:0;
+      background:repeating-linear-gradient(0deg,transparent 0 4px,rgba(204,32,32,.25) 4px 5px);
+      pointer-events:none;z-index:1;
+    }
+    .grain{
+      position:fixed;inset:0;pointer-events:none;z-index:999;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='1.3' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.06 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity:.4;mix-blend-mode:multiply;
+    }
+    a{color:inherit;text-decoration:none}
+
+    .doc-bar{
+      background:var(--ink);color:var(--cream);padding:8px 38px;
+      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+      font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;
+      position:relative;z-index:10;
+    }
+    .doc-bar .gold{color:var(--gold)}
+
+    main{flex:1;padding:44px 52px 72px;max-width:1080px;margin:0 auto;width:100%;position:relative;z-index:2}
+
+    .box{
+      background:var(--cream);
+      border:3px solid var(--ink);
+      box-shadow:0 0 0 6px var(--cream),0 0 0 9px var(--ink),12px 12px 24px rgba(0,0,0,.2);
+      position:relative;
+    }
+
+    .sf-header{
+      background:linear-gradient(180deg,var(--purple),var(--purple-2));
+      color:var(--cream);
+      padding:16px 28px;
+      display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;
+      border-bottom:4px solid var(--gold);
+    }
+    .sf-header .sfc{
+      font-family:var(--f-disp);font-size:18px;letter-spacing:.28em;color:var(--gold);
+      border:2px solid var(--gold);padding:3px 10px;
+    }
+    .sf-header .cat{
+      font-family:var(--f-disp);font-size:24px;letter-spacing:.18em;text-align:center;
+      color:var(--cream);
+    }
+    .sf-header .kanji{
+      font-family:var(--f-ser);font-size:22px;font-weight:800;letter-spacing:.24em;color:var(--gold);
+    }
+
+    .box-body{padding:44px 50px;display:grid;grid-template-columns:1.2fr 1fr;gap:38px;align-items:center}
+
+    .box-body h1{
+      font-family:var(--f-disp);
+      font-size:clamp(82px,12vw,156px);
+      line-height:.82;letter-spacing:-.015em;color:var(--ink);
+      margin-bottom:12px;
+    }
+    .box-body h1 em{font-style:normal;color:var(--red)}
+    .box-body h1 .dot{color:var(--gold)}
+    .box-body h1 .jp{
+      display:block;font-family:var(--f-ser);font-size:.22em;color:var(--purple);
+      letter-spacing:.24em;font-weight:800;margin-bottom:6px;
+    }
+    .box-body h1 .sub{
+      display:block;font-family:var(--f-disp);font-size:.22em;font-weight:400;
+      letter-spacing:.08em;color:var(--ink);margin-top:10px;line-height:1.2;
+    }
+    .box-body h1 .sub em{color:var(--red);background:var(--cream-2);padding:0 8px}
+    .box-body p.lede{font-family:var(--f-jp);font-size:14px;line-height:1.6;font-weight:500;margin-top:16px;max-width:50ch}
+    .box-body p.lede b{background:var(--gold);padding:1px 6px;font-weight:900}
+    .box-body p.lede em{font-style:normal;color:var(--red-2);font-weight:900}
+
+    .box-side{
+      background:var(--cream-2);
+      border:2px solid var(--ink);
+      padding:22px 22px 16px;
+      position:relative;
+    }
+    .box-side::before{
+      content:'FIG. 01';position:absolute;top:-11px;left:16px;
+      background:var(--cream);color:var(--ink);
+      font-family:var(--f-mono);font-size:10px;letter-spacing:.2em;padding:1px 8px;border:1.5px solid var(--ink);
+    }
+    .box-side svg{width:100%;height:auto;display:block;filter:drop-shadow(0 3px 0 var(--red))}
+    .box-side .ribbon{
+      margin-top:10px;background:var(--red);color:var(--cream);
+      padding:5px 8px;font-family:var(--f-disp);font-size:14px;letter-spacing:.14em;
+      text-align:center;
+    }
+
+    .stripes-band{
+      background:var(--ink);padding:12px 30px;
+      display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+      color:var(--cream);font-family:var(--f-mono);font-size:12px;letter-spacing:.18em;
+      border-top:4px solid var(--gold);
+    }
+    .stripes-band .rating{
+      background:var(--gold);color:var(--ink);
+      font-family:var(--f-disp);font-size:14px;letter-spacing:.15em;
+      padding:2px 10px;
+    }
+
+    .specs-grid{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+      padding:18px 30px;background:var(--cream-2);
+      border-top:1px solid var(--ink);
+    }
+    .specs-grid .sp{
+      background:var(--cream);border:2px solid var(--ink);padding:10px 12px;
+      font-family:var(--f-mono);font-size:11px;
+    }
+    .specs-grid .sp .k{display:block;letter-spacing:.2em;color:var(--purple-2);font-weight:700;margin-bottom:3px;font-size:9px;text-transform:uppercase}
+    .specs-grid .sp .v{font-family:var(--f-disp);font-size:18px;color:var(--ink);letter-spacing:.04em}
+    .specs-grid .sp .v em{color:var(--red);font-style:normal}
+
+    .actions-bar{
+      padding:18px 30px 22px;background:var(--cream);
+      display:flex;gap:10px;flex-wrap:wrap;
+      border-top:1px solid var(--ink);
+    }
+    .btn{
+      padding:11px 22px;border:2.5px solid var(--ink);background:var(--cream);color:var(--ink);
+      font-family:var(--f-disp);font-size:16px;letter-spacing:.12em;cursor:pointer;
+      display:inline-flex;gap:10px;align-items:center;
+      box-shadow:4px 4px 0 var(--ink);
+    }
+    .btn:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--ink)}
+    .btn.pri{background:var(--red);color:var(--cream)}
+    .btn.pri:hover{background:var(--gold);color:var(--ink)}
+    .btn.alt{background:var(--purple);color:var(--cream)}
+
+    .notify{
+      margin-top:22px;background:var(--cream);border:3px solid var(--ink);padding:18px 22px;
+      display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;
+    }
+    .notify .lbl{font-family:var(--f-disp);font-size:20px;letter-spacing:.14em;color:var(--red)}
+    .notify .lbl small{display:block;font-family:var(--f-mono);font-size:10px;color:var(--ink);letter-spacing:.18em;margin-top:4px;font-weight:700}
+    .notify form{display:flex;gap:6px;width:100%}
+    .notify input[type="email"]{
+      flex:1;padding:11px 14px;background:var(--cream-2);color:var(--ink);border:2px solid var(--ink);
+      font-family:var(--f-mono);font-size:13px;outline:none;font-weight:600;
+    }
+    .notify input[type="email"]:focus{background:var(--cream)}
+    .notify button{padding:0 22px;background:var(--ink);color:var(--gold);border:2px solid var(--ink);font-family:var(--f-disp);font-size:16px;letter-spacing:.14em;cursor:pointer}
+    .notify button:hover{background:var(--red);color:var(--cream);border-color:var(--red)}
+
+    .privacy-consent{
+      margin-top:14px;font-family:var(--f-mono);font-size:11px;color:var(--ink);
+      letter-spacing:.08em;text-align:center;
+    }
+    .privacy-consent a{color:var(--red);text-decoration:underline}
+
+    footer{
+      background:var(--ink);color:var(--cream);padding:14px 38px;margin-top:18px;
+      display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+      font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;
+      position:relative;z-index:10;
+    }
+    footer em{color:var(--gold);font-style:normal;font-family:var(--f-disp);font-size:14px;letter-spacing:.08em}
+    footer a{color:var(--gold)}
+    footer a:hover{color:var(--red)}
+
+    @media (max-width:820px){
+      body::before,body::after{display:none}
+      main{padding:26px 18px 50px}
+      .box-body{grid-template-columns:1fr;padding:30px 22px}
+      .box-body h1{font-size:80px}
+      .specs-grid{grid-template-columns:1fr 1fr}
+      .notify{grid-template-columns:1fr}
+      .notify form{flex-direction:column}
+    }
+  </style>
+
+  <div class="grain"></div>
+
+  <div class="doc-bar">
+    <span>CAT. NO. <span class="gold">BTO-001</span> · {content.catNoEdition}</span>
+    <span><span class="gold" id="clk">--:--:--</span> · {content.region}</span>
+  </div>
+
+  <main>
+    <div class="box">
+      <div class="sf-header">
+        <span class="sfc">SFC</span>
+        <span class="cat">{content.cat}</span>
+        <span class="kanji">弁当</span>
+      </div>
+
+      <div class="box-body">
+        <div>
+          <h1>
+            <span class="jp">ベントー · 源泉から</span>
+            BENT<em>OO</em><span class="dot">.</span>
+            <span class="sub" set:html={content.subTaglineHtml}></span>
+          </h1>
+          <p class="lede" set:html={content.ledeHtml}></p>
+        </div>
+
+        <div class="box-side">
+          <svg viewBox="0 0 160 110" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="14" width="140" height="84" fill="#e4d9b8" stroke="#1a1410" stroke-width="2.5"/>
+            <rect x="18" y="22" width="124" height="20" fill="#cc2020" stroke="#1a1410" stroke-width="1.5"/>
+            <text x="80" y="37" text-anchor="middle" font-family="Bebas Neue" font-size="14" fill="#f1e8d1" letter-spacing="2">BENTOO</text>
+            <rect x="18" y="48" width="60" height="42" fill="#f1e8d1" stroke="#1a1410" stroke-width="1.2"/>
+            <circle cx="48" cy="69" r="11" fill="#cc2020" stroke="#8f1515" stroke-width="1"/>
+            <rect x="84" y="48" width="58" height="20" fill="#c89a3a" stroke="#1a1410" stroke-width="1.2"/>
+            <rect x="84" y="72" width="58" height="18" fill="#2a1a42" stroke="#1a1410" stroke-width="1.2"/>
+            <text x="113" y="85" text-anchor="middle" font-family="Shippori Mincho" font-size="10" font-weight="800" fill="#c89a3a" letter-spacing="1">弁当</text>
+          </svg>
+          <div class="ribbon">{content.ribbon}</div>
+        </div>
+      </div>
+
+      <div class="stripes-band">
+        <span>{content.playersRow}</span>
+        <span class="rating">{content.rating}</span>
+        <span>{content.cartSize}</span>
+      </div>
+
+      <div class="specs-grid">
+        <div class="sp"><span class="k">Release</span><span class="v"><em>0.1.0</em> · alpha</span></div>
+        <div class="sp"><span class="k">{content.specWindowKey}</span><span class="v" set:html={content.specWindowValHtml}></span></div>
+        <div class="sp"><span class="k">Arch</span><span class="v">x86-64-v3</span></div>
+        <div class="sp"><span class="k">{content.specKitchenKey}</span><span class="v">{content.specKitchenVal}</span></div>
+      </div>
+
+      <div class="actions-bar">
+        <a class="btn pri" href="https://github.com/obentoo" target="_blank" rel="noopener">{content.btnSource}</a>
+        <a class="btn alt" href="mailto:contact@obentoo.org">{content.btnContact}</a>
+        <a class="btn" href="#notify">{content.btnNotify}</a>
+      </div>
+    </div>
+
+    <div class="notify" id="notify">
+      <div class="lbl">{content.releasePingLabel}<small>{content.releasePingSub}</small></div>
+      <form
+        data-bentoo-subscribe
+        action={`https://buttondown.com/api/emails/embed-subscribe/${buttondownUser}`}
+        method="post"
+        data-success-msg={strings.successMsg}
+        data-error-msg={strings.errorMsg}
+      >
+        <input type="hidden" name="embed" value="1" />
+        <input type="email" name="email" required placeholder={strings.subscribePlaceholder} />
+        <button type="submit">{strings.subscribeButton}</button>
+      </form>
+    </div>
+    <p class="privacy-consent">
+      {strings.privacyConsent} <a href={privacyHref}>{strings.privacyLinkLabel}</a>
+    </p>
+  </main>
+
+  <footer>
+    <span set:html={content.footerCopyHtml}></span>
+    <span>
+      <a href="https://github.com/obentoo" target="_blank" rel="noopener">github.com/obentoo</a>
+      ·
+      <a href="mailto:contact@obentoo.org">contact@obentoo.org</a>
+    </span>
+  </footer>
+
+  <script is:inline>
+    (function(){
+      var c=document.getElementById('clk');
+      if (!c) return;
+      var p=function(n){return String(n).padStart(2,'0');};
+      function t(){var d=new Date();c.textContent=p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());}
+      t();setInterval(t,1000);
+    })();
+  </script>
+</VariantLayout>
+</content>
+</invoke>

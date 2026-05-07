@@ -1,9 +1,12 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import type { Lang } from '~/utils/getLang';
+import { LOCALES, hreflangFor, type Lang } from '~/utils/getLang';
+import { localizedPath } from '~/utils/siteUrl';
 import type { VariantSlug } from '~/data/variants';
 import { FORM_HANDLER_JS } from '~/scripts/form-handler.inline';
 import { SHUFFLE_JS } from '~/scripts/shuffle.inline';
+import { LANG_FAB_JS } from '~/scripts/lang-fab.inline';
+import { stringsFor } from '~/i18n';
 
 export interface Props {
   lang: Lang;
@@ -16,8 +19,40 @@ export interface Props {
 
 const { lang, path, title, description, variantSlug, ogImage } = Astro.props;
 const resolvedOg = ogImage ?? `/og/${variantSlug}.png`;
-const shuffleAria = lang === 'pt' ? 'trocar versão da home' : 'shuffle homepage variant';
-const shuffleTip = lang === 'pt' ? 'trocar visual' : 'shuffle theme';
+const strings = stringsFor(lang);
+const shuffleAria = strings.shuffleAria;
+const shuffleTip = strings.shuffleTip;
+const langMenuLabel = strings.languageMenuLabel;
+
+// Endonyms (each language's own name) — never translated.
+const ENDONYM: Record<Lang, string> = {
+  en: 'english',
+  pt: 'português',
+  es: 'español',
+};
+
+// Inline SVG flags clipped to a circle. Each clipPath ID is unique per
+// locale so a single page rendering trigger + 2 menu items never
+// collides. viewBox 60×60 to match the FAB outer dimension.
+const FLAG_SVG: Record<Lang, string> = {
+  pt: `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" focusable="false"><defs><clipPath id="bdFlagClipBR"><circle cx="30" cy="30" r="30"/></clipPath><linearGradient id="bdFlagBRGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1FB04C"/><stop offset="1" stop-color="#0A7129"/></linearGradient></defs><g clip-path="url(#bdFlagClipBR)"><rect width="60" height="60" fill="url(#bdFlagBRGreen)"/><polygon points="30,9 51,30 30,51 9,30" fill="#FFDF00" stroke="#E2B700" stroke-width="0.5"/><circle cx="30" cy="30" r="9" fill="#002776"/><path d="M21.5,32.5 Q30,28 38.5,32.5" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><g fill="#fff"><circle cx="25" cy="29" r="0.5"/><circle cx="29" cy="27" r="0.6"/><circle cx="33" cy="28" r="0.5"/><circle cx="35" cy="31" r="0.4"/><circle cx="27" cy="33.5" r="0.4"/><circle cx="31" cy="33.5" r="0.4"/><circle cx="26" cy="34" r="0.3"/></g></g></svg>`,
+  en: `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" focusable="false"><defs><clipPath id="bdFlagClipUS"><circle cx="30" cy="30" r="30"/></clipPath></defs><g clip-path="url(#bdFlagClipUS)"><rect width="60" height="60" fill="#fff"/><g fill="#B22234"><rect y="0" width="60" height="4.62"/><rect y="9.23" width="60" height="4.62"/><rect y="18.46" width="60" height="4.62"/><rect y="27.69" width="60" height="4.62"/><rect y="36.92" width="60" height="4.62"/><rect y="46.15" width="60" height="4.62"/><rect y="55.38" width="60" height="4.62"/></g><rect width="24" height="32.31" fill="#3C3B6E"/><g fill="#fff"><circle cx="3" cy="4" r="0.7"/><circle cx="9" cy="4" r="0.7"/><circle cx="15" cy="4" r="0.7"/><circle cx="21" cy="4" r="0.7"/><circle cx="6" cy="9" r="0.7"/><circle cx="12" cy="9" r="0.7"/><circle cx="18" cy="9" r="0.7"/><circle cx="3" cy="14" r="0.7"/><circle cx="9" cy="14" r="0.7"/><circle cx="15" cy="14" r="0.7"/><circle cx="21" cy="14" r="0.7"/><circle cx="6" cy="19" r="0.7"/><circle cx="12" cy="19" r="0.7"/><circle cx="18" cy="19" r="0.7"/><circle cx="3" cy="24" r="0.7"/><circle cx="9" cy="24" r="0.7"/><circle cx="15" cy="24" r="0.7"/><circle cx="21" cy="24" r="0.7"/><circle cx="6" cy="29" r="0.7"/><circle cx="12" cy="29" r="0.7"/><circle cx="18" cy="29" r="0.7"/></g></g></svg>`,
+  es: `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" focusable="false"><defs><clipPath id="bdFlagClipES"><circle cx="30" cy="30" r="30"/></clipPath></defs><g clip-path="url(#bdFlagClipES)"><rect y="0" width="60" height="15" fill="#AA151B"/><rect y="15" width="60" height="30" fill="#F1BF00"/><rect y="45" width="60" height="15" fill="#AA151B"/><g transform="translate(13.5,22)"><rect width="9" height="13" rx="1" fill="#AA151B" opacity="0.85" stroke="#7a0e14" stroke-width="0.4"/><rect x="0.6" y="0.6" width="7.8" height="11.8" rx="0.6" fill="#F4D44E"/><rect x="3.5" y="0" width="2" height="3" fill="#AA151B"/><line x1="0.5" y1="6.5" x2="8.5" y2="6.5" stroke="#AA151B" stroke-width="0.4"/></g></g></svg>`,
+};
+
+const GLOBE_BADGE_SVG = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" focusable="false"><circle cx="8" cy="8" r="7" fill="#0a0a12" stroke="rgba(255,255,255,0.85)" stroke-width="0.9"/><ellipse cx="8" cy="8" rx="3.5" ry="6.5" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="0.7"/><line x1="1.5" y1="8" x2="14.5" y2="8" stroke="rgba(255,255,255,0.85)" stroke-width="0.7"/><line x1="8" y1="1.5" x2="8" y2="14.5" stroke="rgba(255,255,255,0.6)" stroke-width="0.5"/></svg>`;
+
+const otherLocales = LOCALES.filter((l) => l !== lang);
+const langItems = otherLocales.map((target, i) => ({
+  target,
+  href: localizedPath(path, target),
+  hreflang: hreflangFor(target),
+  endonym: ENDONYM[target],
+  flagSvg: FLAG_SVG[target],
+  index: i,
+}));
+const currentEndonym = ENDONYM[lang];
+const currentFlagSvg = FLAG_SVG[lang];
 ---
 <BaseLayout
   lang={lang}
@@ -39,6 +74,40 @@ const shuffleTip = lang === 'pt' ? 'trocar visual' : 'shuffle theme';
     title="form-submission-sink"
   ></iframe>
   <slot />
+
+  <div class="bd-lang-fab" data-bd-lang-fab>
+    <ul class="bd-lang-menu" role="menu" aria-label={langMenuLabel}>
+      {langItems.map((item) => (
+        <li role="none" style={`--i:${item.index}`}>
+          <a
+            class="bd-lang-item"
+            href={item.href}
+            role="menuitem"
+            rel="alternate"
+            hreflang={item.hreflang}
+            data-bentoo-lang-toggle
+            data-target-lang={item.target}
+            aria-label={item.endonym}
+          >
+            <span class="bd-lang-flag" aria-hidden="true" set:html={item.flagSvg} />
+            <span class="bd-lang-label" aria-hidden="true">{item.endonym}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <button
+      type="button"
+      class="bd-lang-trigger"
+      data-bd-lang-trigger
+      aria-haspopup="menu"
+      aria-expanded="false"
+      aria-label={langMenuLabel}
+    >
+      <span class="bd-lang-flag" aria-hidden="true" set:html={currentFlagSvg} />
+      <span class="bd-lang-globe" aria-hidden="true" set:html={GLOBE_BADGE_SVG} />
+      <span class="bd-lang-tip" aria-hidden="true">{currentEndonym}</span>
+    </button>
+  </div>
 
   <button
     type="button"
@@ -243,8 +312,281 @@ const shuffleTip = lang === 'pt' ? 'trocar visual' : 'shuffle theme';
     @media print {
       .bd-shuffle-fab { display: none; }
     }
+
+    /* ── language FAB (sits above the shuffle cube) ───────────────── */
+    .bd-lang-fab {
+      position: fixed;
+      right: 22px;
+      bottom: 94px;
+      width: 60px;
+      height: 60px;
+      z-index: 9998;
+      font: inherit;
+      color: inherit;
+    }
+
+    .bd-lang-trigger {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 50%;
+      background:
+        linear-gradient(155deg, rgba(28, 28, 42, 0.78) 0%, rgba(10, 10, 18, 0.94) 100%);
+      backdrop-filter: blur(14px) saturate(1.3);
+      -webkit-backdrop-filter: blur(14px) saturate(1.3);
+      cursor: pointer;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        0 12px 32px rgba(0, 0, 0, 0.32),
+        0 4px 10px rgba(0, 0, 0, 0.22);
+      transition:
+        transform .28s cubic-bezier(.2, .8, .2, 1.2),
+        box-shadow .28s ease,
+        border-color .28s ease,
+        background .28s ease;
+      animation: bdLangEntry .8s 1.4s cubic-bezier(.2, .8, .2, 1.2) both;
+      font: inherit;
+      color: inherit;
+    }
+    .bd-lang-trigger:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.28);
+      background:
+        linear-gradient(155deg, rgba(38, 38, 56, 0.82) 0%, rgba(14, 14, 24, 0.96) 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.24),
+        0 18px 40px rgba(0, 0, 0, 0.42),
+        0 6px 14px rgba(0, 0, 0, 0.30);
+    }
+    .bd-lang-trigger:active { transform: translateY(0) scale(0.96); transition-duration: .12s; }
+    .bd-lang-trigger:focus-visible {
+      outline: 2px solid #ffd500;
+      outline-offset: 3px;
+    }
+
+    .bd-lang-flag {
+      display: block;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      overflow: hidden;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+      transition: transform .35s cubic-bezier(.2, .8, .2, 1.4);
+      transform-origin: 50% 50%;
+    }
+    .bd-lang-flag svg { width: 100%; height: 100%; display: block; }
+    .bd-lang-trigger:hover .bd-lang-flag,
+    .bd-lang-item:hover .bd-lang-flag {
+      transform: rotate(-6deg) scale(1.06);
+    }
+
+    .bd-lang-globe {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 18px;
+      height: 18px;
+      display: grid;
+      place-items: center;
+      background: rgba(10, 10, 18, 0.96);
+      border: 1.5px solid rgba(28, 28, 42, 1);
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+      transition: transform .35s cubic-bezier(.2, .8, .2, 1.4);
+      pointer-events: none;
+    }
+    .bd-lang-globe svg { width: 12px; height: 12px; display: block; }
+
+    .bd-lang-tip {
+      position: absolute;
+      right: calc(100% + 12px);
+      top: 50%;
+      transform: translateY(-50%) translateX(8px);
+      white-space: nowrap;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(15, 15, 22, 0.94);
+      color: #f5f5f5;
+      font-family: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
+      opacity: 0;
+      pointer-events: none;
+      transition:
+        opacity .25s ease,
+        transform .28s cubic-bezier(.2, .8, .2, 1.2);
+    }
+    .bd-lang-tip::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      transform: translateY(-50%) rotate(45deg);
+      background: rgba(15, 15, 22, 0.94);
+      border-right: 1px solid rgba(255, 255, 255, 0.12);
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .bd-lang-trigger:hover .bd-lang-tip,
+    .bd-lang-trigger:focus-visible .bd-lang-tip {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+    }
+    .bd-lang-fab.is-open .bd-lang-tip { opacity: 0; }
+    .bd-lang-fab.is-open .bd-lang-globe { transform: rotate(180deg); }
+
+    .bd-lang-menu {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 10px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .bd-lang-menu li {
+      margin: 0;
+      padding: 0;
+      position: relative;
+      opacity: 0;
+      transform: translateY(8px) scale(0.4);
+      transform-origin: 50% 100%;
+      transition:
+        opacity .22s ease,
+        transform .35s cubic-bezier(.2, .8, .2, 1.4);
+      pointer-events: none;
+    }
+    .bd-lang-fab.is-open .bd-lang-menu li {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+      transition-delay: calc(var(--i, 0) * 60ms);
+    }
+
+    .bd-lang-item {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background:
+        linear-gradient(155deg, rgba(28, 28, 42, 0.78) 0%, rgba(10, 10, 18, 0.94) 100%);
+      backdrop-filter: blur(14px) saturate(1.3);
+      -webkit-backdrop-filter: blur(14px) saturate(1.3);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.16),
+        0 8px 24px rgba(0, 0, 0, 0.32),
+        0 3px 8px rgba(0, 0, 0, 0.22);
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+      transition:
+        transform .28s cubic-bezier(.2, .8, .2, 1.2),
+        box-shadow .28s ease,
+        border-color .28s ease,
+        background .28s ease;
+    }
+    .bd-lang-item .bd-lang-flag { width: 40px; height: 40px; }
+    .bd-lang-item:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.28);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.22),
+        0 14px 30px rgba(0, 0, 0, 0.4),
+        0 5px 12px rgba(0, 0, 0, 0.28);
+    }
+    .bd-lang-item:focus-visible {
+      outline: 2px solid #ffd500;
+      outline-offset: 3px;
+    }
+
+    .bd-lang-label {
+      position: absolute;
+      right: calc(100% + 10px);
+      top: 50%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+      padding: 6px 11px;
+      border-radius: 999px;
+      background: rgba(15, 15, 22, 0.94);
+      color: #f5f5f5;
+      font-family: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 5px 14px rgba(0, 0, 0, 0.32);
+      pointer-events: none;
+    }
+    .bd-lang-label::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      transform: translateY(-50%) rotate(45deg);
+      background: rgba(15, 15, 22, 0.94);
+      border-right: 1px solid rgba(255, 255, 255, 0.12);
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    @keyframes bdLangEntry {
+      from { opacity: 0; transform: translateY(20px) scale(.7); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @media (max-width: 680px) {
+      .bd-lang-fab {
+        right: 14px;
+        bottom: 76px;
+        width: 52px;
+        height: 52px;
+      }
+      .bd-lang-flag { width: 38px; height: 38px; }
+      .bd-lang-globe { width: 16px; height: 16px; }
+      .bd-lang-globe svg { width: 10px; height: 10px; }
+      .bd-lang-tip { display: none; }
+      .bd-lang-item { width: 46px; height: 46px; }
+      .bd-lang-item .bd-lang-flag { width: 34px; height: 34px; }
+      .bd-lang-label { display: none; }
+      .bd-lang-menu { gap: 8px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bd-lang-trigger,
+      .bd-lang-flag,
+      .bd-lang-globe,
+      .bd-lang-tip,
+      .bd-lang-menu li,
+      .bd-lang-item { animation: none !important; transition: none !important; }
+      .bd-lang-trigger:hover,
+      .bd-lang-trigger:hover .bd-lang-flag,
+      .bd-lang-item:hover,
+      .bd-lang-item:hover .bd-lang-flag { transform: none; }
+    }
+
+    @media print {
+      .bd-lang-fab { display: none; }
+    }
   </style>
 
   <script is:inline set:html={SHUFFLE_JS} />
+  <script is:inline set:html={LANG_FAB_JS} />
   {FORM_HANDLER_JS && <script is:inline set:html={FORM_HANDLER_JS} />}
 </BaseLayout>

@@ -11,4 +11,14 @@ export type Strings = {
   privacyPageBody: string;
   notFoundTitle: string;
   notFoundBody: string;
+  notFoundBackLabel: string;
+  shuffleAria: string;
+  shuffleTip: string;
+  languageMenuLabel: string;
+  noscriptVariantsHint: string;
+  loaderAriaLabel: string;
+  indexTitle: string;
+  indexDescription: string;
+  privacyPageDescription: string;
+  backLink: string;
 };

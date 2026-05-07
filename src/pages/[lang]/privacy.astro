@@ -1,0 +1,59 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { stringsFor } from '~/i18n';
+import type { Lang } from '~/utils/getLang';
+import { LOCALES, DEFAULT_LOCALE } from '~/utils/getLang';
+
+export function getStaticPaths() {
+  return LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((lang) => ({
+    params: { lang },
+  }));
+}
+
+type Params = { lang: Exclude<Lang, typeof DEFAULT_LOCALE> };
+const { lang } = Astro.params as Params;
+const strings = stringsFor(lang);
+const path = `/${lang}/privacy`;
+const homePath = `/${lang}/`;
+---
+<BaseLayout
+  lang={lang}
+  path={path}
+  title={`${strings.privacyPageTitle} — Bentoo`}
+  description={strings.privacyPageDescription}
+  isVariantPage={false}
+>
+  <main class="bentoo-privacy">
+    <h1>{strings.privacyPageTitle}</h1>
+    <div class="bentoo-privacy-body">
+      {strings.privacyPageBody.split('\n\n').map((para) => <p>{para}</p>)}
+    </div>
+    <p><a href={homePath}>{strings.backLink}</a></p>
+  </main>
+  <style slot="style">
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #e7e7e7;
+      line-height: 1.6;
+    }
+    .bentoo-privacy {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 3rem 1.25rem 6rem;
+    }
+    .bentoo-privacy h1 { font-size: 2rem; margin: 0 0 1.5rem; }
+    .bentoo-privacy p { margin: 0 0 1rem; }
+    .bentoo-privacy a { color: #9eb6ff; }
+    footer.bentoo-footer {
+      max-width: 640px;
+      margin: 2rem auto 4rem;
+      padding: 1rem 1.25rem;
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+    footer.bentoo-footer a { color: inherit; margin: 0 0.25rem; min-height: 44px; display: inline-block; line-height: 44px; }
+    .bentoo-footer-sep { margin: 0 0.5rem; opacity: 0.5; }
+  </style>
+</BaseLayout>

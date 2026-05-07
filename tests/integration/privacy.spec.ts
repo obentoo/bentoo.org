@@ -13,7 +13,7 @@ test.describe('privacy page + consent', () => {
     expect(bodyText).toMatch(/Buttondown/);
 
     // Footer language toggle points to the pt sibling /pt/privacy
-    const toggle = page.locator('a[data-bentoo-lang-toggle]').first();
+    const toggle = page.locator('footer a[data-bentoo-lang-toggle]').first();
     await expect(toggle).toHaveAttribute('href', '/pt/privacy');
 
     const cookies = await page.evaluate(() => document.cookie);

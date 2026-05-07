@@ -72,3 +72,39 @@ returning to `/`. Implementation:
   outline, `prefers-reduced-motion` disables every animation,
   `@media print` hides the button.
 - Mobile (≤680 px) shrinks the FAB to 52 × 52 and hides the tooltip.
+
+## Language picker FAB (added post-launch)
+
+A floating circular flag button stacks **above** the shuffle cube in the
+bottom-right of every variant home page. Closed state shows the current
+locale's flag (BR / US / ES) inside a dark-glass circle with a tiny
+globe badge in the bottom-right corner. Clicking it expands a vertical
+menu of the other two locales (each with a side mono-caps pill label —
+`português` / `english` / `español`, always endonyms). Implementation:
+
+- Markup + style live in `src/layouts/VariantLayout.astro`; the inline
+  open/close IIFE comes from `src/scripts/lang-fab.inline.ts`. The
+  flag SVGs are inline strings clipped to `<circle r=30>` per locale
+  with unique clipPath IDs to avoid collisions.
+- Persistence is **not** in this script — menu items carry the same
+  `data-bentoo-lang-toggle` + `data-target-lang` attributes the footer
+  toggle uses, and the BaseLayout `langToggleScript` writes
+  `bentoo-lang` + `bentoo-lang-expires` to localStorage on click before
+  the anchor navigates.
+- Inline `lang-fab.inline.ts` script gzip 293B → classified as
+  `variant` by `scripts/check-js-budget.mjs` (deliberately avoids the
+  literal `bentoo-lang-toggle` substring so it doesn't compete for the
+  core-lang 1536B budget; uses `data-bd-lang-fab` /
+  `data-bd-lang-trigger` selectors instead).
+- Behaviour: trigger click toggles `is-open` + `aria-expanded`; ESC
+  closes; click outside closes. Items pop up with 60ms staggered scale
+  + translate animation.
+- A11y: `aria-haspopup="menu"`, `role="menu"` / `role="menuitem"`,
+  locale-aware `aria-label` (`switch language` / `trocar idioma` /
+  `cambiar idioma`), `:focus-visible` outline, `prefers-reduced-motion`
+  disables animations, `@media print` hides the FAB.
+- Mobile (≤680 px) shrinks trigger to 52 × 52, items to 46 × 46, and
+  hides the side pill labels.
+- Tests: `tests/integration/language-fab.spec.ts` covers toggle,
+  ESC/click-outside dismissal, item navigation+localStorage persistence,
+  and per-locale trigger correctness across en/pt/es.

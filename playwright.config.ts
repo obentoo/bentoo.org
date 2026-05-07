@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const port = Number(process.env.PLAYWRIGHT_PORT) || 4321;
+const baseURL = `http://localhost:${port}`;
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
@@ -8,7 +11,7 @@ export default defineConfig({
   workers: process.env.CI ? 4 : 1,
   reporter: process.env.CI ? 'github' : 'list',
   use: {
-    baseURL: 'http://localhost:4321',
+    baseURL,
     trace: 'on-first-retry',
   },
   expect: {
@@ -18,10 +21,13 @@ export default defineConfig({
     },
   },
   webServer: {
-    command: 'pnpm preview',
-    port: 4321,
+    command: `pnpm build && pnpm preview --port ${port}`,
+    port,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    env: {
+      PUBLIC_IS_PRODUCTION: 'true',
+    },
   },
   projects: [
     {

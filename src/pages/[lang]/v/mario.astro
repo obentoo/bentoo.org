@@ -1,0 +1,15 @@
+---
+import Mario from '~/components/variants/Mario.astro';
+import type { Lang } from '~/utils/getLang';
+import { LOCALES, DEFAULT_LOCALE } from '~/utils/getLang';
+
+export function getStaticPaths() {
+  return LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((lang) => ({
+    params: { lang },
+  }));
+}
+
+type Params = { lang: Exclude<Lang, typeof DEFAULT_LOCALE> };
+const { lang } = Astro.params as Params;
+---
+<Mario lang={lang} />

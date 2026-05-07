@@ -23,9 +23,11 @@ test('zero cookies after rotator + form submit + language toggle', async ({
     });
   });
 
-  // 1. Let the rotator redirect from / to a variant page.
-  await page.goto('/');
-  await page.waitForURL(/\/v\/[^/]+\/$/);
+  // 1. Let the rotator redirect from / to a variant page. Pin the variant
+  //    via ?v=v4 so the test isn't flaky when the rotator picks a variant
+  //    whose internal <footer> overlaps the BaseLayout footer.
+  await page.goto('/?v=v4');
+  await page.waitForURL(/\/v\/v4\/$/);
 
   let cookies = await page.evaluate(() => document.cookie);
   expect(cookies, 'cookies after rotator').toBe('');
@@ -44,7 +46,7 @@ test('zero cookies after rotator + form submit + language toggle', async ({
   expect(cookies, 'cookies after form submit').toBe('');
 
   // 3. Click the footer language toggle → navigates to pt sibling.
-  const toggle = page.locator('a[data-bentoo-lang-toggle]').first();
+  const toggle = page.locator('footer a[data-bentoo-lang-toggle]').first();
   await Promise.all([
     page.waitForURL(/\/pt\/v\/[^/]+\/$/),
     toggle.click(),

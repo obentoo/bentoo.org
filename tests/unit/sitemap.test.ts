@@ -15,11 +15,15 @@ describe('sitemap.xml', () => {
     expect(response.headers.get('content-type')).toMatch(/application\/xml/);
   });
 
-  it('lists exactly 2 urls: / and /pt/', async () => {
+  it('lists exactly 3 urls: /, /pt/, /es/', async () => {
     const response = await GET({} as never);
     const body = await response.text();
     const locs = [...body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-    expect(locs).toEqual(['https://bentoo.org/', 'https://bentoo.org/pt/']);
+    expect(locs).toEqual([
+      'https://bentoo.org/',
+      'https://bentoo.org/pt/',
+      'https://bentoo.org/es/',
+    ]);
   });
 
   it('emits hreflang alternates for each url', async () => {
@@ -27,6 +31,7 @@ describe('sitemap.xml', () => {
     const body = await response.text();
     expect(body).toContain('hreflang="en"');
     expect(body).toContain('hreflang="pt-BR"');
+    expect(body).toContain('hreflang="es"');
     expect(body).toContain('hreflang="x-default"');
   });
 

@@ -1,9 +1,15 @@
 ---
-import { rootUrl, siblingPath, canonicalForVariant } from '~/utils/siteUrl';
-import type { Lang } from '~/utils/getLang';
+import { rootUrl, localizedPath, canonicalForVariant } from '~/utils/siteUrl';
+import {
+  LOCALES,
+  DEFAULT_LOCALE,
+  htmlLangFor,
+  ogLocaleFor,
+  hreflangFor,
+  type Lang,
+} from '~/utils/getLang';
 import type { VariantSlug } from '~/data/variants';
-import { strings as enStrings } from '~/i18n/en';
-import { strings as ptStrings } from '~/i18n/pt';
+import { I18N, stringsFor } from '~/i18n';
 import '~/styles/base.css';
 
 export interface Props {
@@ -28,7 +34,7 @@ const {
   noindexOverride = false,
 } = Astro.props;
 
-const htmlLang = lang === 'pt' ? 'pt-BR' : 'en';
+const htmlLang = htmlLangFor(lang);
 const isProduction = import.meta.env.PUBLIC_IS_PRODUCTION === true;
 const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
 const siteRoot = (import.meta.env.PUBLIC_SITE_URL || 'https://bentoo.org').replace(/\/$/, '');
@@ -45,10 +51,15 @@ const robotsContent =
       ? 'noindex,follow'
       : 'index,follow';
 
-const hreflangEn = `${siteRoot}/`;
-const hreflangPt = `${siteRoot}/pt/`;
+const hreflangLinks = LOCALES.map((l) => ({
+  hreflang: hreflangFor(l),
+  href: `${siteRoot}${l === DEFAULT_LOCALE ? '/' : `/${l}/`}`,
+}));
+const xDefaultHref = `${siteRoot}/`;
 
 const ogImageAbs = ogImage.startsWith('http') ? ogImage : `${siteRoot}${ogImage}`;
+
+const inLanguageList = LOCALES.map((l) => htmlLangFor(l));
 
 const jsonLd = !isVariantPage && !noindexOverride
   ? JSON.stringify({
@@ -60,14 +71,19 @@ const jsonLd = !isVariantPage && !noindexOverride
       operatingSystem: 'Linux (Gentoo-based)',
       description,
       url: siteRoot,
-      inLanguage: [htmlLang],
+      inLanguage: inLanguageList,
     })
   : null;
 
-const strings = lang === 'pt' ? ptStrings : enStrings;
-const sibling = siblingPath(path);
-const targetLang = lang === 'pt' ? 'en' : 'pt';
-const privacyHref = lang === 'pt' ? '/pt/privacy' : '/privacy';
+const strings = stringsFor(lang);
+const otherLocales = LOCALES.filter((l) => l !== lang);
+const langLinks = otherLocales.map((target) => ({
+  target,
+  href: localizedPath(path, target),
+  label: I18N[target].languageToggleLabel,
+  hreflang: hreflangFor(target),
+}));
+const privacyHref = localizedPath('/privacy', lang);
 
 const langToggleScript = `
 try {
@@ -93,12 +109,16 @@ try {
     <link rel="icon" href="/bentoo-logo.svg" />
     <link rel="canonical" href={canonicalHref} />
     <meta name="robots" content={robotsContent} />
-    <link rel="alternate" hreflang="en" href={hreflangEn} />
-    <link rel="alternate" hreflang="pt-BR" href={hreflangPt} />
-    <link rel="alternate" hreflang="x-default" href={hreflangEn} />
+    {hreflangLinks.map((l) => (
+      <link rel="alternate" hreflang={l.hreflang} href={l.href} />
+    ))}
+    <link rel="alternate" hreflang="x-default" href={xDefaultHref} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Bentoo" />
-    <meta property="og:locale" content={htmlLang === 'pt-BR' ? 'pt_BR' : 'en_US'} />
+    <meta property="og:locale" content={ogLocaleFor(lang)} />
+    {otherLocales.map((l) => (
+      <meta property="og:locale:alternate" content={ogLocaleFor(l)} />
+    ))}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalHref} />
@@ -122,13 +142,18 @@ try {
   <body>
     <slot />
     <footer class="bentoo-footer">
-      <a
-        href={sibling}
-        data-bentoo-lang-toggle
-        data-target-lang={targetLang}
-        rel="alternate"
-        hreflang={targetLang === 'pt' ? 'pt-BR' : 'en'}
-      >{strings.languageToggleLabel}</a>
+      {langLinks.map((l, i) => (
+        <>
+          <a
+            href={l.href}
+            data-bentoo-lang-toggle
+            data-target-lang={l.target}
+            rel="alternate"
+            hreflang={l.hreflang}
+          >{l.label}</a>
+          {i < langLinks.length - 1 ? <span class="bentoo-footer-sep">·</span> : null}
+        </>
+      ))}
       <span class="bentoo-footer-sep">·</span>
       <a href={privacyHref}>{strings.privacyLinkLabel}</a>
       <span class="bentoo-footer-sep">·</span>
