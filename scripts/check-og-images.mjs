@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 // CI gate: asserts every public/og/*.png is 1200x630 and <= 300KB.
-import { execFileSync } from 'node:child_process';
-import { readdirSync, statSync } from 'node:fs';
+import { closeSync, openSync, readSync, readdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
@@ -12,12 +11,20 @@ const MAX_BYTES = 300 * 1024;
 const EXPECTED_W = 1200;
 const EXPECTED_H = 630;
 
+const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+
 function dims(path) {
-  const out = execFileSync('identify', ['-format', '%w %h', path], {
-    encoding: 'utf8',
-  }).trim();
-  const [w, h] = out.split(/\s+/).map(Number);
-  return { w, h };
+  const buf = Buffer.alloc(24);
+  const fd = openSync(path, 'r');
+  try {
+    readSync(fd, buf, 0, 24, 0);
+  } finally {
+    closeSync(fd);
+  }
+  if (!buf.subarray(0, 8).equals(PNG_SIGNATURE)) {
+    throw new Error(`not a PNG: ${path}`);
+  }
+  return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
 }
 
 const files = readdirSync(ogDir).filter((f) => f.endsWith('.png'));
