@@ -1,5 +1,5 @@
 ---
-import { rootUrl, localizedPath, canonicalForVariant } from '~/utils/siteUrl';
+import { rootUrl, canonicalForVariant } from '~/utils/siteUrl';
 import {
   LOCALES,
   DEFAULT_LOCALE,
@@ -9,7 +9,7 @@ import {
   type Lang,
 } from '~/utils/getLang';
 import type { VariantSlug } from '~/data/variants';
-import { I18N, stringsFor } from '~/i18n';
+import { stringsFor } from '~/i18n';
 import '~/styles/base.css';
 
 export interface Props {
@@ -77,27 +77,6 @@ const jsonLd = !isVariantPage && !noindexOverride
 
 const strings = stringsFor(lang);
 const otherLocales = LOCALES.filter((l) => l !== lang);
-const langLinks = otherLocales.map((target) => ({
-  target,
-  href: localizedPath(path, target),
-  label: I18N[target].languageToggleLabel,
-  hreflang: hreflangFor(target),
-}));
-const privacyHref = localizedPath('/privacy', lang);
-
-const langToggleScript = `
-try {
-  var links = document.querySelectorAll('[data-bentoo-lang-toggle]');
-  for (var i = 0; i < links.length; i++) {
-    links[i].addEventListener('click', function () {
-      try {
-        localStorage.setItem('bentoo-lang', this.getAttribute('data-target-lang'));
-        localStorage.setItem('bentoo-lang-expires', String(Date.now() + 86400000));
-      } catch (e) {}
-    });
-  }
-} catch (e) {}
-`.trim();
 ---
 <!doctype html>
 <html lang={htmlLang}>
@@ -142,23 +121,7 @@ try {
   <body>
     <slot />
     <footer class="bentoo-footer">
-      {langLinks.map((l, i) => (
-        <>
-          <a
-            href={l.href}
-            data-bentoo-lang-toggle
-            data-target-lang={l.target}
-            rel="alternate"
-            hreflang={l.hreflang}
-          >{l.label}</a>
-          {i < langLinks.length - 1 ? <span class="bentoo-footer-sep">·</span> : null}
-        </>
-      ))}
-      <span class="bentoo-footer-sep">·</span>
-      <a href={privacyHref}>{strings.privacyLinkLabel}</a>
-      <span class="bentoo-footer-sep">·</span>
       <span class="bentoo-footer-copy">{strings.footerCopyright}</span>
     </footer>
-    <script is:inline set:html={langToggleScript} />
   </body>
 </html>
