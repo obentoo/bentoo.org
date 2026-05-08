@@ -9,7 +9,6 @@ import {
   type Lang,
 } from '~/utils/getLang';
 import type { VariantSlug } from '~/data/variants';
-import { stringsFor } from '~/i18n';
 import '~/styles/base.css';
 
 export interface Props {
@@ -75,7 +74,6 @@ const jsonLd = !isVariantPage && !noindexOverride
     })
   : null;
 
-const strings = stringsFor(lang);
 const otherLocales = LOCALES.filter((l) => l !== lang);
 ---
 <!doctype html>
@@ -120,8 +118,5 @@ const otherLocales = LOCALES.filter((l) => l !== lang);
   </head>
   <body>
     <slot />
-    <footer class="bentoo-footer">
-      <span class="bentoo-footer-copy">{strings.footerCopyright}</span>
-    </footer>
   </body>
 </html>
