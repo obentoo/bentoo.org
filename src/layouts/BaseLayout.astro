@@ -112,6 +112,8 @@ const otherLocales = LOCALES.filter((l) => l !== lang);
       <link rel="alternate" hreflang={l.hreflang} href={l.href} />
     ))}
     <link rel="alternate" hreflang="x-default" href={xDefaultHref} />
+    <link rel="alternate" type="application/feed+json" title="bentoo notices" href={pageUrl('/notices.json')} />
+    <link rel="alternate" type="application/atom+xml" title="bentoo notices" href={pageUrl('/notices.atom')} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Bentoo" />
     <meta property="og:locale" content={ogLocaleFor(lang)} />
