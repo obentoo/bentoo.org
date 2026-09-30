@@ -34,4 +34,18 @@ Contact. For data access, deletion, or any privacy request, write to contact@obe
   privacyPageDescription:
     'How Bentoo handles your data on the pre-launch site.',
   backLink: '← back',
+  noticesTitle: 'Notices',
+  noticesIntro: 'Security advisories, releases and news for Bentoo, most recently updated first.',
+  noticeType_security: 'Security',
+  noticeType_release: 'Release',
+  noticeType_news: 'News',
+  noticeType_announcement: 'Announcement',
+  noticeSeverity_info: 'Info',
+  noticeSeverity_warning: 'Warning',
+  noticeSeverity_critical: 'Critical',
+  noticeAffects: 'Affected packages',
+  noticePublished: 'Published',
+  noticeUpdated: 'Updated',
+  noticesEmpty: 'No notices yet.',
+  noticesFeedLinks: 'Follow the notices feed:',
 } as const satisfies Strings;

@@ -25,8 +25,14 @@ export default defineConfig({
     port,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    // Production-shaped build (robots/SEO specs need it) over the notice
+    // fixtures; NOTICES_INTEGRATION_BUILD lets NOTICES_DIR through the
+    // production guard in src/content.config.ts. The resulting dist/ carries
+    // fixture notices: never deploy it by hand.
     env: {
       PUBLIC_IS_PRODUCTION: 'true',
+      NOTICES_DIR: 'tests/fixtures/notices',
+      NOTICES_INTEGRATION_BUILD: 'true',
     },
   },
   projects: [

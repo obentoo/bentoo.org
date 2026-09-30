@@ -34,4 +34,19 @@ Contacto. Para solicitudes de acceso, supresión o cualquier cuestión de privac
   privacyPageDescription:
     'Cómo Bentoo trata tus datos en el sitio de pre-lanzamiento.',
   backLink: '← volver',
+  noticesTitle: 'Avisos',
+  noticesIntro:
+    'Alertas de seguridad, lanzamientos y novedades de Bentoo, de la actualización más reciente a la más antigua. El texto de los avisos se publica en inglés.',
+  noticeType_security: 'Seguridad',
+  noticeType_release: 'Lanzamiento',
+  noticeType_news: 'Noticia',
+  noticeType_announcement: 'Anuncio',
+  noticeSeverity_info: 'Informativo',
+  noticeSeverity_warning: 'Advertencia',
+  noticeSeverity_critical: 'Crítico',
+  noticeAffects: 'Paquetes afectados',
+  noticePublished: 'Publicado',
+  noticeUpdated: 'Actualizado',
+  noticesEmpty: 'Todavía no hay avisos.',
+  noticesFeedLinks: 'Sigue los avisos por feed:',
 } as const satisfies Strings;

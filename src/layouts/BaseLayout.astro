@@ -1,5 +1,5 @@
 ---
-import { rootUrl, canonicalForVariant, siteOrigin } from '~/utils/siteUrl';
+import { rootUrl, canonicalForVariant, siteOrigin, pageUrl, localizedPath } from '~/utils/siteUrl';
 import {
   LOCALES,
   DEFAULT_LOCALE,
@@ -20,6 +20,17 @@ export interface Props {
   variantSlug?: VariantSlug;
   ogImage?: string;
   noindexOverride?: boolean;
+  /**
+   * Build canonical, og:url and the hreflang alternates from `path` instead of
+   * the locale root. Opt-in so the pages that predate it (roots, privacy,
+   * variants, 404) keep their output byte for byte.
+   */
+  canonicalFromPath?: boolean;
+  /**
+   * Emit the SoftwareApplication JSON-LD. Off for pages about something other
+   * than the application itself (notices), whose description is author text.
+   */
+  structuredData?: boolean;
 }
 
 const {
@@ -31,6 +42,8 @@ const {
   variantSlug,
   ogImage = '/og/default.png',
   noindexOverride = false,
+  canonicalFromPath = false,
+  structuredData = true,
 } = Astro.props;
 
 const htmlLang = htmlLangFor(lang);
@@ -38,8 +51,12 @@ const isProduction = import.meta.env.PUBLIC_IS_PRODUCTION === true;
 const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
 const siteRoot = siteOrigin();
 
-const canonicalHref =
-  isVariantPage && variantSlug
+// Without canonicalFromPath every page declares its locale root canonical,
+// which is right for the roots and variants but would make search engines
+// drop any page with content of its own (story 002, R5.3).
+const canonicalHref = canonicalFromPath
+  ? pageUrl(localizedPath(path, lang))
+  : isVariantPage && variantSlug
     ? canonicalForVariant(variantSlug, lang)
     : rootUrl(lang);
 
@@ -52,15 +69,20 @@ const robotsContent =
 
 const hreflangLinks = LOCALES.map((l) => ({
   hreflang: hreflangFor(l),
-  href: `${siteRoot}${l === DEFAULT_LOCALE ? '/' : `/${l}/`}`,
+  href: canonicalFromPath
+    ? pageUrl(localizedPath(path, l))
+    : `${siteRoot}${l === DEFAULT_LOCALE ? '/' : `/${l}/`}`,
 }));
-const xDefaultHref = `${siteRoot}/`;
+const xDefaultHref = canonicalFromPath
+  ? pageUrl(localizedPath(path, DEFAULT_LOCALE))
+  : `${siteRoot}/`;
 
 const ogImageAbs = ogImage.startsWith('http') ? ogImage : `${siteRoot}${ogImage}`;
 
 const inLanguageList = LOCALES.map((l) => htmlLangFor(l));
 
-const jsonLd = !isVariantPage && !noindexOverride
+// `<` is escaped so no string can close the inline <script> (set:html below).
+const jsonLd = structuredData && !isVariantPage && !noindexOverride
   ? JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
@@ -71,7 +93,7 @@ const jsonLd = !isVariantPage && !noindexOverride
       description,
       url: siteRoot,
       inLanguage: inLanguageList,
-    })
+    }).replace(/</g, '\\u003c')
   : null;
 
 const otherLocales = LOCALES.filter((l) => l !== lang);

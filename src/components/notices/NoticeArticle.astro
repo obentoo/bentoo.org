@@ -1,0 +1,131 @@
+---
+// One notice, rendered in full (story 002, R5.1). The chrome follows `lang`;
+// the notice content itself stays in English (R5.3). Ships no client JS.
+import type { Notice } from '~/content/noticeSchema';
+import { stringsFor } from '~/i18n';
+import { htmlLangFor, type Lang } from '~/utils/getLang';
+import { formatAtom } from '~/utils/formatAtom';
+import { bodyParagraphs, formatNoticeDate } from '~/utils/noticeLabels';
+import NoticeBadges from './NoticeBadges.astro';
+
+export interface Props {
+  notice: Notice;
+  lang: Lang;
+}
+
+const { notice, lang } = Astro.props;
+const s = stringsFor(lang);
+const atoms = formatAtom(notice.affects);
+const paragraphs = bodyParagraphs(notice.body);
+const dates = [
+  { label: s.noticePublished, date: notice.published },
+  { label: s.noticeUpdated, date: notice.updated },
+];
+const affectsHeadingId = `notice-affects-${notice.id}`;
+---
+<article class="notice" data-severity={notice.severity} lang="en">
+  <header class="notice-head">
+    <p class="notice-badges">
+      <NoticeBadges type={notice.type} severity={notice.severity} lang={lang} />
+    </p>
+    <h1 class="notice-title">{notice.title}</h1>
+    <dl class="notice-dates" lang={htmlLangFor(lang)}>
+      {dates.map(({ label, date }) => (
+        <div class="notice-date">
+          <dt>{label}</dt>
+          <dd><time datetime={date.toISOString()}>{formatNoticeDate(date, lang)}</time></dd>
+        </div>
+      ))}
+    </dl>
+  </header>
+
+  {atoms.length > 0 && (
+    <section class="notice-affects" aria-labelledby={affectsHeadingId}>
+      <h2 id={affectsHeadingId} lang={htmlLangFor(lang)}>{s.noticeAffects}</h2>
+      <ul>
+        {atoms.map((atom) => (
+          <li><code>{atom}</code></li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <div class="notice-body">
+    {paragraphs.map((para) => <p>{para}</p>)}
+  </div>
+</article>
+
+<style>
+  .notice {
+    --notice-rule: #3a3a3a;
+    --notice-muted: #a9a9a9;
+    --notice-mono: ui-monospace, 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 3rem;
+    background: #0a0a0a;
+    color: #e7e7e7;
+    line-height: 1.65;
+  }
+  .notice[data-severity='critical'] { --notice-rule: #ff8a7a; }
+  .notice[data-severity='warning'] { --notice-rule: #f2c66d; }
+  .notice[data-severity='info'] { --notice-rule: #8fb0ff; }
+
+  .notice-head {
+    border-left: 3px solid var(--notice-rule);
+    padding: 0.25rem 0 0.25rem 1.1rem;
+    margin-bottom: 2.25rem;
+  }
+  .notice-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0 0 0.9rem;
+  }
+  .notice-title {
+    font-size: clamp(1.6rem, 4.5vw, 2.3rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin: 0 0 1.1rem;
+    overflow-wrap: anywhere;
+  }
+  .notice-dates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.75rem;
+    margin: 0;
+    font-family: var(--notice-mono);
+    font-size: 0.85rem;
+  }
+  .notice-date { display: flex; gap: 0.5rem; }
+  .notice-date dt { color: var(--notice-muted); }
+  .notice-date dd { margin: 0; }
+
+  .notice-affects {
+    margin: 0 0 2rem;
+    padding: 1rem 1.1rem;
+    background: #121212;
+    border: 1px solid #262626;
+    border-radius: 6px;
+  }
+  .notice-affects h2 {
+    margin: 0 0 0.6rem;
+    font-family: var(--notice-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--notice-muted);
+  }
+  .notice-affects ul { list-style: none; margin: 0; padding: 0; }
+  .notice-affects li { padding: 0.2rem 0; }
+  .notice-affects li + li { border-top: 1px dashed #262626; }
+  .notice-affects code {
+    font-family: var(--notice-mono);
+    font-size: 0.92rem;
+    color: #e7e7e7;
+    overflow-wrap: anywhere;
+  }
+
+  .notice-body p { margin: 0 0 1rem; overflow-wrap: anywhere; }
+</style>

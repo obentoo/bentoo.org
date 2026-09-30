@@ -15,7 +15,8 @@ describe('sitemap.xml', () => {
     expect(response.headers.get('content-type')).toMatch(/application\/xml/);
   });
 
-  it('lists exactly 3 urls: /, /pt/, /es/', async () => {
+  // With no notices the sitemap lists the roots and the notice index (R5.4).
+  it('lists the roots and the notice index in every locale', async () => {
     const response = await GET({} as never);
     const body = await response.text();
     const locs = [...body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
@@ -23,6 +24,9 @@ describe('sitemap.xml', () => {
       'https://obentoo.org/',
       'https://obentoo.org/pt/',
       'https://obentoo.org/es/',
+      'https://obentoo.org/notices/',
+      'https://obentoo.org/pt/notices/',
+      'https://obentoo.org/es/notices/',
     ]);
   });
 

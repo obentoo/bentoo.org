@@ -1,0 +1,36 @@
+---
+// /<lang>/notices/<id>/ for every non-default locale × notice (story 002,
+// R5.1, R5.3): localized chrome, notice content in English.
+import NoticesLayout from '~/layouts/NoticesLayout.astro';
+import NoticeArticle from '~/components/notices/NoticeArticle.astro';
+import { stringsFor } from '~/i18n';
+import { LOCALES, DEFAULT_LOCALE, type Lang } from '~/utils/getLang';
+import { localizedPath } from '~/utils/siteUrl';
+import { loadNotices } from '~/utils/noticesCollection';
+import type { Notice } from '~/content/noticeSchema';
+
+export async function getStaticPaths() {
+  const notices = await loadNotices();
+  return LOCALES.filter((l) => l !== DEFAULT_LOCALE).flatMap((lang) =>
+    notices.map((notice) => ({
+      params: { lang, id: notice.id },
+      props: { notice },
+    }))
+  );
+}
+
+type Params = { lang: Exclude<Lang, typeof DEFAULT_LOCALE>; id: string };
+const { lang } = Astro.params as Params;
+const { notice } = Astro.props as { notice: Notice };
+const s = stringsFor(lang);
+---
+<NoticesLayout
+  lang={lang}
+  path={localizedPath(`/notices/${notice.id}/`, lang)}
+  title={`${notice.title} — Bentoo`}
+  description={notice.summary}
+  backHref={localizedPath('/notices/', lang)}
+  backLabel={`← ${s.noticesTitle}`}
+>
+  <NoticeArticle notice={notice} lang={lang} />
+</NoticesLayout>

@@ -1,0 +1,31 @@
+---
+// /notices/<id>/ in the default locale (story 002, R5.1).
+import NoticesLayout from '~/layouts/NoticesLayout.astro';
+import NoticeArticle from '~/components/notices/NoticeArticle.astro';
+import { stringsFor } from '~/i18n';
+import { DEFAULT_LOCALE } from '~/utils/getLang';
+import { localizedPath } from '~/utils/siteUrl';
+import { loadNotices } from '~/utils/noticesCollection';
+import type { Notice } from '~/content/noticeSchema';
+
+export async function getStaticPaths() {
+  return (await loadNotices()).map((notice) => ({
+    params: { id: notice.id },
+    props: { notice },
+  }));
+}
+
+const { notice } = Astro.props as { notice: Notice };
+const lang = DEFAULT_LOCALE;
+const s = stringsFor(lang);
+---
+<NoticesLayout
+  lang={lang}
+  path={localizedPath(`/notices/${notice.id}/`, lang)}
+  title={`${notice.title} — Bentoo`}
+  description={notice.summary}
+  backHref={localizedPath('/notices/', lang)}
+  backLabel={`← ${s.noticesTitle}`}
+>
+  <NoticeArticle notice={notice} lang={lang} />
+</NoticesLayout>

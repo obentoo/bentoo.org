@@ -1,0 +1,23 @@
+---
+// /notices/ in the default locale (story 002, R5.2).
+import NoticesLayout from '~/layouts/NoticesLayout.astro';
+import NoticesIndex from '~/components/notices/NoticesIndex.astro';
+import { stringsFor } from '~/i18n';
+import { DEFAULT_LOCALE } from '~/utils/getLang';
+import { localizedPath } from '~/utils/siteUrl';
+import { loadNotices } from '~/utils/noticesCollection';
+
+const lang = DEFAULT_LOCALE;
+const s = stringsFor(lang);
+const notices = await loadNotices();
+---
+<NoticesLayout
+  lang={lang}
+  path={localizedPath('/notices/', lang)}
+  title={`${s.noticesTitle} — Bentoo`}
+  description={s.noticesIntro}
+  backHref={localizedPath('/', lang)}
+  backLabel={s.backLink}
+>
+  <NoticesIndex notices={notices} lang={lang} />
+</NoticesLayout>

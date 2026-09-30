@@ -1,0 +1,116 @@
+---
+// The notice index body (story 002, R5.2): every notice in the feed's order
+// (R3.5) with title, type, severity and update date, each linking to its page,
+// then visible links to both feeds. Ships no client JS.
+import type { Notice } from '~/content/noticeSchema';
+import { stringsFor } from '~/i18n';
+import type { Lang } from '~/utils/getLang';
+import { sortNotices } from '~/utils/feed';
+import { localizedPath } from '~/utils/siteUrl';
+import { formatNoticeDate } from '~/utils/noticeLabels';
+import NoticeBadges from './NoticeBadges.astro';
+
+export interface Props {
+  notices: Notice[];
+  lang: Lang;
+}
+
+const { notices, lang } = Astro.props;
+const s = stringsFor(lang);
+const ordered = sortNotices(notices);
+const feeds = [
+  { href: '/notices.json', type: 'application/feed+json', label: 'JSON Feed' },
+  { href: '/notices.atom', type: 'application/atom+xml', label: 'Atom' },
+];
+---
+<div class="notices">
+  {ordered.length === 0 ? (
+    <p class="notices-empty">{s.noticesEmpty}</p>
+  ) : (
+    <ol class="notices-list">
+      {ordered.map((n) => (
+        <li>
+          <article class="notice-row" data-severity={n.severity}>
+            <h2 class="notice-row-title" lang="en">
+              <a href={localizedPath(`/notices/${n.id}/`, lang)}>{n.title}</a>
+            </h2>
+            <p class="notice-row-meta">
+              <NoticeBadges type={n.type} severity={n.severity} lang={lang} />
+              <span class="notice-row-updated">
+                {s.noticeUpdated} <time datetime={n.updated.toISOString()}>{formatNoticeDate(n.updated, lang)}</time>
+              </span>
+            </p>
+          </article>
+        </li>
+      ))}
+    </ol>
+  )}
+
+  <p class="notices-feeds">
+    <span>{s.noticesFeedLinks}</span>
+    {feeds.map((f) => (
+      <a href={f.href} type={f.type}>{f.label}</a>
+    ))}
+  </p>
+</div>
+
+<style>
+  .notices {
+    --notice-muted: #a9a9a9;
+    --notice-mono: ui-monospace, 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+    background: #0a0a0a;
+    color: #e7e7e7;
+    line-height: 1.6;
+  }
+  .notices-empty { color: var(--notice-muted); font-family: var(--notice-mono); }
+
+  .notices-list { list-style: none; margin: 0 0 2.5rem; padding: 0; border-top: 1px solid #262626; }
+  .notices-list > li { border-bottom: 1px solid #262626; }
+
+  .notice-row {
+    --notice-rule: #3a3a3a;
+    border-left: 3px solid var(--notice-rule);
+    padding: 1rem 0 1rem 1rem;
+    transition: background-color 120ms ease;
+  }
+  .notice-row:hover, .notice-row:focus-within { background: #121212; }
+  .notice-row[data-severity='critical'] { --notice-rule: #ff8a7a; }
+  .notice-row[data-severity='warning'] { --notice-rule: #f2c66d; }
+  .notice-row[data-severity='info'] { --notice-rule: #8fb0ff; }
+
+  .notice-row-title { font-size: 1.15rem; line-height: 1.35; margin: 0 0 0.55rem; overflow-wrap: anywhere; }
+  .notice-row-title a { color: #e7e7e7; text-decoration: underline; text-decoration-color: #5a5a5a; text-underline-offset: 0.2em; }
+  .notice-row-title a:hover, .notice-row-title a:focus-visible { color: #9eb6ff; text-decoration-color: currentColor; }
+
+  .notice-row-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.6rem;
+    margin: 0;
+  }
+  .notice-row-updated { font-family: var(--notice-mono); font-size: 0.8rem; color: var(--notice-muted); }
+
+  .notices-feeds {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1rem;
+    margin: 0;
+    font-family: var(--notice-mono);
+    font-size: 0.9rem;
+  }
+  .notices-feeds span { color: var(--notice-muted); }
+  .notices-feeds a {
+    color: #9eb6ff;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    display: inline-block;
+    min-height: 44px;
+    line-height: 44px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .notice-row { transition: none; }
+  }
+</style>

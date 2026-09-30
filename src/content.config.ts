@@ -13,10 +13,19 @@ const DEFAULT_NOTICES_DIR = './src/content/notices';
  * integration build points it at tests/fixtures/notices) only outside a
  * production build: published ids are permanent, so a fixture id must never
  * reach production. An empty `NOTICES_DIR` counts as unset.
+ *
+ * The one exception is `NOTICES_INTEGRATION_BUILD=true`, set only by the
+ * Playwright webServer: its build is production-shaped (the SEO specs assert
+ * production robots tags) yet must load the fixtures. It is a second, explicit
+ * key: the deploy workflow sets neither it nor `NOTICES_DIR`.
  */
 export function noticesDir(): string {
   const override = process.env.NOTICES_DIR;
-  if (process.env.PUBLIC_IS_PRODUCTION === 'true' || !override) return DEFAULT_NOTICES_DIR;
+  if (!override) return DEFAULT_NOTICES_DIR;
+  // Same production test as astro.config.mjs: an explicit flag, or a
+  // Cloudflare Pages build of main.
+  const production = process.env.PUBLIC_IS_PRODUCTION === 'true' || process.env.CF_PAGES_BRANCH === 'main';
+  if (production && process.env.NOTICES_INTEGRATION_BUILD !== 'true') return DEFAULT_NOTICES_DIR;
   if (!existsSync(override) || !statSync(override).isDirectory()) {
     throw new Error(`NOTICES_DIR does not exist: ${override}`);
   }

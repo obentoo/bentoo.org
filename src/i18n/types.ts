@@ -21,4 +21,18 @@ export type Strings = {
   indexDescription: string;
   privacyPageDescription: string;
   backLink: string;
+  noticesTitle: string;
+  noticesIntro: string;
+  noticeType_security: string;
+  noticeType_release: string;
+  noticeType_news: string;
+  noticeType_announcement: string;
+  noticeSeverity_info: string;
+  noticeSeverity_warning: string;
+  noticeSeverity_critical: string;
+  noticeAffects: string;
+  noticePublished: string;
+  noticeUpdated: string;
+  noticesEmpty: string;
+  noticesFeedLinks: string;
 };

@@ -1,0 +1,24 @@
+---
+// Body of /notices/ in any locale (story 002, R5.2): heading, intro, then the
+// list with its trailing feed links.
+import NoticeList from './NoticeList.astro';
+import { stringsFor } from '~/i18n';
+import type { Lang } from '~/utils/getLang';
+import type { Notice } from '~/content/noticeSchema';
+
+export interface Props {
+  notices: Notice[];
+  lang: Lang;
+}
+
+const { notices, lang } = Astro.props;
+const s = stringsFor(lang);
+---
+<h1 class="notices-heading">{s.noticesTitle}</h1>
+<p class="notices-intro">{s.noticesIntro}</p>
+<NoticeList notices={notices} lang={lang} />
+
+<style>
+  .notices-heading { font-size: 2rem; margin: 0 0 0.75rem; }
+  .notices-intro { margin: 0 0 2rem; color: #c9c9c9; }
+</style>
