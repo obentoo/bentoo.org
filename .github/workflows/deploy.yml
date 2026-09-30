@@ -1,0 +1,51 @@
+name: deploy
+
+# Builds, tests and deploys the site to Cloudflare Workers Static Assets.
+# The weekly run rebuilds the notice feeds so their 30-day `expires` stays fresh.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 6 * * 1' # Mondays 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One constant group: at most one production deploy at a time, and a queued run
+# never cancels one already in progress.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: build + test + deploy
+    # workflow_dispatch can run from any branch; only main may reach production.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # pnpm version comes from package.json `packageManager`.
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          # Latest 22.x; package.json engines requires >=22.18.0.
+          node-version: '22'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test:unit
+      - run: pnpm build
+        env:
+          # Without this the build ships noindex and a disallow-all robots.txt:
+          # astro.config.mjs otherwise keys production on the Pages-only CF_PAGES_BRANCH.
+          PUBLIC_IS_PRODUCTION: 'true'
+          PUBLIC_SITE_URL: https://obentoo.org
+      # wrangler comes from the lockfile (devDependency), never an unpinned download.
+      - run: pnpm exec wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

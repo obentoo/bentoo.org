@@ -1,90 +1,183 @@
-# bentoo.org — Deploy Runbook
+# obentoo.org — Deploy Runbook
 
-## One-time Cloudflare Pages setup
+The site is a static Astro build served by **Cloudflare Workers Static Assets**
+(`wrangler.jsonc`) and deployed **only** by the GitHub Actions workflow
+`.github/workflows/deploy.yml`. There is no Cloudflare Pages project and no
+manual deploy step.
 
-### 1. Connect GitHub repo
-1. Sign in to [Cloudflare dashboard](https://dash.cloudflare.com) → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**.
-2. Pick `obentoo/bentoo.org` (install the Cloudflare GitHub app on the org if prompted; scope to this repo only).
-3. Build settings:
-   - **Framework preset**: Astro
-   - **Build command**: `pnpm build`
-   - **Build output directory**: `dist`
-   - **Root directory**: `/`
-   - **Environment variable**: `PNPM_VERSION=10.30.1` (matches `packageManager` in `package.json`)
+> **Never deploy a local `dist/` by hand.** `pnpm test:integration` builds the
+> site in production mode over the test fixtures (`NOTICES_DIR=tests/fixtures/notices`,
+> `NOTICES_INTEGRATION_BUILD=true`, see `playwright.config.ts`). After any
+> integration run, the local `dist/` holds fixture notices whose ids would become
+> permanent the moment they were published. Production deploys come only from
+> the workflow, which builds from a clean checkout.
 
-### 2. Environment variables
-In **Settings → Environment variables**, set the same keys in **Production** and **Preview** unless noted:
+## How a deploy runs
 
-| Variable | Production | Preview |
+`deploy.yml` runs on:
+
+| Trigger | When | Why |
 |---|---|---|
-| `NODE_VERSION` | `22` | `22` |
-| `PUBLIC_SITE_URL` | `https://bentoo.org` | leave unset (CF injects `CF_PAGES_URL`) |
-| `PUBLIC_BUTTONDOWN_USERNAME` | `<Buttondown handle>` | same |
-| `PUBLIC_CF_ANALYTICS_TOKEN` | `<token from Web Analytics dashboard>` | **leave unset** |
+| `push` to `main` | every merge | ship the change |
+| `schedule` `17 6 * * 1` | Mondays 06:17 UTC | rebuild so the feed's `_bentoo.expires` (build time + 30 days) never lapses |
+| `workflow_dispatch` | on demand | manual redeploy: `gh workflow run deploy.yml` |
 
-`PUBLIC_IS_PRODUCTION` is derived at build time from `CF_PAGES_BRANCH === 'main'` (see `astro.config.mjs`). Do not set it manually.
+The single job (`build + test + deploy`) runs only when `github.ref` is
+`refs/heads/main`: a manual dispatch from another branch skips it. Steps:
 
-### 3. Custom domain (apex + www)
-1. **Pages project → Custom domains → Add**: `bentoo.org`. CF creates the CNAME automatically (DNS must be on Cloudflare — it is).
-2. **Rules → Redirect Rules → Create rule**:
-   - Incoming hostname: `www.bentoo.org`
-   - Path: `/*`
-   - Destination: `https://bentoo.org/$1`
-   - Status: `301`
+1. checkout (`persist-credentials: false`), pnpm (version from `packageManager`), Node 22 with the pnpm cache
+2. `pnpm install --frozen-lockfile`
+3. `pnpm typecheck`
+4. `pnpm test:unit`
+5. `pnpm build` with the production env (below)
+6. `pnpm exec wrangler deploy` — wrangler is pinned in the lockfile (devDependency), never downloaded unpinned
 
-Apex `bentoo.org` serves Pages; `www.bentoo.org` 301 → apex.
+Guard rails: the workflow token has `permissions: contents: read` only, every
+`uses:` is pinned to a commit SHA, and `concurrency: deploy-production` with
+`cancel-in-progress: false` lets at most one deploy run at a time without ever
+cancelling one in progress.
 
-### 4. Cloudflare Web Analytics (cookie-less)
-1. **Web Analytics → Add a site → `bentoo.org`**. CF generates a beacon token.
-2. Copy the token into `PUBLIC_CF_ANALYTICS_TOKEN` (Production env only).
-3. The beacon is only emitted when `PUBLIC_IS_PRODUCTION=true` AND `PUBLIC_CF_ANALYTICS_TOKEN` is set (see `BaseLayout.astro`).
+`wrangler.jsonc` defines the Worker `bentoo`: assets from `./dist`,
+`not_found_handling: "404-page"`, custom domains `obentoo.org` and
+`www.obentoo.org` (both serve the same assets; canonical tags point to the
+apex), and `workers_dev: true` (the `*.workers.dev` URL also answers).
 
-## Preview deploy smoke checklist
-Open the `*.pages.dev` URL from the PR comment and verify:
-- [ ] `/` redirects to `/v/<slug>/`
-- [ ] Variant page renders
-- [ ] `/robots.txt` returns `User-agent: *\nDisallow: /`
-- [ ] HTML `<meta name="robots" content="noindex,nofollow">` on every page
-- [ ] No CF Analytics beacon `<script>` (token unset in Preview)
-- [ ] `curl -I <preview-url>/ | grep -i 'content-security-policy'` returns the CSP header
-- [ ] `curl -sL <preview-url>/hub/foo` lands at `/` with a 301 hop
+## Production build env
 
-## Production smoke checklist (post-DNS)
-- [ ] `curl -sI https://bentoo.org/` returns `HTTP/2 200`
-- [ ] `curl -sI https://www.bentoo.org/` returns `301` → `https://bentoo.org`
-- [ ] `curl -s https://bentoo.org/robots.txt | head -5` matches production template (Allow: /, Disallow: /v/, Sitemap: line)
-- [ ] `curl -s https://bentoo.org/sitemap.xml | xmllint --noout -` succeeds
-- [ ] `curl -sI https://bentoo.org/ | grep -iE 'x-content-type|x-frame|referrer-policy|content-security'` returns all 4 security headers
-- [ ] CF Analytics beacon script present on rendered `/`
-- [ ] JSON-LD `SoftwareApplication` present on `/`
-- [ ] DevTools Console on real mobile: `document.cookie === ''` (R6.1/R6.2/R6.7)
+Set in `deploy.yml` on the `pnpm build` step; nothing is configured in the
+Cloudflare dashboard.
 
-## Rollback (one-click, R7.6)
-Pages keeps every deployment. To roll back:
-1. **Pages project → Deployments**
-2. Find the last known-good deploy
-3. **⋯ → Rollback to this deployment**
-No custom script, no blue/green routing — just a single dashboard action.
+| Variable | Value | Effect |
+|---|---|---|
+| `PUBLIC_IS_PRODUCTION` | `true` | indexable pages and the production `robots.txt`; without it the build ships `noindex` and a disallow-all `robots.txt` |
+| `PUBLIC_SITE_URL` | `https://obentoo.org` | origin of every absolute URL: canonical tags, sitemap, feed ids and links |
 
-## Local dev
+Not set by the workflow today:
+
+- `PUBLIC_CF_ANALYTICS_TOKEN` — so production emits **no** Web Analytics beacon.
+  To enable it, add the token to the `pnpm build` step's `env`.
+- `PUBLIC_BUTTONDOWN_USERNAME` — the newsletter form falls back to `bentoo`.
+- `NOTICES_DIR` / `NOTICES_INTEGRATION_BUILD` — test-only; must never be set here.
+
+`CF_PAGES_BRANCH` belonged to the retired Pages flow; the code still treats
+`CF_PAGES_BRANCH=main` as production, but nothing sets it any more.
+
+## One-time setup
+
+### 1. Cloudflare API token (scoped)
+
+Following Cloudflare's GitHub Actions guide
+(<https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/>):
+
+1. Cloudflare dashboard → **Account API tokens** → **Create Token**.
+2. Under **Permission policies**, pick the template **Edit Cloudflare Workers**.
+   It grants (per <https://developers.cloudflare.com/fundamentals/api/reference/template/>)
+   Account: Workers Scripts Write, Workers KV Storage Write, Workers R2 Storage
+   Write, Account Settings Read, User Details Read, User Memberships Read;
+   Zone: Workers Routes Write.
+3. Scope it: **Account resources** → only the account that owns the Worker;
+   **Zone resources** → only the zone `obentoo.org`. Add a TTL if you rotate
+   tokens on a schedule.
+4. Copy the token once; Cloudflare does not show it again.
+
+### 2. Account ID
+
+Follow "Find account and zone IDs"
+(<https://developers.cloudflare.com/fundamentals/account/find-account-and-zone-ids/>).
+
+### 3. GitHub secrets
+
+Repository `obentoo/bentoo.org` → **Settings → Secrets and variables → Actions**:
+
+| Secret | Value |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | the token from step 1 |
+| `CLOUDFLARE_ACCOUNT_ID` | the ID from step 2 |
+
+Or from a shell: `gh secret set CLOUDFLARE_API_TOKEN` and
+`gh secret set CLOUDFLARE_ACCOUNT_ID` (each prompts for the value, so it never
+lands in shell history). Never commit either value, and never put them in `.env`.
+
+### 4. Custom domains
+
+The first `wrangler deploy` creates the custom domains listed in
+`wrangler.jsonc` (DNS records included). Cloudflare refuses a custom domain on a
+hostname that already has a CNAME record: delete any leftover record for
+`obentoo.org` / `www.obentoo.org` (for example from the old Pages project) first.
+
+## The 60-day schedule caveat
+
+GitHub **disables scheduled workflows in public repositories after 60 days
+without repository activity**, and the deploy workflow's own scheduled runs do
+**not** count as activity. If nothing is pushed for 60 days, the Monday rebuild
+stops silently and the feed's `expires` lapses 30 days after the last build.
+
+- Re-enable it with `gh workflow enable deploy.yml`, then redeploy at once with
+  `gh workflow run deploy.yml`.
+- Check its state with `gh workflow list --all` (the list hides disabled
+  workflows without `--all`).
+
+## Manual deploy
+
+```sh
+gh workflow run deploy.yml            # runs on main (the default branch)
+gh run watch                          # follow the run
 ```
-pnpm install       # install deps (pnpm 10+ required, see packageManager in package.json)
-pnpm dev           # astro dev on http://localhost:4321 (Node 22+ required)
-pnpm build         # emits dist/
-pnpm preview       # serves dist/ via astro preview (what CI tests against)
+
+`gh workflow run deploy.yml --ref <branch>` starts a run that skips the job:
+only `main` reaches production.
+
+## Response headers and media types
+
+`public/_headers` sets the security headers on every path and the feed media
+types: `/notices.json` → `application/feed+json; charset=utf-8`,
+`/notices.atom` → `application/atom+xml; charset=utf-8` (each `! Content-Type`
+first removes the default). `public/_redirects` holds the legacy 301s.
+
+`astro preview` ignores `_headers`, so verify headers locally with the Workers
+runtime itself:
+
+```sh
+pnpm build
+pnpm exec wrangler dev                # serves ./dist as production would
+curl -sI http://localhost:8787/notices.json | grep -i content-type
 ```
 
-## CI
-Every PR runs (.github/workflows/ci.yml):
-- typecheck (astro check + tsc --noEmit)
-- unit tests (Vitest)
-- build
-- integrity gates: `check:js`, `check:og`, `check:forms`, `check:variants-sync`
-- visual regression (Playwright, 84 snapshots) — baselines updated via PR labeled `update-visual-baselines`
-- integration tests (Playwright)
-- a11y audit (@axe-core/playwright)
-- Lighthouse CI on `/` and `/pt/`
+Revalidation is by `ETag` (Workers static assets send no `Last-Modified`).
 
-## Fonts
-Fonts are loaded from Google Fonts with `preconnect` hints (R5.7 preconnect pattern). Full self-hosting via
-Google Webfonts Helper is tracked as a follow-up performance optimization.
+Notice ids may contain `+`. Workers static assets serve such a page at the
+`%2B` form of the URL; the literal `+` URL answers `307` to it. This is an
+accepted trade-off (decided 2026-09-29).
+
+## Rollback
+
+Cloudflare keeps previous Worker versions:
+
+- Dashboard: **Workers & Pages** → `bentoo` → **Deployments** → `⋯` next to the
+  known-good version → **Rollback**.
+- CLI: `pnpm exec wrangler rollback` (needs Cloudflare credentials: `wrangler login`
+  or a token in `CLOUDFLARE_API_TOKEN`).
+
+A rollback is temporary: the next push to `main` or the Monday run redeploys
+`main`. Make it permanent by reverting the bad commit on `main`.
+
+## Production smoke checklist
+
+- [ ] `curl -sI https://obentoo.org/` returns `200`
+- [ ] `curl -sI https://www.obentoo.org/` returns `200` with the same page (canonical → apex)
+- [ ] `curl -s https://obentoo.org/robots.txt` is the production template (`Allow: /`, `Sitemap:` line)
+- [ ] `curl -s https://obentoo.org/sitemap.xml | xmllint --noout -` succeeds
+- [ ] `curl -sI https://obentoo.org/ | grep -iE 'x-content-type|x-frame|referrer-policy|content-security'` shows all 4 security headers
+- [ ] `curl -sI https://obentoo.org/notices.json | grep -i content-type` → `application/feed+json; charset=utf-8`
+- [ ] `curl -sI https://obentoo.org/notices.atom | grep -i content-type` → `application/atom+xml; charset=utf-8`
+- [ ] `curl -s https://obentoo.org/notices.json | jq ._bentoo.expires` is about 30 days after the last deploy
+- [ ] `curl -sL https://obentoo.org/hub/foo` lands on `/` after a 301
+- [ ] DevTools Console on a real mobile device: `document.cookie === ''`
+
+## CI (pull requests)
+
+`.github/workflows/ci.yml` runs on every pull request and push to `main`:
+typecheck, unit tests, build, the integrity gates (`check:js`, `check:og`,
+`check:forms`, `check:variants-sync`), Playwright visual and integration
+suites, the axe accessibility audit and Lighthouse CI. It never deploys.
+Local commands are in the [README](../README.md).
