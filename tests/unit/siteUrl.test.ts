@@ -8,33 +8,33 @@ import {
 
 describe('rootUrl', () => {
   beforeEach(() => {
-    vi.stubEnv('PUBLIC_SITE_URL', 'https://bentoo.org');
+    vi.stubEnv('PUBLIC_SITE_URL', 'https://obentoo.org');
   });
   afterEach(() => {
     vi.unstubAllEnvs();
   });
 
   it('returns /  for en', () => {
-    expect(rootUrl('en')).toBe('https://bentoo.org/');
+    expect(rootUrl('en')).toBe('https://obentoo.org/');
   });
 
   it('returns /pt/ for pt', () => {
-    expect(rootUrl('pt')).toBe('https://bentoo.org/pt/');
+    expect(rootUrl('pt')).toBe('https://obentoo.org/pt/');
   });
 
   it('returns /es/ for es', () => {
-    expect(rootUrl('es')).toBe('https://bentoo.org/es/');
+    expect(rootUrl('es')).toBe('https://obentoo.org/es/');
   });
 
-  it('falls back to https://bentoo.org when PUBLIC_SITE_URL is unset', () => {
+  it('falls back to https://obentoo.org when PUBLIC_SITE_URL is unset', () => {
     vi.stubEnv('PUBLIC_SITE_URL', '');
-    expect(rootUrl('en')).toBe('https://bentoo.org/');
+    expect(rootUrl('en')).toBe('https://obentoo.org/');
   });
 
   it('strips trailing slash from PUBLIC_SITE_URL', () => {
-    vi.stubEnv('PUBLIC_SITE_URL', 'https://preview.bentoo.org/');
-    expect(rootUrl('en')).toBe('https://preview.bentoo.org/');
-    expect(rootUrl('pt')).toBe('https://preview.bentoo.org/pt/');
+    vi.stubEnv('PUBLIC_SITE_URL', 'https://preview.obentoo.org/');
+    expect(rootUrl('en')).toBe('https://preview.obentoo.org/');
+    expect(rootUrl('pt')).toBe('https://preview.obentoo.org/pt/');
   });
 });
 
@@ -112,21 +112,21 @@ describe('localizedPath', () => {
 
 describe('canonicalForVariant', () => {
   beforeEach(() => {
-    vi.stubEnv('PUBLIC_SITE_URL', 'https://bentoo.org');
+    vi.stubEnv('PUBLIC_SITE_URL', 'https://obentoo.org');
   });
   afterEach(() => {
     vi.unstubAllEnvs();
   });
 
   it('returns language root for en variant', () => {
-    expect(canonicalForVariant('mario', 'en')).toBe('https://bentoo.org/');
+    expect(canonicalForVariant('mario', 'en')).toBe('https://obentoo.org/');
   });
 
   it('returns language root for pt variant', () => {
-    expect(canonicalForVariant('mario', 'pt')).toBe('https://bentoo.org/pt/');
+    expect(canonicalForVariant('mario', 'pt')).toBe('https://obentoo.org/pt/');
   });
 
   it('returns language root for es variant', () => {
-    expect(canonicalForVariant('mario', 'es')).toBe('https://bentoo.org/es/');
+    expect(canonicalForVariant('mario', 'es')).toBe('https://obentoo.org/es/');
   });
 });

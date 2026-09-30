@@ -1,11 +1,26 @@
 import { DEFAULT_LOCALE, LOCALES, type Lang } from './getLang';
 import type { VariantSlug } from '~/data/variants';
 
-const FALLBACK_SITE = 'https://bentoo.org';
+const FALLBACK_SITE = 'https://obentoo.org';
 
-function site(): string {
+/**
+ * The site origin, with no trailing slash: `PUBLIC_SITE_URL` when non-empty,
+ * else the canonical `https://obentoo.org`. The single origin derivation in `src/`.
+ */
+export function siteOrigin(): string {
   const envSite = import.meta.env.PUBLIC_SITE_URL;
   return (envSite && envSite.length > 0 ? envSite : FALLBACK_SITE).replace(/\/$/, '');
+}
+
+/**
+ * Absolute URL for a site-relative `path`. The path must start with "/" so the
+ * result never loses or doubles the separator; it is appended verbatim.
+ */
+export function pageUrl(path: string): string {
+  if (!path.startsWith('/')) {
+    throw new Error(`pageUrl: path must start with "/": ${path}`);
+  }
+  return siteOrigin() + path;
 }
 
 function langPrefix(lang: Lang): string {
@@ -13,7 +28,7 @@ function langPrefix(lang: Lang): string {
 }
 
 export function rootUrl(lang: Lang): string {
-  return `${site()}${langPrefix(lang)}/`;
+  return `${siteOrigin()}${langPrefix(lang)}/`;
 }
 
 function stripLangPrefix(path: string): { rest: string } {

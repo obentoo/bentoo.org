@@ -1,5 +1,5 @@
 ---
-import { rootUrl, canonicalForVariant } from '~/utils/siteUrl';
+import { rootUrl, canonicalForVariant, siteOrigin } from '~/utils/siteUrl';
 import {
   LOCALES,
   DEFAULT_LOCALE,
@@ -36,7 +36,7 @@ const {
 const htmlLang = htmlLangFor(lang);
 const isProduction = import.meta.env.PUBLIC_IS_PRODUCTION === true;
 const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
-const siteRoot = (import.meta.env.PUBLIC_SITE_URL || 'https://bentoo.org').replace(/\/$/, '');
+const siteRoot = siteOrigin();
 
 const canonicalHref =
   isVariantPage && variantSlug
@@ -65,7 +65,7 @@ const jsonLd = !isVariantPage && !noindexOverride
       '@context': 'https://schema.org',
       '@type': 'SoftwareApplication',
       name: 'Bentoo',
-      alternateName: 'bentoo.org',
+      alternateName: 'obentoo.org',
       applicationCategory: 'OperatingSystem',
       operatingSystem: 'Linux (Gentoo-based)',
       description,

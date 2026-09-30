@@ -8,7 +8,7 @@ export const strings = {
   privacyConsent: 'By subscribing you agree to our privacy policy',
   privacyLinkLabel: 'privacy',
   languageToggleLabel: 'en',
-  footerCopyright: 'handcrafted, source-first · © 2026 bentoo.org',
+  footerCopyright: 'handcrafted, source-first · © 2026 obentoo.org',
   privacyPageTitle: 'Privacy',
   privacyPageBody: `Bentoo respects your privacy and collects only the minimum data needed to announce the launch.
 
@@ -20,7 +20,7 @@ Retention. Buttondown retains your email until you unsubscribe via the one-click
 
 localStorage. This site uses two localStorage keys on your device, never synced to a server: "bentoo-variant" (the visual variant assigned to your session, with a 24-hour TTL) and "bentoo-lang" (your language preference, with a 24-hour TTL). You can clear them at any time via your browser's site-data controls.
 
-Contact. For data access, deletion, or any privacy request, write to founder@bentoo.org.`,
+Contact. For data access, deletion, or any privacy request, write to contact@obentoo.org.`,
   notFoundTitle: 'Not found',
   notFoundBody: 'This page does not exist — return to the landing.',
   notFoundBackLabel: '← back to the landing',

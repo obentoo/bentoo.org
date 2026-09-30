@@ -3,7 +3,7 @@ import { GET } from '../../src/pages/sitemap.xml';
 
 describe('sitemap.xml', () => {
   beforeEach(() => {
-    vi.stubEnv('PUBLIC_SITE_URL', 'https://bentoo.org');
+    vi.stubEnv('PUBLIC_SITE_URL', 'https://obentoo.org');
   });
   afterEach(() => {
     vi.unstubAllEnvs();
@@ -20,9 +20,9 @@ describe('sitemap.xml', () => {
     const body = await response.text();
     const locs = [...body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
     expect(locs).toEqual([
-      'https://bentoo.org/',
-      'https://bentoo.org/pt/',
-      'https://bentoo.org/es/',
+      'https://obentoo.org/',
+      'https://obentoo.org/pt/',
+      'https://obentoo.org/es/',
     ]);
   });
 
@@ -36,11 +36,11 @@ describe('sitemap.xml', () => {
   });
 
   it('uses PUBLIC_SITE_URL when provided', async () => {
-    vi.stubEnv('PUBLIC_SITE_URL', 'https://preview.bentoo.org');
+    vi.stubEnv('PUBLIC_SITE_URL', 'https://preview.obentoo.org');
     const response = await GET({} as never);
     const body = await response.text();
-    expect(body).toContain('https://preview.bentoo.org/');
-    expect(body).toContain('https://preview.bentoo.org/pt/');
+    expect(body).toContain('https://preview.obentoo.org/');
+    expect(body).toContain('https://preview.obentoo.org/pt/');
   });
 
   it('matches snapshot (production baseline)', async () => {

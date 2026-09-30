@@ -1,7 +1,7 @@
 {
   "name": "bentoo-website",
   "version": "0.1.0",
-  "description": "bentoo.org — coming-soon landing site (Astro 6 + Cloudflare Pages)",
+  "description": "obentoo.org — coming-soon landing site (Astro 6 + Cloudflare Pages)",
   "type": "module",
   "private": true,
   "packageManager": "pnpm@10.30.1",
@@ -29,7 +29,7 @@
   "bugs": {
     "url": "https://github.com/obentoo/bentoo.org/issues"
   },
-  "homepage": "https://bentoo.org",
+  "homepage": "https://obentoo.org",
   "license": "UNLICENSED",
   "dependencies": {
     "@astrojs/check": "^0.9.9",

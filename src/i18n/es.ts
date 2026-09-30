@@ -8,7 +8,7 @@ export const strings = {
   privacyConsent: 'al suscribirte, aceptas nuestra política de privacidad',
   privacyLinkLabel: 'privacidad',
   languageToggleLabel: 'es',
-  footerCopyright: 'hecho a mano, código abierto · © 2026 bentoo.org',
+  footerCopyright: 'hecho a mano, código abierto · © 2026 obentoo.org',
   privacyPageTitle: 'Privacidad',
   privacyPageBody: `Bentoo respeta tu privacidad y recopila únicamente los datos mínimos necesarios para anunciar el lanzamiento.
 
@@ -20,7 +20,7 @@ Conservación. Buttondown conserva tu correo electrónico hasta que te das de ba
 
 localStorage. Este sitio web utiliza dos claves de localStorage en tu dispositivo, que nunca se sincronizan con ningún servidor: "bentoo-variant" (la variante visual asignada a tu sesión, con un TTL de 24 horas) y "bentoo-lang" (tu preferencia de idioma, con un TTL de 24 horas). Puedes borrarlas en cualquier momento a través de los controles de datos del sitio de tu navegador.
 
-Contacto. Para solicitudes de acceso, supresión o cualquier cuestión de privacidad, escribe a founder@bentoo.org.`,
+Contacto. Para solicitudes de acceso, supresión o cualquier cuestión de privacidad, escribe a contact@obentoo.org.`,
   notFoundTitle: 'Página no encontrada',
   notFoundBody: 'Esta página no existe — vuelve a la página de inicio.',
   notFoundBackLabel: '← volver a la página de inicio',

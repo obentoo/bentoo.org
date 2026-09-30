@@ -4,9 +4,10 @@ import {
   DEFAULT_LOCALE,
   hreflangFor,
 } from '~/utils/getLang';
+import { siteOrigin } from '~/utils/siteUrl';
 
 export const GET: APIRoute = () => {
-  const site = (import.meta.env.PUBLIC_SITE_URL || 'https://bentoo.org').replace(/\/$/, '');
+  const site = siteOrigin();
 
   const localeUrl = (lang: string): string =>
     lang === DEFAULT_LOCALE ? `${site}/` : `${site}/${lang}/`;

@@ -3,7 +3,7 @@ import { GET } from '../../src/pages/robots.txt';
 
 describe('robots.txt', () => {
   beforeEach(() => {
-    vi.stubEnv('PUBLIC_SITE_URL', 'https://bentoo.org');
+    vi.stubEnv('PUBLIC_SITE_URL', 'https://obentoo.org');
   });
   afterEach(() => {
     vi.unstubAllEnvs();

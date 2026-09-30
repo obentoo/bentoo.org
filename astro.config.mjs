@@ -4,7 +4,7 @@ import { defineConfig } from 'astro/config';
 // The sitemap is authored at src/pages/sitemap.xml.ts for hreflang control
 // (see tasks.md Task 8.1 GOTCHA).
 export default defineConfig({
-  site: 'https://bentoo.org',
+  site: 'https://obentoo.org',
   integrations: [],
   vite: {
     define: {
