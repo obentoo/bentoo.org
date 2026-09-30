@@ -1,0 +1,9 @@
+id: 2026-10-02-leadnl
+type: announcement
+severity: warning
+title: "#not a comment: really"
+summary: "- starts like a list, has \"quotes\" and 'single'"
+body: "\nleading blank line\n\n  indented\n"
+affects: []
+published: "2026-10-02T00:00:00Z"
+updated: "2026-10-05T13:04:05Z"

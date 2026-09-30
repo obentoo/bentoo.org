@@ -1,0 +1,22 @@
+id: 2026-10-02-edge+case_1
+type: security
+severity: critical
+title: "null"
+summary: "2026-10-02 10:00:00Z"
+body: |
+  tab	inside
+  	tab-led line
+affects:
+  - cp: dev-libs/libfoo+
+    slot: "0.1"
+    ranges:
+      - {op: ">=", ver: "1.0_rc1_p2"}
+      - {op: "<", ver: "1.0b-r0"}
+  - cp: dev-libs/foo
+    slot: "1"
+    ranges:
+      - {op: "=", ver: "1.10"}
+  - cp: app-misc/true
+    ranges: []
+published: "2026-10-02T00:00:00Z"
+updated: "2026-10-05T13:04:05Z"
