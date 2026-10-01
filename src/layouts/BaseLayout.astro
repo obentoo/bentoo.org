@@ -22,8 +22,8 @@ export interface Props {
   noindexOverride?: boolean;
   /**
    * Build canonical, og:url and the hreflang alternates from `path` instead of
-   * the locale root. Opt-in so the pages that predate it (roots, privacy,
-   * variants, 404) keep their output byte for byte.
+   * the locale root. Opt-in so the pages that predate it (roots, variants,
+   * 404) keep their output byte for byte; the notices and privacy pages set it.
    */
   canonicalFromPath?: boolean;
   /**

@@ -13,12 +13,13 @@ export function getStaticPaths() {
 type Params = { lang: Exclude<Lang, typeof DEFAULT_LOCALE> };
 const { lang } = Astro.params as Params;
 const strings = stringsFor(lang);
-const path = `/${lang}/privacy`;
+const path = `/${lang}/privacy/`;
 const homePath = `/${lang}/`;
 ---
 <BaseLayout
   lang={lang}
   path={path}
+  canonicalFromPath
   title={`${strings.privacyPageTitle} — Bentoo`}
   description={strings.privacyPageDescription}
   isVariantPage={false}
