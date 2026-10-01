@@ -1,0 +1,13 @@
+# pnpm resolution policy for this project (story 003).
+# Supply chain: pnpm refuses any version published less than seven days ago.
+# The unit is MINUTES — 10080 = 7 days. pnpm >= 10.16.0 honours it (engines.pnpm).
+minimumReleaseAge: 10080
+
+# Packages allowed to skip the age rule. Empty by policy: an entry needs a
+# comment of its own naming the advisory or reason that justifies it.
+minimumReleaseAgeExclude: []
+
+# Dependencies whose install scripts may run.
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
