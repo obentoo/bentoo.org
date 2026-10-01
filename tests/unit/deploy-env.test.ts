@@ -99,7 +99,7 @@ const GOOD = { ...EXPECTED };
 describe('the R7.10 predicate rejects every wrong source (hostile fixtures)', () => {
   it.each([
     ['read from secrets', { ...GOOD, PUBLIC_CF_ANALYTICS_TOKEN: '${{ secrets.PUBLIC_CF_ANALYTICS_TOKEN }}' }],
-    ['a literal token', { ...GOOD, PUBLIC_CF_ANALYTICS_TOKEN: '0123456789abcdef0123456789abcdef' }],
+    ['a literal token', { ...GOOD, PUBLIC_CF_ANALYTICS_TOKEN: 'literal-analytics-token' }],
     ['a literal username', { ...GOOD, PUBLIC_BUTTONDOWN_USERNAME: 'bentoo' }],
     ['a vars expression with a literal fallback', { ...GOOD, PUBLIC_CF_ANALYTICS_TOKEN: "${{ vars.PUBLIC_CF_ANALYTICS_TOKEN || 'tok' }}" }],
     // Wrongly collapse: two distinct variables fed from one source.
