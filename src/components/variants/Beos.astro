@@ -30,6 +30,8 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
   </Fragment>
   <style slot="style">
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    /* set:html content carries no scope attribute: same reset for injected descendants */
+    * :global(*),* :global(*::before),* :global(*::after){margin:0;padding:0;box-sizing:border-box}
     :root{
       --desktop:#b4c4d2; --desktop-2:#8a9eb0;
       --chrome:#cfcfcf; --chrome-l:#e8e8e8; --chrome-d:#7a7a7a; --chrome-dd:#3a3a3a;
@@ -135,10 +137,10 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       font-family:var(--f-sans);font-weight:700;font-size:16px;color:var(--ink);
       margin-bottom:14px;
     }
-    .win-body .tagline em{font-style:italic;font-weight:700;color:var(--blue);background:var(--yellow);padding:1px 6px}
+    .win-body .tagline :global(em){font-style:italic;font-weight:700;color:var(--blue);background:var(--yellow);padding:1px 6px}
     .win-body p.lede{font-family:var(--f-sans);font-size:13px;line-height:1.55;color:var(--ink);max-width:54ch;margin-bottom:16px}
-    .win-body p.lede b{color:var(--blue);font-weight:700}
-    .win-body p.lede em{font-style:italic;color:var(--red);font-weight:700}
+    .win-body p.lede :global(b){color:var(--blue);font-weight:700}
+    .win-body p.lede :global(em){font-style:italic;color:var(--red);font-weight:700}
 
     .opts{background:var(--chrome-l);border:1px solid var(--chrome-d);padding:10px 14px;margin-bottom:16px}
     .opts .row{display:grid;grid-template-columns:20px 1fr auto;gap:10px;padding:5px 0;border-bottom:1px dotted var(--chrome-d);align-items:center;font-family:var(--f-mono);font-size:11.5px}
@@ -148,7 +150,7 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       background:var(--white);
     }
     .opts .row.on .radio{background:var(--blue);box-shadow:inset 0 0 0 2px var(--white)}
-    .opts .row b{color:var(--blue);font-weight:700}
+    .opts .row :global(b){color:var(--blue);font-weight:700}
     .opts .row .t{color:var(--green);font-weight:700;font-size:10.5px;letter-spacing:.12em}
 
     .progress{
@@ -191,7 +193,7 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
     }
     .notify input:focus{background:var(--white);border-color:var(--blue)}
     .notify .note{font-family:var(--f-mono);font-size:10px;color:var(--chrome-dd);letter-spacing:.08em;margin-top:6px}
-    .notify .note b{color:var(--green)}
+    .notify .note :global(b){color:var(--green)}
 
     .statusbar{
       background:var(--chrome);padding:3px 14px;border-top:1px solid var(--chrome-dd);

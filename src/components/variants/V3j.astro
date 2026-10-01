@@ -130,6 +130,8 @@ const V3J_SCRIPT = `
   </Fragment>
   <style slot="style">
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    /* set:html content carries no scope attribute: same reset for injected descendants */
+    * :global(*),* :global(*::before),* :global(*::after){margin:0;padding:0;box-sizing:border-box}
     :root{
       --desk:#3a2d3a; --desk-2:#2c2430; --desk-3:#1c161e;
       --motif:#9b95a3; --motif-2:#b5afbc; --motif-l:#dcd5e3;
@@ -266,14 +268,14 @@ const V3J_SCRIPT = `
       margin-bottom:14px;text-transform:uppercase;
       display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
     }
-    .pkg-win .sub b{color:var(--red)}
+    .pkg-win .sub :global(b){color:var(--red)}
     .pkg-win .tagline{
       font-family:var(--f-sans);font-weight:700;
       font-size:clamp(16px,1.6vw,19px);
       color:var(--ink);letter-spacing:-.01em;
       margin-bottom:16px;line-height:1.35;
     }
-    .pkg-win .tagline em{font-style:italic;font-weight:600;color:var(--teal-2)}
+    .pkg-win .tagline :global(em){font-style:italic;font-weight:600;color:var(--teal-2)}
 
     .pkg-win .desc{
       font-family:var(--f-sans);font-size:14px;line-height:1.55;color:var(--ink);
@@ -283,8 +285,8 @@ const V3J_SCRIPT = `
       border:1px inset var(--motif-d);
       max-width:620px;
     }
-    .pkg-win .desc b{color:var(--teal-2)}
-    .pkg-win .desc em{font-style:italic;color:var(--red);font-weight:500}
+    .pkg-win .desc :global(b){color:var(--teal-2)}
+    .pkg-win .desc :global(em){font-style:italic;color:var(--red);font-weight:500}
 
     .spec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;max-width:620px}
     .spec{
@@ -295,7 +297,7 @@ const V3J_SCRIPT = `
     }
     .spec .k{color:var(--teal-2);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:9px;display:block;margin-bottom:2px}
     .spec .v{color:var(--ink);font-size:13px}
-    .spec .v em{font-style:normal;color:var(--red);font-weight:600}
+    .spec .v :global(em){font-style:normal;color:var(--red);font-weight:600}
 
     .pkg-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;max-width:620px}
     .btn-motif{
@@ -337,7 +339,7 @@ const V3J_SCRIPT = `
       font-family:var(--f-mono);font-size:10px;color:var(--teal-2);
       letter-spacing:.08em;text-transform:uppercase;
     }
-    .notify-note b{color:var(--green);font-weight:700}
+    .notify-note :global(b){color:var(--green);font-weight:700}
 
     .privacy-consent{
       margin-top:10px;font-family:var(--f-mono);font-size:10px;color:var(--teal-2);
@@ -358,7 +360,7 @@ const V3J_SCRIPT = `
       background:repeating-linear-gradient(0deg,transparent 0 2px,rgba(111,242,74,.04) 2px 3px);
     }
     .xterm .cmt{color:#f2d550;opacity:.85}
-    .xterm .kw{color:#73d5ff;font-weight:700}
+    .xterm :global(.kw){color:#73d5ff;font-weight:700}
     .xterm .str{color:#e08cdf}
     .xterm .ok{color:#6ff24a}
     .xterm .ok::before{content:'✓ '}

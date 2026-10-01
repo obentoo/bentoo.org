@@ -30,6 +30,8 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
   </Fragment>
   <style slot="style">
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    /* set:html content carries no scope attribute: same reset for injected descendants */
+    * :global(*),* :global(*::before),* :global(*::after){margin:0;padding:0;box-sizing:border-box}
     :root{
       --bg:#c7c8c3; --bg-2:#9e9fa0;
       --ink:#0b0b0b;
@@ -109,10 +111,10 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       padding:6px 14px;font-family:var(--f-pix);font-size:16px;color:var(--ink);
       margin-bottom:16px;
     }
-    .hero .tagline em{font-style:normal;color:var(--magenta);font-weight:400}
+    .hero .tagline :global(em){font-style:normal;color:var(--magenta);font-weight:400}
     .hero p{font-family:var(--f-pix);font-size:14px;line-height:1.55;margin-bottom:16px;max-width:60ch}
-    .hero p b{color:var(--cyan-2)}
-    .hero p em{font-style:normal;color:var(--magenta);font-weight:400}
+    .hero p :global(b){color:var(--cyan-2)}
+    .hero p :global(em){font-style:normal;color:var(--magenta);font-weight:400}
 
     .box-specs{
       background:var(--white);
@@ -146,7 +148,7 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       display:grid;gap:10px;
     }
     .notify .lbl{font-family:var(--f-pix);font-size:13px;color:var(--cyan-2);font-weight:700}
-    .notify .lbl span{color:var(--lime);font-size:11px;margin-left:8px}
+    .notify .lbl :global(span){color:var(--lime);font-size:11px;margin-left:8px}
     .notify form{display:flex;gap:6px}
     .notify input{
       flex:1;padding:8px 10px;background:var(--white);color:var(--ink);
@@ -170,8 +172,8 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
     }
     footer a{color:var(--yellow)}
     footer a:hover{color:var(--magenta)}
-    footer em{color:var(--cyan);font-style:normal}
-    footer .dot{color:var(--magenta)}
+    footer :global(em){color:var(--cyan);font-style:normal}
+    footer :global(.dot){color:var(--magenta)}
 
     @media (max-width:640px){
       .hero h1{font-size:52px;text-shadow:3px 0 var(--magenta),6px 0 var(--cyan-2),3px 3px 0 var(--shadow)}

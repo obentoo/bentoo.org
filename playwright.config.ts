@@ -10,6 +10,18 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 4 : 1,
   reporter: process.env.CI ? 'github' : 'list',
+  // PW_UPDATE_SNAPSHOTS=all recaptures every baseline (e.g. inside the CI
+  // runner image via `act`); otherwise Playwright's default ('missing') applies.
+  updateSnapshots: process.env.PW_UPDATE_SNAPSHOTS === 'all' ? 'all' : 'missing',
+  // PW_SNAPSHOT_DIR=<dir> reads and writes the screenshots under <dir>
+  // (relative to this file) with the committed file names, e.g. to capture
+  // twice into scratch dirs and compare them for determinism without touching
+  // the committed baselines. Unset (the default): Playwright's own path.
+  ...(process.env.PW_SNAPSHOT_DIR
+    ? {
+        snapshotPathTemplate: `${process.env.PW_SNAPSHOT_DIR}/{arg}{-projectName}{-snapshotSuffix}{ext}`,
+      }
+    : {}),
   use: {
     baseURL,
     trace: 'on-first-retry',

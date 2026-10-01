@@ -30,6 +30,8 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
   </Fragment>
   <style slot="style">
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    /* set:html content carries no scope attribute: same reset for injected descendants */
+    * :global(*),* :global(*::before),* :global(*::after){margin:0;padding:0;box-sizing:border-box}
     :root{
       --cream:#f1e8d1; --cream-2:#e4d9b8; --cream-3:#d4c7a0;
       --ink:#1a1410;
@@ -110,7 +112,7 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       line-height:.82;letter-spacing:-.015em;color:var(--ink);
       margin-bottom:12px;
     }
-    .box-body h1 em{font-style:normal;color:var(--red)}
+    .box-body h1 :global(em){font-style:normal;color:var(--red)}
     .box-body h1 .dot{color:var(--gold)}
     .box-body h1 .jp{
       display:block;font-family:var(--f-ser);font-size:.22em;color:var(--purple);
@@ -120,10 +122,10 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       display:block;font-family:var(--f-disp);font-size:.22em;font-weight:400;
       letter-spacing:.08em;color:var(--ink);margin-top:10px;line-height:1.2;
     }
-    .box-body h1 .sub em{color:var(--red);background:var(--cream-2);padding:0 8px}
+    .box-body h1 .sub :global(em){color:var(--red);background:var(--cream-2);padding:0 8px}
     .box-body p.lede{font-family:var(--f-jp);font-size:14px;line-height:1.6;font-weight:500;margin-top:16px;max-width:50ch}
-    .box-body p.lede b{background:var(--gold);padding:1px 6px;font-weight:900}
-    .box-body p.lede em{font-style:normal;color:var(--red-2);font-weight:900}
+    .box-body p.lede :global(b){background:var(--gold);padding:1px 6px;font-weight:900}
+    .box-body p.lede :global(em){font-style:normal;color:var(--red-2);font-weight:900}
 
     .box-side{
       background:var(--cream-2);
@@ -166,7 +168,7 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
     }
     .specs-grid .sp .k{display:block;letter-spacing:.2em;color:var(--purple-2);font-weight:700;margin-bottom:3px;font-size:9px;text-transform:uppercase}
     .specs-grid .sp .v{font-family:var(--f-disp);font-size:18px;color:var(--ink);letter-spacing:.04em}
-    .specs-grid .sp .v em{color:var(--red);font-style:normal}
+    .specs-grid .sp .v :global(em){color:var(--red);font-style:normal}
 
     .actions-bar{
       padding:18px 30px 22px;background:var(--cream);
@@ -211,7 +213,7 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       font-family:var(--f-mono);font-size:11px;letter-spacing:.18em;
       position:relative;z-index:10;
     }
-    footer em{color:var(--gold);font-style:normal;font-family:var(--f-disp);font-size:14px;letter-spacing:.08em}
+    footer :global(em){color:var(--gold);font-style:normal;font-family:var(--f-disp);font-size:14px;letter-spacing:.08em}
     footer a{color:var(--gold)}
     footer a:hover{color:var(--red)}
 

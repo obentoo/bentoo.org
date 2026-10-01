@@ -31,6 +31,8 @@ const tickerSpansDoubled = [...content.tickerSpans, ...content.tickerSpans];
   </Fragment>
   <style slot="style">
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    /* set:html content carries no scope attribute: same reset for injected descendants */
+    * :global(*),* :global(*::before),* :global(*::after){margin:0;padding:0;box-sizing:border-box}
     :root{
       --paper:#f0ede2; --paper-2:#e4dfc8; --paper-3:#d5ceb0;
       --ink:#111110;
@@ -143,7 +145,7 @@ const tickerSpansDoubled = [...content.tickerSpans, ...content.tickerSpans];
       letter-spacing:.2em;
       margin-bottom:10px;
     }
-    .hero h1 em{font-style:normal;color:var(--ink)}
+    .hero h1 :global(em){font-style:normal;color:var(--ink)}
     .hero h1 .dot{color:var(--red-2)}
     .hero h1 .sub{
       display:block;
@@ -154,7 +156,7 @@ const tickerSpansDoubled = [...content.tickerSpans, ...content.tickerSpans];
       text-transform:uppercase;
       line-height:1.2;
     }
-    .hero h1 .sub em{color:var(--red);font-style:normal}
+    .hero h1 .sub :global(em){color:var(--red);font-style:normal}
 
     .hero .intro{
       font-family:var(--f-mono);font-size:12.5px;
@@ -164,7 +166,7 @@ const tickerSpansDoubled = [...content.tickerSpans, ...content.tickerSpans];
       background:var(--paper-2);
       border-left:4px solid var(--red);
     }
-    .hero .intro b{color:var(--red-2)}
+    .hero .intro :global(b){color:var(--red-2)}
 
     /* Spec table */
     .spec-table{
@@ -264,7 +266,7 @@ const tickerSpansDoubled = [...content.tickerSpans, ...content.tickerSpans];
       text-transform:uppercase;align-self:flex-start;
       white-space:nowrap;
     }
-    .notify-card .meta b{color:var(--red)}
+    .notify-card .meta :global(b){color:var(--red)}
     .notify-card form{display:flex;gap:0;width:100%}
     .notify-card input[type="email"]{
       flex:1;padding:12px 14px;
@@ -309,9 +311,9 @@ const tickerSpansDoubled = [...content.tickerSpans, ...content.tickerSpans];
     .doc-foot .r{justify-self:end;display:flex;gap:18px}
     .doc-foot a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
     .doc-foot a:hover{color:var(--red)}
-    .doc-foot .sig{display:inline-flex;align-items:center;gap:8px}
-    .doc-foot .sig em{font-family:var(--f-display);font-weight:700;font-style:normal;text-transform:none;letter-spacing:normal;font-size:15px;color:var(--ink)}
-    .doc-foot .sig em .dot{color:var(--red)}
+    .doc-foot :global(.sig){display:inline-flex;align-items:center;gap:8px}
+    .doc-foot :global(.sig em){font-family:var(--f-display);font-weight:700;font-style:normal;text-transform:none;letter-spacing:normal;font-size:15px;color:var(--ink)}
+    .doc-foot :global(.sig em .dot){color:var(--red)}
 
     /* ===== Signature block ===== */
     .sig-block{

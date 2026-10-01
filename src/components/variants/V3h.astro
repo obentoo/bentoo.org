@@ -31,6 +31,8 @@ const tickerSpansDoubled = [...content.tickerSpans, ...content.tickerSpans];
   </Fragment>
   <style slot="style">
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    /* set:html content carries no scope attribute: same reset for injected descendants */
+    * :global(*),* :global(*::before),* :global(*::after){margin:0;padding:0;box-sizing:border-box}
     :root{
       --bg:#070509; --bg-2:#0d0915; --bg-3:#16101f;
       --pink:#ff3ea8; --pink-2:#ff7cc7;
@@ -117,11 +119,11 @@ const tickerSpansDoubled = [...content.tickerSpans, ...content.tickerSpans];
       box-shadow:0 0 18px rgba(255,62,168,.4),inset 0 0 18px rgba(255,62,168,.1);
       text-transform:uppercase;
     }
-    .tagline em{font-style:normal;color:var(--cyan);font-weight:400}
+    .tagline :global(em){font-style:normal;color:var(--cyan);font-weight:400}
 
     .lede-wrap{max-width:640px;margin:36px auto 44px;font-family:var(--f-jp);font-size:15px;line-height:1.7;color:var(--white);opacity:.92}
-    .lede-wrap b{color:var(--cyan);font-weight:700}
-    .lede-wrap em{color:var(--pink);font-style:normal;font-weight:700}
+    .lede-wrap :global(b){color:var(--cyan);font-weight:700}
+    .lede-wrap :global(em){color:var(--pink);font-style:normal;font-weight:700}
 
     .neon-grid{
       display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:44px;
@@ -160,7 +162,7 @@ const tickerSpansDoubled = [...content.tickerSpans, ...content.tickerSpans];
       box-shadow:0 0 32px rgba(255,62,168,.2);
     }
     .notify .lbl{font-family:var(--f-mich);font-size:10px;letter-spacing:.28em;color:var(--cyan);margin-bottom:14px;text-transform:uppercase}
-    .notify .lbl b{color:var(--pink)}
+    .notify .lbl :global(b){color:var(--pink)}
     .notify form{display:flex;gap:8px}
     .notify input{
       flex:1;padding:12px 16px;background:var(--bg);color:var(--white);
@@ -187,7 +189,7 @@ const tickerSpansDoubled = [...content.tickerSpans, ...content.tickerSpans];
       font-family:var(--f-mich);font-size:10px;letter-spacing:.22em;color:var(--cyan);text-transform:uppercase;
       position:relative;z-index:10;
     }
-    footer em{color:var(--pink);font-style:normal}
+    footer :global(em){color:var(--pink);font-style:normal}
     footer a{color:var(--cyan)}
     footer a:hover{color:var(--pink)}
 

@@ -378,7 +378,7 @@ const currentFlagSvg = FLAG_SVG[lang];
       transition: transform .35s cubic-bezier(.2, .8, .2, 1.4);
       transform-origin: 50% 50%;
     }
-    .bd-lang-flag svg { width: 100%; height: 100%; display: block; }
+    .bd-lang-flag :global(svg) { width: 100%; height: 100%; display: block; }
     .bd-lang-trigger:hover .bd-lang-flag,
     .bd-lang-item:hover .bd-lang-flag {
       transform: rotate(-6deg) scale(1.06);
@@ -399,7 +399,7 @@ const currentFlagSvg = FLAG_SVG[lang];
       transition: transform .35s cubic-bezier(.2, .8, .2, 1.4);
       pointer-events: none;
     }
-    .bd-lang-globe svg { width: 12px; height: 12px; display: block; }
+    .bd-lang-globe :global(svg) { width: 12px; height: 12px; display: block; }
 
     .bd-lang-tip {
       position: absolute;
@@ -560,7 +560,7 @@ const currentFlagSvg = FLAG_SVG[lang];
       }
       .bd-lang-flag { width: 38px; height: 38px; }
       .bd-lang-globe { width: 16px; height: 16px; }
-      .bd-lang-globe svg { width: 10px; height: 10px; }
+      .bd-lang-globe :global(svg) { width: 10px; height: 10px; }
       .bd-lang-tip { display: none; }
       .bd-lang-item { width: 46px; height: 46px; }
       .bd-lang-item .bd-lang-flag { width: 34px; height: 34px; }
