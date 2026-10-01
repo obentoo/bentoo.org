@@ -1,8 +1,7 @@
 import { defineConfig } from 'astro/config';
 
-// Note: @astrojs/sitemap is installed but NOT loaded as integration.
-// The sitemap is authored at src/pages/sitemap.xml.ts for hreflang control
-// (see tasks.md Task 8.1 GOTCHA).
+// No sitemap integration: the sitemap is authored at src/pages/sitemap.xml.ts
+// for hreflang control.
 export default defineConfig({
   site: 'https://obentoo.org',
   integrations: [],
