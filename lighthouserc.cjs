@@ -2,7 +2,14 @@ module.exports = {
   ci: {
     collect: {
       staticDistDir: './dist',
-      url: ['http://localhost/index.html', 'http://localhost/pt/index.html'],
+      // Deterministic, indexable pages that render without redirecting. The
+      // locale roots (/, /pt/, /es/) only redirect to a random variant, and
+      // variants are noindex by design — auditing them measured the draw.
+      url: [
+        'http://localhost/privacy/index.html',
+        'http://localhost/notices/index.html',
+        'http://localhost/pt/notices/index.html',
+      ],
       numberOfRuns: 1,
       settings: {
         preset: 'desktop',

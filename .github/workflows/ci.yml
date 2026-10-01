@@ -131,10 +131,12 @@ jobs:
           node-version: '22'
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        with:
-          name: dist
-          path: dist
+      # Lighthouse audits a production build: the `ci` job's dist artifact is a
+      # non-production build (noindex,nofollow), which fails SEO on any page.
+      - run: pnpm build
+        env:
+          PUBLIC_IS_PRODUCTION: 'true'
+          PUBLIC_SITE_URL: https://obentoo.org
       - uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # 12.6.2
         with:
           configPath: ./lighthouserc.cjs
