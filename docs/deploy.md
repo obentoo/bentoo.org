@@ -187,6 +187,50 @@ A rollback is temporary: the next push to `main` or the Monday run redeploys
 - [ ] `curl -sL https://obentoo.org/hub/foo` lands on `/` after a 301
 - [ ] DevTools Console on a real mobile device: `document.cookie === ''`
 
+## Dependency policy
+
+**Minimum release age.** `pnpm-workspace.yaml` sets `minimumReleaseAge: 10080`
+(the unit is minutes: 7 days). pnpm refuses to resolve any version published
+less than seven days ago — locally and in CI — and fails with
+`ERR_PNPM_NO_MATURE_MATCHING_VERSION`, naming the package and its age. That is
+the intended stop: wait until the release is old enough. `minimumReleaseAgeExclude`
+is empty by policy; an entry needs its own comment naming the advisory or
+reason that justifies it. pnpm 10.16.0 is the first release that honours the
+setting, hence `engines.pnpm: >=10.16.0`.
+
+**Overrides.** When a vulnerable package is pinned by a dependency we do not
+control, `pnpm-workspace.yaml` `overrides` replaces it — scoped to the
+vulnerable major (`undici@7`, never a bare `undici`) and pinned to the lowest
+patched release that is at least seven days old. Each override carries a
+comment listing the GHSA ids it closes and the parent that pins the package.
+Prefer bumping a direct dependency when that fixes it; drop an override once
+every parent has moved past the vulnerable range.
+
+**Exceptions.** An advisory with no patched release old enough is recorded
+where the scanners read it, with an expiry, so the scan fails again on the
+date the fix becomes eligible:
+
+- `osv-scanner.toml` — an `[[IgnoredVulns]]` entry with `id`, `ignoreUntil`
+  (the eligibility date) and `reason` (package and parent);
+- `.trivyignore.yaml` — the same id with `expired_at` and a `statement`
+  (trivy reads it only with `--ignorefile .trivyignore.yaml`).
+
+None exists today.
+
+**Local scans.**
+
+```sh
+osv-scanner scan source --lockfile pnpm-lock.yaml
+trivy fs --scanners vuln --severity HIGH,CRITICAL --exit-code 1 .
+```
+
+**Renovate.** `renovate.json` opens update PRs only for releases at least seven
+days old (`minimumReleaseAge: "7 days"`, `internalChecksFilter: "strict"`), pins
+GitHub Action digests and devDependencies, and refreshes the lockfile weekly.
+It takes effect only after the Renovate GitHub App is installed on
+`obentoo/bentoo.org` (github.com/apps/renovate → Configure → select the
+repository) — a one-time step for the repository owner.
+
 ## CI (pull requests)
 
 `.github/workflows/ci.yml` runs on every pull request and push to `main`:

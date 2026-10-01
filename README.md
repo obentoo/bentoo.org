@@ -10,7 +10,9 @@ announcements) as a JSON Feed, an Atom feed and one page per notice.
 - Node.js **>= 22.18.0** — the unit tests and the golden-fixture script load
   `src/content/noticeSchema.ts` through Node's native TypeScript type stripping,
   which older Node versions lack.
-- pnpm **>= 10** (the exact version is pinned in `package.json` `packageManager`).
+- pnpm **>= 10.16.0** (the exact version is pinned in `package.json` `packageManager`):
+  older pnpm releases silently ignore the seven-day `minimumReleaseAge` in
+  `pnpm-workspace.yaml`.
 
 ## Install
 
@@ -108,6 +110,15 @@ gh workflow run deploy.yml
 GitHub disables the weekly schedule after 60 days without repository activity,
 and the workflow's own runs do not count: see the 60-day caveat in
 [docs/deploy.md](docs/deploy.md) for how to re-enable it.
+
+## Dependency updates
+
+Dependencies are only taken once they are at least seven days old: pnpm refuses
+anything younger on every install (`minimumReleaseAge` in `pnpm-workspace.yaml`),
+and Renovate (`renovate.json`) opens update PRs under the same rule. Renovate
+does nothing until its GitHub App is installed on `obentoo/bentoo.org` — a
+one-time step for the repository owner. The policy, the override rule and how a
+security exception is recorded: [docs/deploy.md](docs/deploy.md#dependency-policy).
 
 Secrets, token scope, production env vars, headers and rollback:
 [docs/deploy.md](docs/deploy.md). Local env vars: [.env.example](.env.example).
