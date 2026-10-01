@@ -7,7 +7,8 @@ import yaml from 'js-yaml';
 type Raw = Record<string, any>;
 
 const ROOT = process.cwd();
-const REMOVED = ['@lhci/cli', '@astrojs/sitemap'] as const;
+// @testing-library/dom: scaffold leftover, found by the story-003 audit (validation fix round 1).
+const REMOVED = ['@lhci/cli', '@astrojs/sitemap', '@testing-library/dom'] as const;
 const THIS_FILE = 'tests/unit/unused-deps.test.ts';
 const SCANNED_DIRS = ['src', 'scripts', 'tests', '.github'];
 const SCANNED_EXT = /\.(ts|mts|cts|mjs|cjs|js|json|jsonc|ya?ml|astro)$/;
