@@ -14,6 +14,15 @@ manual deploy step.
 
 ## How a deploy runs
 
+**`deploy.yml` is the only production deployer.** The `bentoo` Worker is also
+connected to Cloudflare **Workers Builds**, but only its preview trigger remains
+(branches other than `main`, `npx wrangler versions upload` — uploads a version
+without making it live). Its production trigger (`main`, `npx wrangler deploy`)
+was removed on 2026-10-01: it built with no environment variables, so production
+shipped `noindex`, a disallow-all `robots.txt` and the retired origin, and it
+would race `deploy.yml` on every push. Do not re-add it (dashboard → Workers &
+Pages → `bentoo` → Settings → Builds).
+
 `deploy.yml` runs on:
 
 | Trigger | When | Why |
