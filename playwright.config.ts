@@ -21,7 +21,10 @@ export default defineConfig({
     },
   },
   webServer: {
-    command: `pnpm build && pnpm preview --port ${port}`,
+    // --ignore-lock: Astro 7 backgrounds `astro preview` when it detects an AI
+    // agent and refuses to start beside another preview's lock file; either
+    // would make the webServer exit early.
+    command: `pnpm build && pnpm preview --port ${port} --ignore-lock`,
     port,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
