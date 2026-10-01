@@ -51,12 +51,15 @@ Cloudflare dashboard.
 |---|---|---|
 | `PUBLIC_IS_PRODUCTION` | `true` | indexable pages and the production `robots.txt`; without it the build ships `noindex` and a disallow-all `robots.txt` |
 | `PUBLIC_SITE_URL` | `https://obentoo.org` | origin of every absolute URL: canonical tags, sitemap, feed ids and links |
-| `PUBLIC_CF_ANALYTICS_TOKEN` | `${{ vars.PUBLIC_CF_ANALYTICS_TOKEN }}` | the Cloudflare Web Analytics beacon token; empty means no beacon |
+| `PUBLIC_CF_ANALYTICS_TOKEN` | `${{ vars.PUBLIC_CF_ANALYTICS_TOKEN }}` | **left unset on purpose**: `obentoo.org` uses Web Analytics **auto-install**, so Cloudflare injects the beacon at the edge; setting this too would add a second beacon and count every visit twice |
 | `PUBLIC_BUTTONDOWN_USERNAME` | `${{ vars.PUBLIC_BUTTONDOWN_USERNAME }}` | the Buttondown account the newsletter form posts to; empty falls back to `bentoo` |
 
 The last two are **repository variables, not secrets**: both values end up in the
 public HTML. An unset variable resolves to an empty string, so the build quietly
-uses the fallbacks above — set both before the first deploy (step 3).
+uses the fallbacks above. `PUBLIC_BUTTONDOWN_USERNAME` is set (`bentoo`);
+`PUBLIC_CF_ANALYTICS_TOKEN` stays unset while auto-install is on — set it only
+after turning auto-install off for the site (dashboard → Analytics & Logs → Web
+Analytics → `obentoo.org`).
 
 Never set here:
 
@@ -105,11 +108,10 @@ Same page, **Variables** tab — public values the build embeds in the HTML:
 
 | Variable | Value |
 |---|---|
-| `PUBLIC_CF_ANALYTICS_TOKEN` | the Web Analytics site token (dashboard → Analytics & Logs → Web Analytics → the site → JS snippet `token`) |
+| `PUBLIC_CF_ANALYTICS_TOKEN` | not set — Web Analytics auto-install injects the beacon (see above); only if auto-install is turned off: the site's JS snippet `token` |
 | `PUBLIC_BUTTONDOWN_USERNAME` | the Buttondown username (`bentoo`) |
 
-Or: `gh variable set PUBLIC_CF_ANALYTICS_TOKEN --body <token>` and
-`gh variable set PUBLIC_BUTTONDOWN_USERNAME --body bentoo`.
+Or: `gh variable set PUBLIC_BUTTONDOWN_USERNAME --body bentoo`.
 
 ### 4. Custom domains
 

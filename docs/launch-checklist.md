@@ -33,8 +33,8 @@ every gate on each pull request and push to `main`; `deploy.yml` re-runs
 
 - [ ] **Cloudflare API token + account ID** (deploy.md §1–§3): scoped token, then the two repository **secrets** `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` (`gh secret set …`, prompts for the value)
 - [ ] **Buttondown account**: confirm the handle and set it as the repository **variable** `PUBLIC_BUTTONDOWN_USERNAME` (deploy.md §3)
-- [ ] **CF Web Analytics**: register `obentoo.org`, copy the beacon token into the repository **variable** `PUBLIC_CF_ANALYTICS_TOKEN` (deploy.md §3). Unset means the build ships no beacon
-- [ ] **Verify the four values are in place**: `gh secret list` shows both secrets, `gh variable list` shows both variables
+- [x] **CF Web Analytics**: `obentoo.org` is registered with **auto-install**, so Cloudflare injects the beacon at the edge; `PUBLIC_CF_ANALYTICS_TOKEN` stays unset to avoid a second beacon (deploy.md §3)
+- [ ] **Verify the values are in place**: `gh secret list` shows both secrets, `gh variable list` shows `PUBLIC_BUTTONDOWN_USERNAME`
 - [ ] **Custom domains** (deploy.md §4): `wrangler.jsonc` declares `obentoo.org` and `www.obentoo.org` as Worker custom domains; the first deploy creates their DNS records and certificates. Cloudflare refuses a custom domain on a hostname that already has a CNAME record, so first delete any leftover record for either hostname (for example the one the old Pages project created) and detach both hostnames from that Pages project
 - [ ] **www** (optional): by default `www.obentoo.org` serves the same pages, with canonical tags pointing to the apex. A 301 instead needs a zone Redirect Rule `https://www.obentoo.org/*` → `https://obentoo.org/${1}`, which runs before the Worker
 
@@ -106,7 +106,7 @@ too.
   ```
 
   Expect `200` for both. A notice id containing `+` answers `307` to its `%2B` form; that is expected (deploy.md).
-- [ ] **Web Analytics beacon** — present once `PUBLIC_CF_ANALYTICS_TOKEN` is set:
+- [ ] **Web Analytics beacon** — injected by auto-install (exactly one `static.cloudflareinsights.com` script):
 
   ```sh
   curl -s https://obentoo.org/ | grep -c static.cloudflareinsights.com
