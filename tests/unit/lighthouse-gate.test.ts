@@ -314,3 +314,14 @@ describe('ci.yml lighthouse job audits its own production build (R3.1, R4.2)', (
     expect(w.urls, 'action `urls` input').toBeUndefined();
   });
 });
+
+// Story 004, 4.1 fix: a single run per URL let cold-start noise on the first
+// URL (TBT 310 ms on a page with no executable script) fail the gate. The gate
+// judges the median of at least three runs; the thresholds stay unchanged.
+describe('each URL is judged on the median of several runs', () => {
+  it('collect.numberOfRuns is an integer of at least 3', () => {
+    const runs = loadRc().ci?.collect?.numberOfRuns;
+    expect(Number.isInteger(runs), `numberOfRuns is ${JSON.stringify(runs)}`).toBe(true);
+    expect(runs).toBeGreaterThanOrEqual(3);
+  });
+});

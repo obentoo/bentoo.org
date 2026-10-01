@@ -10,7 +10,8 @@ module.exports = {
         'http://localhost/notices/index.html',
         'http://localhost/pt/notices/index.html',
       ],
-      numberOfRuns: 1,
+      // Median of three runs: one run let cold-start noise on the first URL fail the gate.
+      numberOfRuns: 3,
       settings: {
         preset: 'desktop',
         throttling: {
