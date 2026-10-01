@@ -51,12 +51,15 @@ Cloudflare dashboard.
 |---|---|---|
 | `PUBLIC_IS_PRODUCTION` | `true` | indexable pages and the production `robots.txt`; without it the build ships `noindex` and a disallow-all `robots.txt` |
 | `PUBLIC_SITE_URL` | `https://obentoo.org` | origin of every absolute URL: canonical tags, sitemap, feed ids and links |
+| `PUBLIC_CF_ANALYTICS_TOKEN` | `${{ vars.PUBLIC_CF_ANALYTICS_TOKEN }}` | the Cloudflare Web Analytics beacon token; empty means no beacon |
+| `PUBLIC_BUTTONDOWN_USERNAME` | `${{ vars.PUBLIC_BUTTONDOWN_USERNAME }}` | the Buttondown account the newsletter form posts to; empty falls back to `bentoo` |
 
-Not set by the workflow today:
+The last two are **repository variables, not secrets**: both values end up in the
+public HTML. An unset variable resolves to an empty string, so the build quietly
+uses the fallbacks above — set both before the first deploy (step 3).
 
-- `PUBLIC_CF_ANALYTICS_TOKEN` — so production emits **no** Web Analytics beacon.
-  To enable it, add the token to the `pnpm build` step's `env`.
-- `PUBLIC_BUTTONDOWN_USERNAME` — the newsletter form falls back to `bentoo`.
+Never set here:
+
 - `NOTICES_DIR` / `NOTICES_INTEGRATION_BUILD` — test-only; must never be set here.
 
 `CF_PAGES_BRANCH` belonged to the retired Pages flow; the code still treats
@@ -85,7 +88,7 @@ Following Cloudflare's GitHub Actions guide
 Follow "Find account and zone IDs"
 (<https://developers.cloudflare.com/fundamentals/account/find-account-and-zone-ids/>).
 
-### 3. GitHub secrets
+### 3. GitHub secrets and variables
 
 Repository `obentoo/bentoo.org` → **Settings → Secrets and variables → Actions**:
 
@@ -97,6 +100,16 @@ Repository `obentoo/bentoo.org` → **Settings → Secrets and variables → Act
 Or from a shell: `gh secret set CLOUDFLARE_API_TOKEN` and
 `gh secret set CLOUDFLARE_ACCOUNT_ID` (each prompts for the value, so it never
 lands in shell history). Never commit either value, and never put them in `.env`.
+
+Same page, **Variables** tab — public values the build embeds in the HTML:
+
+| Variable | Value |
+|---|---|
+| `PUBLIC_CF_ANALYTICS_TOKEN` | the Web Analytics site token (dashboard → Analytics & Logs → Web Analytics → the site → JS snippet `token`) |
+| `PUBLIC_BUTTONDOWN_USERNAME` | the Buttondown username (`bentoo`) |
+
+Or: `gh variable set PUBLIC_CF_ANALYTICS_TOKEN --body <token>` and
+`gh variable set PUBLIC_BUTTONDOWN_USERNAME --body bentoo`.
 
 ### 4. Custom domains
 

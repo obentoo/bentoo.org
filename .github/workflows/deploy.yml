@@ -44,6 +44,11 @@ jobs:
           # astro.config.mjs otherwise keys production on the Pages-only CF_PAGES_BRANCH.
           PUBLIC_IS_PRODUCTION: 'true'
           PUBLIC_SITE_URL: https://obentoo.org
+          # Public values (they end up in the HTML), so repository variables,
+          # not secrets. An unset variable resolves to '' and the build falls
+          # back: no analytics beacon, newsletter username 'bentoo'.
+          PUBLIC_CF_ANALYTICS_TOKEN: ${{ vars.PUBLIC_CF_ANALYTICS_TOKEN }}
+          PUBLIC_BUTTONDOWN_USERNAME: ${{ vars.PUBLIC_BUTTONDOWN_USERNAME }}
       # wrangler comes from the lockfile (devDependency), never an unpinned download.
       - run: pnpm exec wrangler deploy
         env:
