@@ -30,6 +30,8 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
   </Fragment>
   <style slot="style">
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    /* set:html content carries no scope attribute: same reset for injected descendants */
+    * :global(*),* :global(*::before),* :global(*::after){margin:0;padding:0;box-sizing:border-box}
     :root{
       --bg:#1a0e35; --bg-2:#2a1550;
       --hot:#ff2d95; --hot-2:#ff6bb8;
@@ -118,11 +120,11 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       box-shadow:0 0 24px rgba(44,229,196,.35);
       text-transform:uppercase;
     }
-    .tagline em{color:var(--hot);font-style:normal;font-weight:400}
+    .tagline :global(em){color:var(--hot);font-style:normal;font-weight:400}
 
     .lede-wrap{max-width:620px;margin:26px auto 42px;color:var(--white);font-size:15px;line-height:1.7;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-    .lede-wrap b{color:var(--teal);font-weight:700;text-shadow:0 0 10px rgba(44,229,196,.5)}
-    .lede-wrap em{color:var(--peach);font-style:normal;font-weight:700}
+    .lede-wrap :global(b){color:var(--teal);font-weight:700;text-shadow:0 0 10px rgba(44,229,196,.5)}
+    .lede-wrap :global(em){color:var(--peach);font-style:normal;font-weight:700}
 
     .vhs-band{
       display:grid;grid-template-columns:repeat(3,1fr);gap:0;
@@ -136,7 +138,7 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
     .vhs-band > div:last-child{border-right:none}
     .vhs-band .k{font-family:var(--f-mich);font-size:9px;letter-spacing:.24em;color:var(--teal);margin-bottom:6px;text-transform:uppercase}
     .vhs-band .v{font-size:22px;color:var(--white);letter-spacing:.03em}
-    .vhs-band .v em{color:var(--hot);font-style:normal}
+    .vhs-band .v :global(em){color:var(--hot);font-style:normal}
 
     .actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:36px}
     .btn{
@@ -156,7 +158,7 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       box-shadow:0 0 28px rgba(255,226,64,.18);
     }
     .notify .lbl{font-family:var(--f-mich);font-size:10px;letter-spacing:.22em;color:var(--yellow);margin-bottom:12px;text-transform:uppercase}
-    .notify .lbl b{color:var(--hot)}
+    .notify .lbl :global(b){color:var(--hot)}
     .notify form{display:flex;gap:8px}
     .notify input{
       flex:1;padding:12px 14px;background:var(--bg-2);color:var(--white);
@@ -183,7 +185,7 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       font-family:var(--f-mich);font-size:10px;letter-spacing:.22em;color:var(--teal);text-transform:uppercase;
       position:relative;z-index:10;
     }
-    footer em{color:var(--hot);font-style:normal}
+    footer :global(em){color:var(--hot);font-style:normal}
     footer a{color:var(--teal)}
     footer a:hover{color:var(--hot)}
 

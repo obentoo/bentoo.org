@@ -8,7 +8,7 @@ export const strings = {
   privacyConsent: 'Ao inscrever-se, você concorda com nossa política de privacidade',
   privacyLinkLabel: 'privacidade',
   languageToggleLabel: 'pt-BR',
-  footerCopyright: 'feito à mão, código aberto · © 2026 bentoo.org',
+  footerCopyright: 'feito à mão, código aberto · © 2026 obentoo.org',
   privacyPageTitle: 'Privacidade',
   privacyPageBody: `A Bentoo respeita sua privacidade e coleta apenas o mínimo de dados necessário para anunciar o lançamento.
 
@@ -20,7 +20,7 @@ Retenção. O Buttondown mantém seu email até você se descadastrar pelo link 
 
 localStorage. Este site usa duas chaves de localStorage no seu dispositivo, nunca sincronizadas com um servidor: "bentoo-variant" (a variante visual atribuída à sua sessão, com TTL de 24 horas) e "bentoo-lang" (sua preferência de idioma, com TTL de 24 horas). Você pode limpar ambas a qualquer momento pelos controles de dados de site do seu navegador.
 
-Contato. Para solicitações de acesso, exclusão ou qualquer questão de privacidade, escreva para founder@bentoo.org.`,
+Contato. Para solicitações de acesso, exclusão ou qualquer questão de privacidade, escreva para contact@obentoo.org.`,
   notFoundTitle: 'Página não encontrada',
   notFoundBody: 'Esta página não existe — volte para a página inicial.',
   notFoundBackLabel: '← voltar para a página inicial',
@@ -35,4 +35,19 @@ Contato. Para solicitações de acesso, exclusão ou qualquer questão de privac
   privacyPageDescription:
     'Como a Bentoo trata seus dados no site de pré-lançamento.',
   backLink: '← voltar',
+  noticesTitle: 'Avisos',
+  noticesIntro:
+    'Alertas de segurança, lançamentos e novidades da Bentoo, dos atualizados mais recentemente aos mais antigos. O texto dos avisos é publicado em inglês.',
+  noticeType_security: 'Segurança',
+  noticeType_release: 'Lançamento',
+  noticeType_news: 'Notícia',
+  noticeType_announcement: 'Anúncio',
+  noticeSeverity_info: 'Informativo',
+  noticeSeverity_warning: 'Alerta',
+  noticeSeverity_critical: 'Crítico',
+  noticeAffects: 'Pacotes afetados',
+  noticePublished: 'Publicado',
+  noticeUpdated: 'Atualizado',
+  noticesEmpty: 'Nenhum aviso por enquanto.',
+  noticesFeedLinks: 'Acompanhe os avisos pelo feed:',
 } as const satisfies Strings;

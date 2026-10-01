@@ -61,7 +61,7 @@ test.describe('SEO metadata', () => {
     );
   });
 
-  test('(4) /sitemap.xml is 200 XML with one <loc> per locale', async ({
+  test('(4) /sitemap.xml is 200 XML listing each locale root and notice index once', async ({
     page,
   }) => {
     const response = await page.request.get('/sitemap.xml');
@@ -70,8 +70,12 @@ test.describe('SEO metadata', () => {
     expect(contentType).toMatch(/(application|text)\/xml/);
 
     const body = await response.text();
-    const locMatches = body.match(/<loc>[^<]+<\/loc>/g) ?? [];
-    expect(locMatches.length).toBe(3);
+    // Story 002 (R5.4) adds the notice index and pages, so count the fixed
+    // entries instead of the total.
+    const locs = (body.match(/<loc>[^<]+<\/loc>/g) ?? []).map((l) => new URL(l.slice(5, -6)).pathname);
+    for (const path of ['/', '/pt/', '/es/', '/notices/', '/pt/notices/', '/es/notices/']) {
+      expect(locs.filter((p) => p === path), path).toHaveLength(1);
+    }
     expect(body).toMatch(/<loc>[^<]*\/<\/loc>/);
     expect(body).toMatch(/<loc>[^<]*\/pt\/<\/loc>/);
     expect(body).toMatch(/<loc>[^<]*\/es\/<\/loc>/);

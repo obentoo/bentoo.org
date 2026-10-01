@@ -30,6 +30,8 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
   </Fragment>
   <style slot="style">
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    /* set:html content carries no scope attribute: same reset for injected descendants */
+    * :global(*),* :global(*::before),* :global(*::after){margin:0;padding:0;box-sizing:border-box}
     :root{
       --sky:#0a0416; --sky-2:#1a0a2e; --ground:#2a0a3e;
       --pink:#ff36f0; --magenta:#ff1b9c;
@@ -125,11 +127,11 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       box-shadow:0 0 28px rgba(255,54,240,.35),inset 0 0 28px rgba(255,54,240,.05);
       text-transform:uppercase;
     }
-    .tagline em{color:var(--cyan);font-style:normal;font-weight:400}
+    .tagline :global(em){color:var(--cyan);font-style:normal;font-weight:400}
 
     .lede-wrap{max-width:620px;margin:32px auto 40px;color:var(--white);font-family:var(--f-orb);font-size:14.5px;line-height:1.7;text-shadow:0 1px 2px rgba(0,0,0,.4)}
-    .lede-wrap b{color:var(--cyan);font-weight:700;text-shadow:0 0 10px var(--cyan)}
-    .lede-wrap em{color:var(--pink);font-style:normal;font-weight:700;text-shadow:0 0 10px var(--pink)}
+    .lede-wrap :global(b){color:var(--cyan);font-weight:700;text-shadow:0 0 10px var(--cyan)}
+    .lede-wrap :global(em){color:var(--pink);font-style:normal;font-weight:700;text-shadow:0 0 10px var(--pink)}
 
     .stripe-band{
       display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:40px;
@@ -141,7 +143,7 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
     .stripe-band .c:last-child{border-right:none}
     .stripe-band .k{font-family:var(--f-mich);font-size:9px;letter-spacing:.22em;color:var(--cyan);margin-bottom:6px;text-transform:uppercase}
     .stripe-band .v{font-size:20px;color:var(--white);letter-spacing:.04em}
-    .stripe-band .v em{color:var(--pink);font-style:normal}
+    .stripe-band .v :global(em){color:var(--pink);font-style:normal}
 
     .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:40px}
     .btn{
@@ -162,7 +164,7 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       box-shadow:0 0 32px rgba(255,210,0,.2);
     }
     .notify .lbl{font-family:var(--f-mich);font-size:10px;letter-spacing:.24em;color:var(--yellow);margin-bottom:14px;text-transform:uppercase}
-    .notify .lbl b{color:var(--pink)}
+    .notify .lbl :global(b){color:var(--pink)}
     .notify form{display:flex;gap:8px}
     .notify input{
       flex:1;padding:12px 16px;background:var(--sky-2);color:var(--white);border:1px solid var(--cyan);outline:none;
@@ -187,7 +189,7 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       font-family:var(--f-mich);font-size:10px;letter-spacing:.22em;color:var(--cyan);text-transform:uppercase;
       position:relative;z-index:10;
     }
-    footer em{color:var(--pink);font-style:normal}
+    footer :global(em){color:var(--pink);font-style:normal}
     footer a{color:var(--cyan)}
     footer a:hover{color:var(--pink)}
 

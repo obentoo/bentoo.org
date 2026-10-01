@@ -31,6 +31,8 @@ const tickerSpans = [...content.tickerSpans, ...content.tickerSpans];
   </Fragment>
   <style slot="style">
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    /* set:html content carries no scope attribute: same reset for injected descendants */
+    * :global(*), * :global(*::before), * :global(*::after) { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
       --ink:        #5f5fd3;
@@ -77,6 +79,7 @@ const tickerSpans = [...content.tickerSpans, ...content.tickerSpans];
     }
 
     ::selection { background: var(--ink); color: var(--paper); }
+    * :global(*::selection) { background: var(--ink); color: var(--paper); }
     a { color: var(--ink); text-decoration: none; transition: color .15s; }
     a:hover { color: var(--sakura); }
 
@@ -255,7 +258,7 @@ const tickerSpans = [...content.tickerSpans, ...content.tickerSpans];
       line-height: 1.25;
       animation: fadeUp 1s .25s ease-out both;
     }
-    .tagline em {
+    .tagline :global(em) {
       font-style: normal;
       font-weight: 700;
       color: var(--ink);
@@ -271,12 +274,12 @@ const tickerSpans = [...content.tickerSpans, ...content.tickerSpans];
       color: var(--text-soft);
       animation: fadeUp 1s .4s ease-out both;
     }
-    .lede em {
+    .lede :global(em) {
       font-style: italic;
       color: var(--ink);
       font-weight: 500;
     }
-    .lede b {
+    .lede :global(b) {
       color: var(--sakura);
       font-weight: 600;
     }
@@ -358,7 +361,7 @@ const tickerSpans = [...content.tickerSpans, ...content.tickerSpans];
       margin-top: -18px;
       animation: fadeUp 1s .85s ease-out both;
     }
-    .notify-note .priv {
+    .notify-note :global(.priv) {
       color: var(--matcha);
       font-weight: 700;
     }

@@ -1,0 +1,52 @@
+---
+// Page shell of the notice index and notice pages (story 002, R5): BaseLayout
+// with a self-referencing canonical, the dark page background and a back link.
+import BaseLayout from './BaseLayout.astro';
+import type { Lang } from '~/utils/getLang';
+
+export interface Props {
+  lang: Lang;
+  path: string;
+  title: string;
+  description: string;
+  backHref: string;
+  backLabel: string;
+}
+
+const { lang, path, title, description, backHref, backLabel } = Astro.props;
+---
+<BaseLayout
+  lang={lang}
+  structuredData={false}
+  path={path}
+  title={title}
+  description={description}
+  isVariantPage={false}
+  canonicalFromPath={true}
+>
+  <main class="bentoo-notices">
+    <slot />
+    <p class="bentoo-notices-back"><a href={backHref}>{backLabel}</a></p>
+  </main>
+  <style slot="style">
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #e7e7e7;
+      line-height: 1.6;
+    }
+    .bentoo-notices {
+      max-width: 44rem;
+      margin: 0 auto;
+      padding: 3rem 1.25rem 6rem;
+    }
+    .bentoo-notices-back { margin: 2rem 0 0; }
+    .bentoo-notices-back a {
+      color: #9eb6ff;
+      display: inline-block;
+      min-height: 44px;
+      line-height: 44px;
+    }
+  </style>
+</BaseLayout>

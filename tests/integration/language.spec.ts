@@ -1,25 +1,27 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('language routing', () => {
-  test('(1) footer language toggle navigates + persists bentoo-lang', async ({
+  test('(1) language picker navigates + persists bentoo-lang', async ({
     page,
   }) => {
     await page.goto('/v/v4/');
-    await page.waitForSelector('footer a[data-bentoo-lang-toggle]');
-    const toggle = page.locator('footer a[data-bentoo-lang-toggle]').first();
-    const targetLang = await toggle.getAttribute('data-target-lang');
-    expect(['pt', 'en']).toContain(targetLang);
+    const trigger = page.locator('[data-bd-lang-trigger]');
+    await trigger.click();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+    const ptItem = page.locator('.bd-lang-item[data-target-lang="pt"]');
+    await expect(ptItem).toHaveAttribute('href', '/pt/v/v4/');
 
     await Promise.all([
       page.waitForURL(/\/pt\/v\/v4\/$/),
-      toggle.click(),
+      ptItem.click(),
     ]);
 
     expect(page.url()).toMatch(/\/pt\/v\/v4\/$/);
     const stored = await page.evaluate(() =>
       localStorage.getItem('bentoo-lang')
     );
-    expect(stored).toBe(targetLang);
+    expect(stored).toBe('pt');
 
     const cookies = await page.evaluate(() => document.cookie);
     expect(cookies).toBe('');

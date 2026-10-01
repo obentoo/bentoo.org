@@ -2,12 +2,12 @@ import { test, expect } from '@playwright/test';
 
 /**
  * Comprehensive zero-cookie invariant (R2.7, R6.1, R6.2, R6.7): after a
- * rotator redirect + form submission + language toggle, document.cookie
- * must remain empty. Other specs also assert document.cookie === '' as a
+ * rotator redirect + form submission + language switch (floating picker),
+ * document.cookie must remain empty. Other specs also assert document.cookie === '' as a
  * closing invariant per their own scenario; this test stitches the three
  * together end-to-end.
  */
-test('zero cookies after rotator + form submit + language toggle', async ({
+test('zero cookies after rotator + form submit + language switch', async ({
   page,
   context,
 }) => {
@@ -45,15 +45,19 @@ test('zero cookies after rotator + form submit + language toggle', async ({
   cookies = await page.evaluate(() => document.cookie);
   expect(cookies, 'cookies after form submit').toBe('');
 
-  // 3. Click the footer language toggle → navigates to pt sibling.
-  const toggle = page.locator('footer a[data-bentoo-lang-toggle]').first();
+  // 3. Switch language through the floating language picker (FAB):
+  //    open the menu, choose pt → navigates to the pt sibling.
+  const trigger = page.locator('[data-bd-lang-trigger]');
+  await trigger.click();
+  await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  const ptItem = page.locator('.bd-lang-item[data-target-lang="pt"]');
   await Promise.all([
     page.waitForURL(/\/pt\/v\/[^/]+\/$/),
-    toggle.click(),
+    ptItem.click(),
   ]);
 
   cookies = await page.evaluate(() => document.cookie);
-  expect(cookies, 'cookies after language toggle').toBe('');
+  expect(cookies, 'cookies after language switch').toBe('');
 
   // 4. Browser-level cookie jar must also be empty.
   const jarCookies = await context.cookies();

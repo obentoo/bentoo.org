@@ -1,8 +1,19 @@
 # Launch Readiness Checklist
 
-Status at end of story 001 implementation (code-complete, launch-pending).
+Launch target: `https://obentoo.org`, served by **Cloudflare Workers Static
+Assets** (`wrangler.jsonc`, Worker `bentoo`) and deployed **only** by the GitHub
+Actions workflow `.github/workflows/deploy.yml`. There is no Cloudflare Pages
+project and no manual upload.
 
-## Automated quality gates — all passing
+This file is the order of operations and what to verify. The how-to for each
+setup step (token scope, where each value comes from) lives in
+[deploy.md](deploy.md); it is referenced here, not repeated.
+
+## Automated quality gates — all passing at end of story 001
+
+Figures are the story 001 snapshot. CI (`.github/workflows/ci.yml`) re-runs
+every gate on each pull request and push to `main`; `deploy.yml` re-runs
+`pnpm typecheck` and `pnpm test:unit` before every deploy.
 
 - [x] `pnpm build` — 47 pages built (42 variants + 2 roots + 2 privacy + 404)
 - [x] `pnpm typecheck` — 0 errors across 63 files
@@ -14,20 +25,99 @@ Status at end of story 001 implementation (code-complete, launch-pending).
 
 ## Tests authored (run in CI)
 
-- [x] 84-snapshot Playwright visual regression (21 × 2 lang × 2 viewport) — baselines need a fresh capture after the shuffle-FAB rollout (label `update-visual-baselines` on next PR)
-- [x] 23 integration scenarios + 46-route a11y sweep — `pnpm exec playwright test --list tests/integration/` lists 69 discoverable
+- [x] 84-snapshot Playwright visual regression (21 × 2 lang × 2 viewport) — baselines need a fresh capture after the shuffle-FAB rollout (label `update-visual-baselines` on next PR; note: `ci.yml` currently has no step keyed on that label, so confirm the capture path before relying on it)
+- [x] 23 integration scenarios + 46-route a11y sweep (story 001 count; story 002 added the notice specs) — `pnpm test:integration`. It builds `dist/` over the fixture notices: **never deploy that `dist/`**
 - [x] Lighthouse CI configured — perf/a11y/bp/seo ≥ 0.95, LCP ≤ 2500ms, CLS ≤ 0.1
 
-## Pending — manual (outside code repo)
+## Pending — one-time setup (manual, outside the code repo)
 
-- [ ] **CF Pages repo connect** (docs/deploy.md §1): connect obentoo/bentoo.org to CF Pages, build command `pnpm build`, output `dist`, Node 22, `PNPM_VERSION=10.30.1`
-- [ ] **CF env vars** (docs/deploy.md §2): `PUBLIC_SITE_URL`, `PUBLIC_BUTTONDOWN_USERNAME`, `PUBLIC_CF_ANALYTICS_TOKEN` (Production only), `NODE_VERSION=22`
-- [ ] **Buttondown account**: confirm handle + set in `PUBLIC_BUTTONDOWN_USERNAME`
-- [ ] **CF Web Analytics**: register bentoo.org, copy beacon token into `PUBLIC_CF_ANALYTICS_TOKEN`
-- [ ] **Custom domain**: add `bentoo.org` in CF Pages custom domains; add Redirect Rule `www.bentoo.org/* → https://bentoo.org/$1 301`
-- [ ] **Preview deploy smoke** (docs/deploy.md §Preview): open `*.pages.dev`, verify rotator + robots + no beacon + security headers
-- [ ] **Production smoke** (docs/deploy.md §Production): curl + mobile device verification of 200, redirect, security headers, zero cookies
-- [ ] **Visual regression baselines**: open a PR with label `update-visual-baselines` to capture the first 84-snapshot baseline in CI
+- [ ] **Cloudflare API token + account ID** (deploy.md §1–§3): scoped token, then the two repository **secrets** `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` (`gh secret set …`, prompts for the value)
+- [ ] **Buttondown account**: confirm the handle and set it as the repository **variable** `PUBLIC_BUTTONDOWN_USERNAME` (deploy.md §3)
+- [x] **CF Web Analytics**: `obentoo.org` is registered with **auto-install**, so Cloudflare injects the beacon at the edge; `PUBLIC_CF_ANALYTICS_TOKEN` stays unset to avoid a second beacon (deploy.md §3)
+- [ ] **Verify the values are in place**: `gh secret list` shows both secrets, `gh variable list` shows `PUBLIC_BUTTONDOWN_USERNAME`
+- [ ] **Custom domains** (deploy.md §4): `wrangler.jsonc` declares `obentoo.org` and `www.obentoo.org` as Worker custom domains; the first deploy creates their DNS records and certificates. Cloudflare refuses a custom domain on a hostname that already has a CNAME record, so first delete any leftover record for either hostname (for example the one the old Pages project created) and detach both hostnames from that Pages project
+- [ ] **www** (optional): by default `www.obentoo.org` serves the same pages, with canonical tags pointing to the apex. A 301 instead needs a zone Redirect Rule `https://www.obentoo.org/*` → `https://obentoo.org/${1}`, which runs before the Worker
+
+No per-branch preview deploys exist any more: pull requests are checked by
+`ci.yml`, and `pnpm exec wrangler dev` serves a local build with the production
+headers (deploy.md, "Response headers and media types").
+
+## Pending — first deploy
+
+- [ ] Start it from `main`: merge to `main`, or `gh workflow run deploy.yml` (a run from any other branch skips the job)
+- [ ] Follow it with `gh run watch`; the job `build + test + deploy` must end green
+- [ ] `gh workflow list --all` shows `deploy` active (the weekly Monday rebuild depends on it)
+- [ ] The Cloudflare dashboard shows both custom domains attached to the Worker `bentoo`
+
+## Pending — production smoke checks
+
+Run against production after the first deploy. Security headers, the legacy
+`/hub/` redirect, the `_bentoo.expires` date and the zero-cookie check on a
+real mobile device are in deploy.md, "Production smoke checklist"; run those
+too.
+
+- [ ] **Canonical, feeds, indexable** — the home page names the apex as canonical, links both feeds, and is not `noindex`:
+
+  ```sh
+  curl -s https://obentoo.org/ | grep -oE '<link rel="canonical"[^>]*>|<link rel="alternate" type="application/(feed\+json|atom\+xml)"[^>]*>|<meta name="robots"[^>]*>'
+  ```
+
+  Expect `href="https://obentoo.org/"` on the canonical, both feed `<link rel="alternate">` tags, and `content="index,follow"`.
+- [ ] **robots.txt** — allows crawling and names the sitemap:
+
+  ```sh
+  curl -s https://obentoo.org/robots.txt
+  ```
+
+  Expect `Allow: /` and `Sitemap: https://obentoo.org/sitemap.xml` (a `Disallow: /` alone means the build missed `PUBLIC_IS_PRODUCTION`).
+- [ ] **sitemap.xml** — lists `/`, `/pt/`, `/es/` and `/notices/` in each locale (plus one entry per notice):
+
+  ```sh
+  curl -s https://obentoo.org/sitemap.xml | grep -oE '<loc>[^<]*</loc>'
+  ```
+
+- [ ] **JSON Feed media type and ETag**:
+
+  ```sh
+  curl -sI https://obentoo.org/notices.json | grep -iE '^(content-type|etag):'
+  ```
+
+  Expect `content-type: application/feed+json; charset=utf-8` and an `etag`.
+- [ ] **Atom media type**:
+
+  ```sh
+  curl -sI https://obentoo.org/notices.atom | grep -i '^content-type:'
+  ```
+
+  Expect `application/atom+xml; charset=utf-8`.
+- [ ] **ETag revalidation answers 304**:
+
+  ```sh
+  etag=$(curl -sI https://obentoo.org/notices.json | awk -F': ' 'tolower($1)=="etag" {print $2}' | tr -d '\r')
+  curl -s -o /dev/null -w '%{http_code}\n' -H "If-None-Match: $etag" https://obentoo.org/notices.json
+  ```
+
+  Expect `304`.
+- [ ] **Notice pages** — the index and one notice page (needs at least one published notice in `src/content/notices/`):
+
+  ```sh
+  curl -s -o /dev/null -w '%{http_code}\n' https://obentoo.org/notices/
+  curl -s -o /dev/null -w '%{http_code}\n' https://obentoo.org/notices/<id>/
+  ```
+
+  Expect `200` for both. A notice id containing `+` answers `307` to its `%2B` form; that is expected (deploy.md).
+- [ ] **Web Analytics beacon** — injected by auto-install (exactly one `static.cloudflareinsights.com` script):
+
+  ```sh
+  curl -s https://obentoo.org/ | grep -c static.cloudflareinsights.com
+  ```
+
+  Expect a count of at least `1`; `0` means the variable was empty at build time.
+
+## After launch
+
+- [ ] **Weekly rebuild stays enabled**: GitHub disables the scheduled run after 60 days without repository activity (the workflow's own runs do not count). If `gh workflow list --all` shows it disabled, `gh workflow enable deploy.yml`, then `gh workflow run deploy.yml` (deploy.md, "The 60-day schedule caveat")
+- [ ] **Rollback** path known: deploy.md, "Rollback" (`pnpm exec wrangler rollback`, temporary until the next deploy of `main`)
 
 ## Deferred optimizations (follow-up stories)
 
@@ -49,7 +139,7 @@ Status at end of story 001 implementation (code-complete, launch-pending).
 | R5.2 | enforced | check:js tiered budget |
 | R5.3-R5.7 | enforced | font preconnect + preload-by-variant + a11y.spec.ts target-size |
 | R6.x | enforced | privacy.spec.ts + cookies.spec.ts (zero-cookie invariant) |
-| R7.1-R7.8 | ci + manual | .github/workflows/ci.yml + docs/deploy.md |
+| R7.1-R7.8 | ci + manual | .github/workflows/ci.yml + .github/workflows/deploy.yml + docs/deploy.md |
 | R8.1 | ci | 84-snapshot visual regression |
 | R8.2-R8.5 | verified | manual review + visual regression |
 | R8.6-R8.7 | enforced | check:forms asserts dist/hub + dist/coming-soon absent |

@@ -1,39 +1,78 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
+
+// Mirrors siteOrigin() in src/utils/siteUrl.ts: the webServer build inherits
+// this environment, so the pages carry the same origin.
+const ORIGIN = (process.env.PUBLIC_SITE_URL || 'https://obentoo.org').replace(/\/$/, '');
+
+const PRIVACY = {
+  en: '/privacy/',
+  'pt-BR': '/pt/privacy/',
+  es: '/es/privacy/',
+} as const;
+
+async function headLinks(page: Page) {
+  const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+  const alternates = await page
+    .locator('link[rel="alternate"][hreflang]')
+    .evaluateAll((els) =>
+      Object.fromEntries(els.map((e) => [e.getAttribute('hreflang'), e.getAttribute('href')]))
+    );
+  return { canonical, alternates };
+}
 
 test.describe('privacy page + consent', () => {
-  test('(1) /privacy renders + mentions Buttondown + has pt sibling link', async ({
+  test('(1) each privacy page renders, mentions Buttondown and declares itself canonical with hreflang to every locale', async ({
     page,
   }) => {
-    const response = await page.goto('/privacy', {
-      waitUntil: 'domcontentloaded',
-    });
-    expect(response?.status()).toBe(200);
+    const expectedAlternates = {
+      en: `${ORIGIN}${PRIVACY.en}`,
+      'pt-BR': `${ORIGIN}${PRIVACY['pt-BR']}`,
+      es: `${ORIGIN}${PRIVACY.es}`,
+      'x-default': `${ORIGIN}${PRIVACY.en}`,
+    };
 
-    const bodyText = await page.locator('body').innerText();
-    expect(bodyText).toMatch(/Buttondown/);
+    for (const path of Object.values(PRIVACY)) {
+      const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
+      expect(response?.status(), path).toBe(200);
 
-    // Footer language toggle points to the pt sibling /pt/privacy
-    const toggle = page.locator('footer a[data-bentoo-lang-toggle]').first();
-    await expect(toggle).toHaveAttribute('href', '/pt/privacy');
+      const bodyText = await page.locator('body').innerText();
+      expect(bodyText, path).toMatch(/Buttondown/);
 
-    const cookies = await page.evaluate(() => document.cookie);
-    expect(cookies).toBe('');
+      // Own URL as canonical, never the locale root.
+      const { canonical, alternates } = await headLinks(page);
+      expect(canonical, path).toBe(`${ORIGIN}${path}`);
+      expect(alternates, path).toEqual(expectedAlternates);
+
+      const cookies = await page.evaluate(() => document.cookie);
+      expect(cookies, path).toBe('');
+    }
   });
 
-  test('(2) footer privacy link from /v/v4/ resolves to /privacy', async ({
+  test('(2) the consent-notice privacy link on a variant opens the privacy page of that locale', async ({
     page,
   }) => {
-    await page.goto('/v/v4/');
-    const privacyLink = page.locator('footer.bentoo-footer a[href="/privacy"]');
-    await expect(privacyLink).toHaveCount(1);
-    await Promise.all([
-      page.waitForURL(/\/privacy$/),
-      privacyLink.click(),
-    ]);
-    expect(new URL(page.url()).pathname).toBe('/privacy');
+    for (const [variant, lang, href] of [
+      ['/v/v4/', 'en', '/privacy'],
+      ['/pt/v/v4/', 'pt-BR', '/pt/privacy'],
+    ] as const) {
+      await page.goto(variant);
+      const privacyLink = page.locator('.privacy-consent a[href$="/privacy"]');
+      await expect(privacyLink, variant).toHaveCount(1);
+      await expect(privacyLink, variant).toHaveAttribute('href', href);
 
-    const cookies = await page.evaluate(() => document.cookie);
-    expect(cookies).toBe('');
+      // The preview server answers /privacy directly; production redirects it
+      // to /privacy/. Either spelling is the same page.
+      await Promise.all([
+        page.waitForURL((url) => url.pathname.replace(/\/$/, '') === href),
+        privacyLink.click(),
+      ]);
+      await expect(page.locator('html'), variant).toHaveAttribute('lang', lang);
+      const { canonical } = await headLinks(page);
+      expect(canonical, variant).toBe(`${ORIGIN}${PRIVACY[lang]}`);
+
+      const cookies = await page.evaluate(() => document.cookie);
+      expect(cookies, variant).toBe('');
+    }
   });
 
   test('(3) privacy consent text present next to subscribe form on variant', async ({

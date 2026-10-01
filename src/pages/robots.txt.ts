@@ -1,8 +1,9 @@
 import type { APIRoute } from 'astro';
+import { siteOrigin } from '~/utils/siteUrl';
 
 export const GET: APIRoute = () => {
   const isProduction = import.meta.env.PUBLIC_IS_PRODUCTION === true;
-  const site = (import.meta.env.PUBLIC_SITE_URL || 'https://bentoo.org').replace(/\/$/, '');
+  const site = siteOrigin();
 
   const body = isProduction
     ? `User-agent: *

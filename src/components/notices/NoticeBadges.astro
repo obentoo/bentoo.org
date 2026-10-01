@@ -1,0 +1,48 @@
+---
+// Type and severity badges of a notice, shared by NoticeArticle and NoticeList.
+// Each badge names its value in text; colour and glyph only reinforce it, and
+// each carries its own background so its contrast never depends on the page
+// behind it (R5.5).
+import type { Notice } from '~/content/noticeSchema';
+import { stringsFor } from '~/i18n';
+import { htmlLangFor, type Lang } from '~/utils/getLang';
+import { severityLabel, typeLabel } from '~/utils/noticeLabels';
+
+export interface Props {
+  type: Notice['type'];
+  severity: Notice['severity'];
+  lang: Lang;
+}
+
+const { type, severity, lang } = Astro.props;
+const s = stringsFor(lang);
+---
+<span class="badge badge-type" lang={htmlLangFor(lang)}>{typeLabel(s, type)}</span>
+<span class={`badge badge-${severity}`} lang={htmlLangFor(lang)}>
+  <span class="badge-glyph" aria-hidden="true"></span>{severityLabel(s, severity)}
+</span>
+
+<style>
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.12rem 0.58rem;
+    border: 1px solid;
+    border-radius: 3px;
+    font-family: ui-monospace, 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    /* No text-transform: innerText (copy, the R5.1 spec) must read the label as authored. */
+    line-height: 1.6;
+  }
+  .badge-type { background: #1c1c1c; border-color: #3a3a3a; color: #e7e7e7; }
+  .badge-critical { background: #3a1410; border-color: #7a2c22; color: #ffb4a8; }
+  .badge-warning { background: #332607; border-color: #6e5314; color: #ffd98a; }
+  .badge-info { background: #0f1b33; border-color: #2a4172; color: #b8ceff; }
+  .badge-glyph::before { font-size: 0.7em; }
+  .badge-critical .badge-glyph::before { content: '\25B2'; }
+  .badge-warning .badge-glyph::before { content: '\25C6'; }
+  .badge-info .badge-glyph::before { content: '\25CF'; }
+</style>

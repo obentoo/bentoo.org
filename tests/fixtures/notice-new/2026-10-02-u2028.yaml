@@ -1,0 +1,9 @@
+id: 2026-10-02-u2028
+type: news
+severity: info
+title: "yes"
+summary: "1.10"
+body: "line one\Lstill one\Pand\n\nparagraph two\n"
+affects: []
+published: "2026-10-02T00:00:00Z"
+updated: "2026-10-02T00:00:00Z"

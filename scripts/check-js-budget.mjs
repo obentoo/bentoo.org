@@ -16,7 +16,7 @@
 // content without forcing extraction to external files.
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, resolve, join } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -36,13 +36,19 @@ function walk(dir) {
   return out;
 }
 
-function extractInlineScripts(html) {
+// Every inline <script> body, in document order. End tags match whatever their
+// case or trailing whitespace/attributes (`</SCRIPT >`, `</script foo>`), so no
+// script can slip past the budget by the spelling of its end tag (CodeQL
+// js/bad-tag-filter). External scripts (a `src` attribute) and JSON-LD blocks
+// are not executable inline code and are skipped.
+const SCRIPT_RE = /<script\b([^>]*)>([\s\S]*?)<\/script\b[^>]*>/gi;
+const EXTERNAL_RE = /(?:^|\s)src\s*=/i;
+
+export function extractInlineScripts(html) {
   const out = [];
-  const re = /<script(\s[^>]*)?>([\s\S]*?)<\/script>/g;
-  let m;
-  while ((m = re.exec(html)) !== null) {
-    const attrs = (m[1] || '').toLowerCase();
-    if (attrs.includes('src=')) continue;
+  for (const m of html.matchAll(SCRIPT_RE)) {
+    const attrs = m[1].toLowerCase();
+    if (EXTERNAL_RE.test(attrs)) continue;
     if (attrs.includes('application/ld+json')) continue;
     out.push(m[2]);
   }
@@ -60,42 +66,49 @@ function classify(body) {
   return 'variant';
 }
 
-const files = walk(distDir);
-if (files.length === 0) {
-  console.error('fail: no HTML files in dist — run build first');
-  process.exit(1);
-}
+function main() {
+  const files = walk(distDir);
+  if (files.length === 0) {
+    console.error('fail: no HTML files in dist — run build first');
+    process.exit(1);
+  }
 
-let failed = 0;
-let worstCore = { size: 0, file: '' };
-let worstVariant = { size: 0, file: '' };
-let scriptsSeen = 0;
+  let failed = 0;
+  let worstCore = { size: 0, file: '' };
+  let worstVariant = { size: 0, file: '' };
+  let scriptsSeen = 0;
 
-for (const file of files) {
-  const html = readFileSync(file, 'utf8');
-  const scripts = extractInlineScripts(html);
-  for (const [i, body] of scripts.entries()) {
-    const size = gzipSync(body).length;
-    const kind = classify(body);
-    const budget = kind === 'variant' ? VARIANT_MAX : CORE_MAX;
-    scriptsSeen++;
-    if (kind === 'variant' && size > worstVariant.size) worstVariant = { size, file: `${file}#${i}` };
-    else if (kind !== 'variant' && size > worstCore.size) worstCore = { size, file: `${file}#${i}` };
-    if (size > budget) {
-      failed++;
-      console.error(`fail: ${file} script[${i}] (${kind}) gzip=${size}B > ${budget}B`);
+  for (const file of files) {
+    const html = readFileSync(file, 'utf8');
+    const scripts = extractInlineScripts(html);
+    for (const [i, body] of scripts.entries()) {
+      const size = gzipSync(body).length;
+      const kind = classify(body);
+      const budget = kind === 'variant' ? VARIANT_MAX : CORE_MAX;
+      scriptsSeen++;
+      if (kind === 'variant' && size > worstVariant.size) worstVariant = { size, file: `${file}#${i}` };
+      else if (kind !== 'variant' && size > worstCore.size) worstCore = { size, file: `${file}#${i}` };
+      if (size > budget) {
+        failed++;
+        console.error(`fail: ${file} script[${i}] (${kind}) gzip=${size}B > ${budget}B`);
+      }
     }
   }
+
+  if (failed) {
+    console.error(`\n${failed} inline scripts exceed their budget`);
+    process.exit(1);
+  }
+  const relCore = worstCore.file.replace(root + '/', '');
+  const relVariant = worstVariant.file.replace(root + '/', '');
+  console.log(
+    `ok: ${scriptsSeen} inline scripts scanned`
+  );
+  console.log(`  core    (max ${CORE_MAX}B):    worst ${worstCore.size}B at ${relCore || '(none)'}`);
+  console.log(`  variant (max ${VARIANT_MAX}B): worst ${worstVariant.size}B at ${relVariant || '(none)'}`);
 }
 
-if (failed) {
-  console.error(`\n${failed} inline scripts exceed their budget`);
-  process.exit(1);
+// Run only as `node scripts/check-js-budget.mjs`, so tests can import the extractor.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main();
 }
-const relCore = worstCore.file.replace(root + '/', '');
-const relVariant = worstVariant.file.replace(root + '/', '');
-console.log(
-  `ok: ${scriptsSeen} inline scripts scanned`
-);
-console.log(`  core    (max ${CORE_MAX}B):    worst ${worstCore.size}B at ${relCore || '(none)'}`);
-console.log(`  variant (max ${VARIANT_MAX}B): worst ${worstVariant.size}B at ${relVariant || '(none)'}`);

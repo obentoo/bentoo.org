@@ -1,0 +1,5 @@
+# Known false positive: a placeholder token in a hostile test fixture that
+# asserts deploy.yml never carries a literal analytics token (story 002, 8.1).
+# Pinned to its exact commit, file, rule and line; replaced by a low-entropy
+# literal in the following commit, so no other finding is silenced.
+c9aa0925bbe643b40c0e868611b65727930a1ad0:tests/unit/deploy-env.test.ts:generic-api-key:102

@@ -38,4 +38,22 @@ test.describe('CF Pages _redirects + _headers (static file assertions)', () => {
     expect(contents).toMatch(/Referrer-Policy/);
     expect(contents).toMatch(/Content-Security-Policy/);
   });
+
+  // Story 002, R6.1/R6.2: the feeds get their media types from _headers only
+  // (prerendered endpoint headers are dropped at build). `! Content-Type`
+  // detaches the default first, otherwise the two values would be comma-joined.
+  test('(3) dist/_headers sets the feed media types', () => {
+    const file = path.join(DIST_DIR, '_headers');
+    expect(existsSync(file), `missing ${file}; run pnpm build first`).toBe(
+      true
+    );
+    const contents = readFileSync(file, 'utf8');
+
+    expect(contents).toMatch(
+      /^\/notices\.json\n\s+! Content-Type\n\s+Content-Type: application\/feed\+json; charset=utf-8$/m
+    );
+    expect(contents).toMatch(
+      /^\/notices\.atom\n\s+! Content-Type\n\s+Content-Type: application\/atom\+xml; charset=utf-8$/m
+    );
+  });
 });

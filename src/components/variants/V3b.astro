@@ -31,6 +31,8 @@ const tickerSpansDoubled = [...content.tickerSpans, ...content.tickerSpans];
   </Fragment>
   <style slot="style">
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    /* set:html content carries no scope attribute: same reset for injected descendants */
+    * :global(*),* :global(*::before),* :global(*::after){margin:0;padding:0;box-sizing:border-box}
     :root{
       --bg:#1a0e1f; --bg-2:#2b1a35;
       --magenta:#ff4fa8; --magenta-d:#c0277a;
@@ -113,12 +115,12 @@ const tickerSpansDoubled = [...content.tickerSpans, ...content.tickerSpans];
       box-shadow:0 0 0 3px var(--ink),0 0 0 5px var(--magenta);
       letter-spacing:-.01em;
     }
-    .hero .tagline em{font-style:normal;color:var(--ink);background:var(--yellow);padding:2px 8px;margin:0 3px;font-weight:400}
+    .hero .tagline :global(em){font-style:normal;color:var(--ink);background:var(--yellow);padding:2px 8px;margin:0 3px;font-weight:400}
 
     .lede-wrap{max-width:620px;margin:0 auto 34px;text-align:center}
     .lede-wrap p{font-family:var(--f-pix);font-size:14px;line-height:1.55;color:var(--white)}
-    .lede-wrap p b{color:var(--cyan);font-weight:400}
-    .lede-wrap p em{font-style:normal;color:var(--magenta);font-weight:400}
+    .lede-wrap p :global(b){color:var(--cyan);font-weight:400}
+    .lede-wrap p :global(em){font-style:normal;color:var(--magenta);font-weight:400}
 
     .stat-grid{
       display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:34px;
@@ -156,7 +158,7 @@ const tickerSpansDoubled = [...content.tickerSpans, ...content.tickerSpans];
       backdrop-filter:blur(6px);
     }
     .notify .lbl{font-family:var(--f-pix);font-size:11px;color:var(--cyan);letter-spacing:.14em;margin-bottom:10px;text-align:center}
-    .notify .lbl b{color:var(--yellow)}
+    .notify .lbl :global(b){color:var(--yellow)}
     .notify form{display:flex;gap:8px}
     .notify input{
       flex:1;padding:11px 14px;background:var(--ink);color:var(--white);
@@ -183,8 +185,8 @@ const tickerSpansDoubled = [...content.tickerSpans, ...content.tickerSpans];
       font-family:var(--f-pix);font-size:11px;
       position:relative;z-index:10;
     }
-    footer em{color:var(--magenta);font-style:normal}
-    footer .dot{color:var(--yellow)}
+    footer :global(em){color:var(--magenta);font-style:normal}
+    footer :global(.dot){color:var(--yellow)}
     footer a{color:var(--cyan)}
     footer a:hover{color:var(--magenta)}
 

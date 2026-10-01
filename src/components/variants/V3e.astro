@@ -30,6 +30,8 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
   </Fragment>
   <style slot="style">
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    /* set:html content carries no scope attribute: same reset for injected descendants */
+    * :global(*),* :global(*::before),* :global(*::after){margin:0;padding:0;box-sizing:border-box}
     :root{
       --cream:#f5eddb; --cream-2:#e8dfc6;
       --vermillion:#e83d2a; --vermillion-d:#b82a18;
@@ -120,10 +122,10 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       font-family:var(--f-disp);font-size:clamp(22px,2.4vw,30px);letter-spacing:.04em;
       margin-bottom:16px;color:var(--ink);
     }
-    .cart-body .tagline em{font-style:normal;color:var(--vermillion);background:var(--mustard);padding:2px 10px}
+    .cart-body .tagline :global(em){font-style:normal;color:var(--vermillion);background:var(--mustard);padding:2px 10px}
     .cart-body p.lede{font-family:var(--f-jp);font-weight:500;font-size:15px;line-height:1.65;max-width:55ch;margin-bottom:20px}
-    .cart-body p.lede b{background:var(--mustard);padding:2px 6px;font-weight:900}
-    .cart-body p.lede em{font-style:normal;color:var(--vermillion-d);font-weight:900}
+    .cart-body p.lede :global(b){background:var(--mustard);padding:2px 6px;font-weight:900}
+    .cart-body p.lede :global(em){font-style:normal;color:var(--vermillion-d);font-weight:900}
 
     .specs{
       border:2px solid var(--ink);
@@ -145,8 +147,8 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
     .btn:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--ink)}
     .btn.pri{background:var(--vermillion);color:var(--white);border-color:var(--ink)}
     .btn.pri:hover{background:var(--mustard);color:var(--ink)}
-    .btn .arr{color:var(--vermillion)}
-    .btn.pri .arr{color:var(--mustard)}
+    .btn :global(.arr){color:var(--vermillion)}
+    .btn.pri :global(.arr){color:var(--mustard)}
 
     .cart-foot{
       background:var(--ink);color:var(--cream);
@@ -162,7 +164,7 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;
     }
     .notify .lbl{font-family:var(--f-disp);font-size:18px;letter-spacing:.14em;color:var(--mustard)}
-    .notify .lbl b{display:block;color:var(--cream);font-size:11px;font-family:var(--f-mono);letter-spacing:.22em;font-weight:700;margin-top:4px}
+    .notify .lbl :global(b){display:block;color:var(--cream);font-size:11px;font-family:var(--f-mono);letter-spacing:.22em;font-weight:700;margin-top:4px}
     .notify form{display:flex;gap:6px;width:100%}
     .notify input[type="email"]{
       flex:1;padding:11px 14px;background:var(--cream);color:var(--ink);
@@ -187,7 +189,7 @@ const buttondownUser = import.meta.env.PUBLIC_BUTTONDOWN_USERNAME ?? 'bentoo';
       font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;
       border-top:2px solid var(--ink);
     }
-    footer em{font-family:var(--f-disp);font-style:normal;font-size:14px;letter-spacing:.08em;color:var(--vermillion)}
+    footer :global(em){font-family:var(--f-disp);font-style:normal;font-size:14px;letter-spacing:.08em;color:var(--vermillion)}
     footer a{color:var(--ink)}
     footer a:hover{color:var(--vermillion)}
 

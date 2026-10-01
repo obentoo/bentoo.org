@@ -1,0 +1,15 @@
+Output of bentoolkit's `bentoo notice new` renderer (internal/notice
+RenderSiteYAML, bentoolkit commit c204a7f), read by
+tests/unit/consumer-contract-extra.test.ts through the site's notices loader.
+
+- 2026-10-02-foo-cve.yaml: a byte-for-byte copy of bentoolkit's
+  internal/notice/testdata/site.golden.yaml (the renderer's own golden).
+  Re-copy it when that file changes; `cmp` shows drift.
+- The other three files were rendered on 2026-09-29 by that commit's
+  render_site.go, unchanged, from the Notice values listed in the test
+  (WRITTEN). They pin the shapes the golden does not reach: the
+  double-quoted body with \L/\P escapes and with a leading line feed,
+  a tab-led literal body line, quoted free text that a plain scalar would
+  retype, a range-less entry and an `updated` off midnight (a revision).
+
+These are not site notices: the site never builds from this directory.

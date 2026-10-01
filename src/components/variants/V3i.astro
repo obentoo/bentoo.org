@@ -154,6 +154,8 @@ const V3I_SCRIPT = `
   </Fragment>
   <style slot="style">
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    /* set:html content carries no scope attribute: same reset for injected descendants */
+    * :global(*),* :global(*::before),* :global(*::after){margin:0;padding:0;box-sizing:border-box}
     :root{
       --desk:#4b7d7d; --desk-2:#3a6363;
       --chrome:#c0c0c0; --chrome-d:#808080; --chrome-dd:#3a3a3a;
@@ -256,8 +258,8 @@ const V3I_SCRIPT = `
     .dialog .dlg-body{padding:20px 22px;font-family:var(--f-pix);font-size:13px;line-height:1.5}
     .dialog .dlg-body h3{font-size:18px;color:var(--title);margin-bottom:8px}
     .dialog .dlg-body p{margin-bottom:10px}
-    .dialog .dlg-body b{color:var(--title)}
-    .dialog .dlg-body em{font-style:normal;color:var(--pink);font-weight:700}
+    .dialog .dlg-body :global(b){color:var(--title)}
+    .dialog .dlg-body :global(em){font-style:normal;color:var(--pink);font-weight:700}
     .dialog .dlg-foot{
       padding:10px 18px;border-top:1px solid var(--chrome-d);background:var(--chrome-ll);
       text-align:right;
@@ -361,19 +363,19 @@ const V3I_SCRIPT = `
       font-family:var(--f-pix);font-size:15px;color:var(--ink);
       margin-bottom:4px;
     }
-    .install-win .wiz-sub em{font-style:normal;color:var(--title);font-weight:700}
+    .install-win .wiz-sub :global(em){font-style:normal;color:var(--title);font-weight:700}
     .install-win .tagline{
       font-family:var(--f-pix);font-size:18px;color:var(--pink);
       margin-bottom:16px;letter-spacing:-.01em;
       padding:6px 0;border-bottom:1px dashed var(--chrome-d);
     }
-    .install-win .tagline em{font-style:normal;color:var(--title);font-weight:700}
+    .install-win .tagline :global(em){font-style:normal;color:var(--title);font-weight:700}
 
     .install-win .brief{
       font-family:var(--f-pix);font-size:14px;line-height:1.5;margin-bottom:14px;
     }
-    .install-win .brief b{color:var(--title)}
-    .install-win .brief em{font-style:normal;color:var(--pink);font-weight:700}
+    .install-win .brief :global(b){color:var(--title)}
+    .install-win .brief :global(em){font-style:normal;color:var(--pink);font-weight:700}
 
     .box-list{
       background:var(--chrome-ll);
@@ -395,7 +397,7 @@ const V3I_SCRIPT = `
 
     .progress-wrap{margin:12px 0 16px}
     .progress-label-top{font-family:var(--f-pix);font-size:13px;margin-bottom:4px}
-    .progress-label-top em{font-style:normal;color:var(--title);font-weight:700}
+    .progress-label-top :global(em){font-style:normal;color:var(--title);font-weight:700}
     .progress{
       background:var(--chrome-ll);
       border:1px inset var(--chrome-dd);
@@ -427,8 +429,8 @@ const V3I_SCRIPT = `
       font-family:var(--f-pix);font-size:13px;margin-bottom:6px;
       display:flex;justify-content:space-between;align-items:baseline;
     }
-    .notify-dialog .lbl b{color:var(--title);font-weight:700}
-    .notify-dialog .lbl span{font-family:var(--f-mono);font-size:10px;color:var(--green);letter-spacing:.1em}
+    .notify-dialog .lbl :global(b){color:var(--title);font-weight:700}
+    .notify-dialog .lbl :global(span){font-family:var(--f-mono);font-size:10px;color:var(--green);letter-spacing:.1em}
     .notify-row{display:flex;gap:6px}
     .notify-row input{
       flex:1;padding:6px 10px;
