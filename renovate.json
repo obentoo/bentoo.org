@@ -7,6 +7,11 @@
     {
       "matchDepTypes": ["devDependencies"],
       "rangeStrategy": "pin"
+    },
+    {
+      "description": "Pin updates have no release timestamp; without this, stability-days stays pending forever. The 7-day age still applies whenever a timestamp exists",
+      "matchUpdateTypes": ["pin", "pinDigest"],
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
     }
   ],
   "vulnerabilityAlerts": {
