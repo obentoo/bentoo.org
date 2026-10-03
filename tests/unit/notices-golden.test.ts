@@ -7,7 +7,7 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 // js-yaml is what Astro's loader parses YAML data entries with (devDependency, task 3.3).
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
 import { noticeSchema } from '~/content/noticeSchema';
 import { buildJsonFeed, type Notice } from '~/utils/feed';
 

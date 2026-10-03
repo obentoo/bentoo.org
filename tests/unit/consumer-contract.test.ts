@@ -4,7 +4,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
 import { noticeSchema } from '~/content/noticeSchema';
 
 const GOLDEN = path.resolve(process.cwd(), 'tests/fixtures/notices.golden.json');

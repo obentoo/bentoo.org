@@ -10,7 +10,7 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
 import { noticeSchema } from '../src/content/noticeSchema.ts';
 import { buildJsonFeed } from '../src/utils/feed.ts';
 
