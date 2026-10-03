@@ -7,6 +7,11 @@
     {
       "matchDepTypes": ["devDependencies"],
       "rangeStrategy": "pin"
+    },
+    {
+      "description": "Pinning installs no new code and has no release timestamp, which would leave stability-days pending forever",
+      "matchUpdateTypes": ["pin", "pinDigest"],
+      "minimumReleaseAge": null
     }
   ],
   "vulnerabilityAlerts": {
