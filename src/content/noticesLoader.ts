@@ -8,7 +8,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Loader, LoaderContext } from 'astro/loaders';
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
 
 export interface NoticesLoaderOptions {
   /** The notices directory, relative to the project root or absolute. */

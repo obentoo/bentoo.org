@@ -1,7 +1,7 @@
 // Story 002, Task 2.1 review fixes — what a YAML author sees when the loader's
 // parse changes a value's type (R2.1, R2.9), and lone surrogates (R2.10).
 import { describe, it, expect } from 'vitest';
-import yaml from 'js-yaml';
+import * as yaml from 'js-yaml';
 import { noticeSchema } from '~/content/noticeSchema';
 
 const NEWS = `
