@@ -9,9 +9,9 @@
       "rangeStrategy": "pin"
     },
     {
-      "description": "Pinning installs no new code and has no release timestamp, which would leave stability-days pending forever",
+      "description": "Pin updates have no release timestamp; without this, stability-days stays pending forever. The 7-day age still applies whenever a timestamp exists",
       "matchUpdateTypes": ["pin", "pinDigest"],
-      "minimumReleaseAge": null
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
     }
   ],
   "vulnerabilityAlerts": {
