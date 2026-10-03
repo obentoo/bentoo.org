@@ -136,6 +136,46 @@ describe('Action updates are pinned to a commit SHA (R1.4)', () => {
   });
 });
 
+const SAFE_AUTOMERGE = ['minor', 'patch', 'pin', 'pinDigest', 'digest', 'lockFileMaintenance'];
+
+/** Every place a Renovate config turns automerge on must leave majors to a human. */
+function unsafeAutomerge(config: Raw): string[] {
+  const out: string[] = [];
+  if (config.automerge === true) out.push('top-level automerge = true');
+  if (config.ignoreTests === true) out.push('ignoreTests = true');
+  if (config.automerge === true || (config.packageRules ?? []).some((r: Raw) => r.automerge === true)) {
+    if (config.platformAutomerge !== false) out.push('platformAutomerge is not false');
+  }
+  (config.packageRules ?? []).forEach((rule: Raw, i: number) => {
+    if (rule.automerge !== true) return;
+    const types: unknown[] = rule.matchUpdateTypes ?? [];
+    if (types.length === 0 || types.some((t) => !SAFE_AUTOMERGE.includes(String(t)))) {
+      out.push(`packageRules[${i}].matchUpdateTypes = ${JSON.stringify(rule.matchUpdateTypes)}`);
+    }
+  });
+  return out;
+}
+
+describe('automerge never lands a major or skips CI', () => {
+  // Hostile: each way of widening automerge must be reported.
+  it('the guard reports a major, an unscoped rule, ignored tests and platform automerge', () => {
+    expect(unsafeAutomerge({ packageRules: [{ matchUpdateTypes: ['major'], automerge: true }], platformAutomerge: false })).toHaveLength(1);
+    expect(unsafeAutomerge({ packageRules: [{ matchPackageNames: ['astro'], automerge: true }], platformAutomerge: false })).toHaveLength(1);
+    expect(unsafeAutomerge({ ignoreTests: true })).toHaveLength(1);
+    expect(unsafeAutomerge({ packageRules: [{ matchUpdateTypes: ['patch'], automerge: true }] })).toHaveLength(1);
+    expect(unsafeAutomerge({ automerge: true, platformAutomerge: false })).toHaveLength(1);
+  });
+
+  // Hostile (converse): the intended shape passes.
+  it('the guard accepts non-major automerge without platform automerge', () => {
+    expect(unsafeAutomerge({ platformAutomerge: false, packageRules: [{ matchUpdateTypes: ['minor', 'patch'], automerge: true }] })).toEqual([]);
+  });
+
+  it('renovate.json automerges only non-major updates, through its own status check', () => {
+    expect(unsafeAutomerge(renovate())).toEqual([]);
+  });
+});
+
 describe('no second updater bypasses the gate (R1.3)', () => {
   // Hostile: Renovate reads renovate.json first, so a second config is silent drift.
   it('renovate.json is the only Renovate configuration', () => {
