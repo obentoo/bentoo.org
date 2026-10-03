@@ -1,6 +1,3 @@
-# pnpm resolution policy for this project (story 003).
-# Supply chain: pnpm refuses any version published less than seven days ago.
-# The unit is MINUTES — 10080 = 7 days. pnpm >= 10.16.0 honours it (engines.pnpm).
 minimumReleaseAge: 10080
 
 # Packages allowed to skip the age rule. Empty by policy: an entry needs a
@@ -18,7 +15,7 @@ onlyBuiltDependencies:
 overrides:
   # GHSA-2gqq-gqf2-x968 GHSA-2jfj-6hjv-fm6j GHSA-35p6-xmwp-9g52 GHSA-3wwx-pv8p-q78v GHSA-3xpg-4rpp-hhhm GHSA-4cwx-7wf7-3272 GHSA-8436-99hf-9mmv GHSA-8xcm-r25x-g524 GHSA-g8m3-5g58-fq7m GHSA-hm92-r4w5-c3mj GHSA-jr45-8vmc-qm54 GHSA-m8rv-5g2x-5cg5 GHSA-p88m-4jfj-68fv GHSA-pmjh-fq2x-6v4x GHSA-pr7r-676h-xcf6 GHSA-r53p-7pc4-xj5r GHSA-rfgv-xxqx-mfg5 GHSA-rx4f-c7p8-82vq GHSA-v3r7-h72x-cjcm GHSA-vmh5-mc38-953g GHSA-vxpw-j846-p89q GHSA-w293-vg96-wgc3
   # miniflare (via wrangler) pins undici 7.29.0 exactly; jsdom asks ^7.25.0. 7.29.1 published 2026-09-04.
-  undici@7: 7.29.1
+  undici@7: 7.30.0
   # GHSA-4c8g-83qw-93j6 GHSA-7p8r-x3mc-p8w7 GHSA-f65p-4m7j-42xc GHSA-fph4-wmhf-6fwf GHSA-hrr3-gc8f-f4qj GHSA-jqff-g426-hqxp GHSA-qw65-cvwx-89v3 GHSA-v2hh-gcrm-f6hx
   # ajv (via @astrojs/check > yaml-language-server). 3.1.8 published 2026-09-15.
   fast-uri@3: 3.1.8
