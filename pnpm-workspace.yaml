@@ -20,4 +20,4 @@ overrides:
   # ajv (via @astrojs/check > yaml-language-server). 3.1.8 published 2026-09-15.
   fast-uri@3: 3.1.8
   # GHSA-48c2-rrv3-qjmp — yaml-language-server pins yaml 2.7.1; vite and @astrojs/yaml2ts already use 2.8.3. 2.8.3 published 2026-03-21.
-  yaml@2: 2.8.3
+  yaml@2: 2.9.1
