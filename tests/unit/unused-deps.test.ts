@@ -15,7 +15,8 @@ const SCANNED_EXT = /\.(ts|mts|cts|mjs|cjs|js|json|jsonc|ya?ml|astro)$/;
 const SKIP_DIRS = new Set(['node_modules', 'dist', '.git', '__snapshots__']);
 
 const pkg = (): Raw => JSON.parse(readFileSync(path.join(ROOT, 'package.json'), 'utf8')) as Raw;
-const lock = (): Raw => yaml.load(readFileSync(path.join(ROOT, 'pnpm-lock.yaml'), 'utf8')) as Raw;
+// pnpm 12 writes its own pin as a first YAML document; the project lockfile is the last.
+const lock = (): Raw => (yaml.loadAll(readFileSync(path.join(ROOT, 'pnpm-lock.yaml'), 'utf8')) as Raw[]).at(-1) as Raw;
 
 /** Package name of a lockfile `packages` key such as `'@lhci/cli@0.15.1'` or `undici@7.29.0`. */
 const lockName = (key: string): string => key.slice(0, key.lastIndexOf('@'));

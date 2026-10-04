@@ -118,10 +118,13 @@ describe('pnpm-workspace.yaml holds the resolution policy (R1.1)', () => {
     expect(holdsSevenDays(age), `minimumReleaseAge = ${JSON.stringify(age)}`).toBe(true);
   });
 
-  it('keeps the build-script allow-list for esbuild and sharp', () => {
-    const allowed = workspace().onlyBuiltDependencies;
-    expect(Array.isArray(allowed)).toBe(true);
-    expect(allowed).toEqual(expect.arrayContaining(['esbuild', 'sharp']));
+  // pnpm 12 reads allowBuilds; the old onlyBuiltDependencies list is ignored.
+  it('allows build scripts for esbuild and sharp only', () => {
+    const builds = workspace().allowBuilds;
+    expect(builds && typeof builds === 'object' && !Array.isArray(builds)).toBe(true);
+    const allowed = Object.entries(builds).filter(([, v]) => v === true).map(([k]) => k);
+    expect(allowed.sort()).toEqual(['esbuild', 'sharp']);
+    expect(workspace().onlyBuiltDependencies).toBeUndefined();
   });
 });
 
