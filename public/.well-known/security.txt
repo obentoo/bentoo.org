@@ -1,0 +1,5 @@
+Contact: https://github.com/obentoo/bentoo.org/security/advisories/new
+Expires: 2027-10-04T00:00:00.000Z
+Policy: https://github.com/obentoo/bentoo.org/blob/main/SECURITY.md
+Preferred-Languages: en, pt
+Canonical: https://obentoo.org/.well-known/security.txt
