@@ -4,10 +4,13 @@ minimumReleaseAge: 10080
 # comment of its own naming the advisory or reason that justifies it.
 minimumReleaseAgeExclude: []
 
-# Dependencies whose install scripts may run.
-onlyBuiltDependencies:
-  - esbuild
-  - sharp
+# Install scripts allowed (true) or denied (false). pnpm 12 fails the install
+# on any dependency with a build script that is not listed here.
+# workerd is denied: only wrangler's local runtime needs its binary, never the build.
+allowBuilds:
+  esbuild: true
+  sharp: true
+  workerd: false
 
 # Vulnerable transitives the direct upgrades do not reach. Each entry is scoped
 # to the vulnerable major and pinned to the lowest patched release that is at

@@ -18,7 +18,8 @@ const UNDICI_PATCHED: Version = [7, 29, 1];
 
 const workspaceText = (): string => readFileSync(WORKSPACE, 'utf8');
 const overrides = (): Raw => ((yaml.load(workspaceText()) as Raw)?.overrides ?? {}) as Raw;
-const lock = (): Raw => yaml.load(readFileSync(path.join(ROOT, 'pnpm-lock.yaml'), 'utf8')) as Raw;
+// pnpm 12 writes its own pin as a first YAML document; the project lockfile is the last.
+const lock = (): Raw => (yaml.loadAll(readFileSync(path.join(ROOT, 'pnpm-lock.yaml'), 'utf8')) as Raw[]).at(-1) as Raw;
 
 // ---------------------------------------------------------------- versions
 

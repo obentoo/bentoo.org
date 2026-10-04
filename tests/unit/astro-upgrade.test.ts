@@ -18,7 +18,8 @@ const ASTRO_FIXED: Version = [7, 2, 8];
 const VITEST_FIXED: Version = [5, 0, 0];
 
 const pkg = (): Raw => JSON.parse(readFileSync(path.join(ROOT, 'package.json'), 'utf8')) as Raw;
-const lock = (): Raw => yaml.load(readFileSync(path.join(ROOT, 'pnpm-lock.yaml'), 'utf8')) as Raw;
+// pnpm 12 writes its own pin as a first YAML document; the project lockfile is the last.
+const lock = (): Raw => (yaml.loadAll(readFileSync(path.join(ROOT, 'pnpm-lock.yaml'), 'utf8')) as Raw[]).at(-1) as Raw;
 
 function parseVersion(v: string): Version | null {
   const m = v.match(/^(\d+)\.(\d+)\.(\d+)/);
