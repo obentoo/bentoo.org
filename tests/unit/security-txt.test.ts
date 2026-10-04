@@ -41,6 +41,12 @@ describe('public/.well-known/security.txt (RFC 9116)', () => {
     expect(when - Date.now()).toBeLessThanOrEqual(366 * 24 * 60 * 60 * 1000);
   });
 
+  // RFC 9116 section 3: served as text/plain with charset=utf-8; the platform default omits the charset.
+  it('public/_headers serves it as text/plain; charset=utf-8', () => {
+    const headers = readFileSync(path.join(ROOT, 'public/_headers'), 'utf8');
+    expect(headers).toMatch(/^\/\.well-known\/security\.txt\n  ! Content-Type\n  Content-Type: text\/plain; charset=utf-8$/m);
+  });
+
   it('Canonical is the file\'s own production URL', () => {
     expect(fields(text()).get('canonical')).toEqual(['https://obentoo.org/.well-known/security.txt']);
   });
