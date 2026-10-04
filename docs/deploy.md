@@ -207,7 +207,8 @@ less than seven days ago — locally and in CI — and fails with
 the intended stop: wait until the release is old enough. `minimumReleaseAgeExclude`
 is empty by policy; an entry needs its own comment naming the advisory or
 reason that justifies it. pnpm 10.16.0 is the first release that honours the
-setting, hence `engines.pnpm: >=10.16.0`.
+setting; `engines.pnpm` sits higher, at `>=12.7.0`, because the build-script
+policy in `pnpm-workspace.yaml` uses `allowBuilds`, which older pnpm releases ignore.
 
 **Overrides.** When a vulnerable package is pinned by a dependency we do not
 control, `pnpm-workspace.yaml` `overrides` replaces it — scoped to the
