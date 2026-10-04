@@ -10,9 +10,9 @@ announcements) as a JSON Feed, an Atom feed and one page per notice.
 - Node.js **>= 22.18.0** — the unit tests and the golden-fixture script load
   `src/content/noticeSchema.ts` through Node's native TypeScript type stripping,
   which older Node versions lack.
-- pnpm **>= 10.16.0** (the exact version is pinned in `package.json` `packageManager`):
-  older pnpm releases silently ignore the seven-day `minimumReleaseAge` in
-  `pnpm-workspace.yaml`.
+- pnpm **>= 12.7.0** (the exact version is pinned in `package.json` `packageManager`):
+  older pnpm releases silently ignore the `allowBuilds` build-script policy in
+  `pnpm-workspace.yaml` (and before 10.16.0, the seven-day `minimumReleaseAge`).
 
 ## Install
 

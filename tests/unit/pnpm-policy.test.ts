@@ -159,6 +159,7 @@ function floorOf(range: unknown): [number, number, number] | null {
 const atLeast = (v: [number, number, number], min: [number, number, number]): boolean =>
   v[0] !== min[0] ? v[0] > min[0] : v[1] !== min[1] ? v[1] > min[1] : v[2] >= min[2];
 const PNPM_WITH_RELEASE_AGE: [number, number, number] = [10, 16, 0];
+const PNPM_WITH_ALLOW_BUILDS: [number, number, number] = [12, 7, 0];
 
 describe('the pnpm floor honours minimumReleaseAge (R1.1)', () => {
   // Hostile: pnpm 10.0–10.15 ignore minimumReleaseAge without an error.
@@ -174,6 +175,11 @@ describe('the pnpm floor honours minimumReleaseAge (R1.1)', () => {
     const floor = floorOf(pkg().engines?.pnpm);
     expect(floor, `engines.pnpm is ${JSON.stringify(pkg().engines?.pnpm)}`).not.toBeNull();
     expect(atLeast(floor!, PNPM_WITH_RELEASE_AGE)).toBe(true);
+  });
+
+  // Hostile: a pnpm that ignores allowBuilds installs without esbuild's binary, and the build fails later.
+  it('engines.pnpm admits no pnpm older than the one proven to read allowBuilds (12.7.0)', () => {
+    expect(atLeast(floorOf(pkg().engines?.pnpm)!, PNPM_WITH_ALLOW_BUILDS)).toBe(true);
   });
 
   it('packageManager pins a pnpm that honours the setting', () => {
