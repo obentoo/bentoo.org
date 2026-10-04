@@ -14,8 +14,8 @@ type Version = [number, number, number];
 const ROOT = process.cwd();
 /** GHSA-26w7-cxv4-gfx2 is fixed from astro 7.2.8. */
 const ASTRO_FIXED: Version = [7, 2, 8];
-/** First vitest 4 release patched for the vitest / @vitest/mocker advisories. */
-const VITEST_FIXED: Version = [4, 1, 11];
+/** vitest 5.0.0 (2026-09-03) postdates 4.1.11, the release patched for the vitest / @vitest/mocker advisories. */
+const VITEST_FIXED: Version = [5, 0, 0];
 
 const pkg = (): Raw => JSON.parse(readFileSync(path.join(ROOT, 'package.json'), 'utf8')) as Raw;
 const lock = (): Raw => yaml.load(readFileSync(path.join(ROOT, 'pnpm-lock.yaml'), 'utf8')) as Raw;
@@ -97,13 +97,13 @@ describe('the build uses an Astro in which GHSA-26w7-cxv4-gfx2 is fixed (R3.1)',
   });
 });
 
-describe('vitest stays on major 4, patched', () => {
-  it('package.json admits only vitest 4 releases at or after 4.1.11', () => {
+describe('vitest stays on major 5, patched', () => {
+  it('package.json admits only vitest 5 releases', () => {
     const range = pkg().devDependencies?.vitest;
     expect(rangeIsSafe(range, VITEST_FIXED), `vitest range ${JSON.stringify(range)}`).toBe(true);
   });
 
-  it('the lockfile resolves only patched 4.x copies of vitest and its @vitest packages', () => {
+  it('the lockfile resolves only 5.x copies of vitest and its @vitest packages', () => {
     const names = Object.keys(lock().packages ?? {})
       .map((k) => k.slice(0, k.lastIndexOf('@')))
       .filter((n) => n === 'vitest' || n.startsWith('@vitest/'));
