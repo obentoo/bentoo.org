@@ -4,7 +4,7 @@
   "description": "obentoo.org — coming-soon landing site (Astro 7 + Cloudflare Workers Static Assets)",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@12.8.0",
+  "packageManager": "pnpm@12.8.1",
   "engines": {
     "node": ">=22.18.0",
     "pnpm": ">=12.7.0"
