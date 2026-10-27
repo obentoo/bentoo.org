@@ -21,6 +21,6 @@ overrides:
   undici@7: 7.30.1
   # GHSA-4c8g-83qw-93j6 GHSA-7p8r-x3mc-p8w7 GHSA-f65p-4m7j-42xc GHSA-fph4-wmhf-6fwf GHSA-hrr3-gc8f-f4qj GHSA-jqff-g426-hqxp GHSA-qw65-cvwx-89v3 GHSA-v2hh-gcrm-f6hx
   # ajv (via @astrojs/check > yaml-language-server). 3.1.8 published 2026-09-15.
-  fast-uri@3: 3.1.8
+  fast-uri@3: 3.1.9
   # GHSA-48c2-rrv3-qjmp — yaml-language-server pins yaml 2.7.1; vite and @astrojs/yaml2ts already use 2.8.3. 2.8.3 published 2026-03-21.
   yaml@2: 2.9.1
