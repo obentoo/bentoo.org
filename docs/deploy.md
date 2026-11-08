@@ -236,12 +236,22 @@ osv-scanner scan source --lockfile pnpm-lock.yaml
 trivy fs --scanners vuln --severity HIGH,CRITICAL --exit-code 1 .
 ```
 
-**Renovate.** `renovate.json` opens update PRs only for releases at least seven
-days old (`minimumReleaseAge: "7 days"`, `internalChecksFilter: "strict"`), pins
-GitHub Action digests and devDependencies, and refreshes the lockfile weekly.
-It takes effect only after the Renovate GitHub App is installed on
-`obentoo/bentoo.org` (github.com/apps/renovate → Configure → select the
-repository) — a one-time step for the repository owner.
+**Dependabot.** `.github/dependabot.yml` opens update PRs only for releases at
+least seven days old (`cooldown` of 7 days on every update type), for npm and
+GitHub Actions. It keeps Action SHA pins and exact devDependency pins
+(`versioning-strategy: increase`) and holds TypeScript below 7. When a newer
+release lands, Dependabot closes the outdated PR and opens a fresh one; there is
+no dashboard issue. PRs are merged by a human, never automatically: a merge
+made with `GITHUB_TOKEN` would not trigger `deploy.yml`'s push event.
+
+The cooldown does not apply to Dependabot security updates. The age rule still
+holds for them: pnpm refuses to resolve a release younger than seven days
+(above), so a security fix that is too young cannot enter the lockfile until it
+is old enough — or until an exception is recorded as described above.
+
+Dependabot does not cover, so these are done by hand: bumping `packageManager`
+(pnpm) and the workflows' `node-version`, refreshing the whole lockfile
+(`pnpm update` on a branch), and maintaining the pnpm `overrides`.
 
 ## CI (pull requests)
 

@@ -115,9 +115,9 @@ and the workflow's own runs do not count: see the 60-day caveat in
 
 Dependencies are only taken once they are at least seven days old: pnpm refuses
 anything younger on every install (`minimumReleaseAge` in `pnpm-workspace.yaml`),
-and Renovate (`renovate.json`) opens update PRs under the same rule. Renovate
-does nothing until its GitHub App is installed on `obentoo/bentoo.org` — a
-one-time step for the repository owner. The policy, the override rule and how a
+and Dependabot (`.github/dependabot.yml`) opens update PRs under the same rule:
+a seven-day `cooldown` on every update type, for npm and GitHub Actions. Each
+PR is merged by a human. The policy, the override rule and how a
 security exception is recorded: [docs/deploy.md](docs/deploy.md#dependency-policy).
 
 Secrets, token scope, production env vars, headers and rollback:
