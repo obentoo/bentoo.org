@@ -1,0 +1,40 @@
+# Dependabot version updates. One PR per dependency; when a newer release lands,
+# Dependabot closes the outdated PR and opens a fresh one. No dashboard issue.
+#
+# Seven-day rule: `cooldown` withholds any release younger than seven days
+# (major, minor and patch alike). pnpm enforces the same age on every install
+# (`minimumReleaseAge: 10080` in pnpm-workspace.yaml), so a lockfile Dependabot
+# regenerates cannot pull in a younger transitive either.
+#
+# PRs are merged by a human, never automatically: a merge made with
+# GITHUB_TOKEN would not trigger deploy.yml's push event.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+      semver-major-days: 7
+      semver-minor-days: 7
+      semver-patch-days: 7
+    # Exact pins (devDependencies) stay exact; caret ranges move their floor.
+    versioning-strategy: increase
+    open-pull-requests-limit: 10
+    ignore:
+      # astro check does not support TypeScript 7 yet; lift this once @astrojs/check does.
+      - dependency-name: typescript
+        versions: ['>=7']
+
+  # Actions are pinned by commit SHA; Dependabot keeps the SHA pin and updates
+  # the trailing version comment.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+      semver-major-days: 7
+      semver-minor-days: 7
+      semver-patch-days: 7

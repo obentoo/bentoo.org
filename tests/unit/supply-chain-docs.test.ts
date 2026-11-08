@@ -17,9 +17,9 @@ const PNPM_BUILTINS = new Set([
 /** Paragraphs of a markdown document (blank-line separated; headings start a new one). */
 const paragraphs = (md: string): string[] => md.split(/\n\s*\n|\n(?=#)/).map((p) => p.trim()).filter(Boolean);
 
-/** True when one paragraph says Renovate needs its GitHub App installed. */
-const statesRenovateActivation = (md: string): boolean =>
-  paragraphs(md).some((p) => /renovate/i.test(p) && /github app/i.test(p) && /install/i.test(p));
+/** True when one paragraph names Dependabot, its config file and the seven-day cooldown. */
+const statesDependabotPolicy = (md: string): boolean =>
+  paragraphs(md).some((p) => /dependabot/i.test(p) && /dependabot\.yml/.test(p) && /cooldown/i.test(p) && /\b(7|seven)[ -]days?\b/i.test(p));
 
 /** Code in a markdown document: fenced blocks and inline spans. */
 function codeIn(md: string): string[] {
@@ -42,15 +42,15 @@ function unknownPnpmCommands(md: string, known: string[]): string[] {
 }
 
 describe('the guards themselves tell a statement from a near miss', () => {
-  // Hostile (wrong collapse): Renovate and "GitHub App" in unrelated paragraphs are not
-  // the activation step.
-  it('Renovate and the GitHub App in separate paragraphs do not count', () => {
-    const md = '## Updates\n\nRenovate opens update PRs.\n\n## Secrets\n\nInstall the Cloudflare GitHub App.\n';
-    expect(statesRenovateActivation(md)).toBe(false);
+  // Hostile (wrong collapse): Dependabot and the seven-day cooldown in unrelated paragraphs
+  // do not state the policy.
+  it('Dependabot and the cooldown in separate paragraphs do not count', () => {
+    const md = '## Updates\n\nDependabot reads `.github/dependabot.yml`.\n\n## Caching\n\nA seven-day cooldown on the CDN.\n';
+    expect(statesDependabotPolicy(md)).toBe(false);
   });
 
-  it('a paragraph that ties the App installation to Renovate counts', () => {
-    expect(statesRenovateActivation('Renovate takes effect only once its GitHub App is installed on the repository.')).toBe(true);
+  it('a paragraph that ties Dependabot, its config and the seven-day cooldown counts', () => {
+    expect(statesDependabotPolicy('Dependabot (`.github/dependabot.yml`) opens PRs only after a seven-day `cooldown`.')).toBe(true);
   });
 
   it('a pnpm command that is neither a script nor a built-in is reported, in a fence or inline', () => {
@@ -86,9 +86,9 @@ describe('docs/deploy.md documents the release-age policy (R5.1)', () => {
   });
 });
 
-describe('Renovate activation is documented (R5.2)', () => {
-  it.each(['README.md', 'docs/deploy.md'])('%s says Renovate needs its GitHub App installed', (file) => {
-    expect(statesRenovateActivation(read(file))).toBe(true);
+describe('the update bot and its age rule are documented (R5.2)', () => {
+  it.each(['README.md', 'docs/deploy.md'])('%s says Dependabot waits seven days, and where it is configured', (file) => {
+    expect(statesDependabotPolicy(read(file))).toBe(true);
   });
 });
 
