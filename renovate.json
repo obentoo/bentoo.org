@@ -10,8 +10,8 @@
       "rangeStrategy": "pin"
     },
     {
-      "description": "Pin updates have no release timestamp; without this, stability-days stays pending forever. The 7-day age still applies whenever a timestamp exists",
-      "matchUpdateTypes": ["pin", "pinDigest"],
+      "description": "Pin and lock-file-maintenance updates have no release timestamp; without this, stability-days stays pending forever. The 7-day age still applies whenever a timestamp exists, and pnpm's own minimumReleaseAge (pnpm-workspace.yaml) still gates every package the lockfile resolves",
+      "matchUpdateTypes": ["pin", "pinDigest", "lockFileMaintenance"],
       "minimumReleaseAgeBehaviour": "timestamp-optional"
     },
     {
