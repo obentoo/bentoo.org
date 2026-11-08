@@ -3,7 +3,7 @@
   "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
   "minimumReleaseAge": "7 days",
   "internalChecksFilter": "strict",
-  "platformAutomerge": true,
+  "platformAutomerge": false,
   "packageRules": [
     {
       "matchDepTypes": ["devDependencies"],
@@ -21,7 +21,7 @@
       "enabled": false
     },
     {
-      "description": "Non-major updates merge themselves once every status check is green and the 7-day age has passed; majors wait for review. platformAutomerge is safe because the protect-main ruleset requires the CI checks, so GitHub waits for them before merging",
+      "description": "Non-major updates merge themselves once every status check is green and the 7-day age has passed; majors wait for review. platformAutomerge is off because main has no branch protection, so GitHub would not wait for CI",
       "matchUpdateTypes": ["minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance"],
       "automerge": true
     },
