@@ -48,7 +48,16 @@ async function sitemap(): Promise<Map<string, Record<string, string>>> {
   return urls;
 }
 
-const localized = (p: string) => ({ en: `${O}${p}`, 'pt-BR': `${O}/pt${p}`, es: `${O}/es${p}`, 'x-default': `${O}${p}` });
+const localized = (p: string) => ({
+  en: `${O}${p}`,
+  'pt-BR': `${O}/pt${p}`,
+  es: `${O}/es${p}`,
+  ru: `${O}/ru${p}`,
+  'zh-CN': `${O}/zh${p}`,
+  'x-default': `${O}${p}`,
+});
+// Every entry of `localized` but x-default: one <loc> per locale.
+const LOCALE_COUNT = Object.keys(localized('/')).length - 1;
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -61,7 +70,7 @@ describe('sitemap.xml with notices (R5.4)', () => {
     collection.entries = [entry('2026-10-02-gtk+-fix'), entry('2026-10-02-gtk-fix')];
     const locs = [...(await sitemap()).keys()].sort();
     const expected = ['/', '/notices/', '/notices/2026-10-02-gtk+-fix/', '/notices/2026-10-02-gtk-fix/']
-      .flatMap((p) => Object.values(localized(p)).slice(0, 3))
+      .flatMap((p) => Object.values(localized(p)).slice(0, LOCALE_COUNT))
       .sort();
     expect(locs).toEqual(expected);
   });
@@ -73,7 +82,7 @@ describe('sitemap.xml with notices (R5.4)', () => {
     collection.entries = [entry('2026-10-02-gtk+-fix')];
     const urls = await sitemap();
     for (const p of ['/notices/', '/notices/2026-10-02-gtk+-fix/']) {
-      for (const loc of Object.values(localized(p)).slice(0, 3)) {
+      for (const loc of Object.values(localized(p)).slice(0, LOCALE_COUNT)) {
         expect(urls.get(loc), loc).toEqual(localized(p));
       }
     }
@@ -90,7 +99,7 @@ describe('sitemap.xml with notices (R5.4)', () => {
   it('lists the notice index even with no notices', async () => {
     vi.stubEnv('PUBLIC_SITE_URL', O);
     expect([...(await sitemap()).keys()].sort()).toEqual(
-      [...Object.values(localized('/')).slice(0, 3), ...Object.values(localized('/notices/')).slice(0, 3)].sort()
+      [...Object.values(localized('/')).slice(0, LOCALE_COUNT), ...Object.values(localized('/notices/')).slice(0, LOCALE_COUNT)].sort()
     );
   });
 

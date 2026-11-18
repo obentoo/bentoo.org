@@ -72,17 +72,19 @@ test.describe('floating language picker (FAB above the shuffle cube)', () => {
     expect(cookies).toBe('');
   });
 
-  test('(5) trigger reflects current language across en/pt/es', async ({
+  test('(5) trigger reflects current language across en/pt/es/ru/zh', async ({
     page,
   }) => {
     for (const { path, expectedTargets } of [
-      { path: '/v/v4/', expectedTargets: ['pt', 'es'] },
-      { path: '/pt/v/v4/', expectedTargets: ['en', 'es'] },
-      { path: '/es/v/v4/', expectedTargets: ['en', 'pt'] },
+      { path: '/v/v4/', expectedTargets: ['pt', 'es', 'ru', 'zh'] },
+      { path: '/pt/v/v4/', expectedTargets: ['en', 'es', 'ru', 'zh'] },
+      { path: '/es/v/v4/', expectedTargets: ['en', 'pt', 'ru', 'zh'] },
+      { path: '/ru/v/v4/', expectedTargets: ['en', 'pt', 'es', 'zh'] },
+      { path: '/zh/v/v4/', expectedTargets: ['en', 'pt', 'es', 'ru'] },
     ]) {
       await page.goto(path);
       const items = page.locator('.bd-lang-item');
-      await expect(items).toHaveCount(2);
+      await expect(items).toHaveCount(4);
       const targets = await items.evaluateAll((nodes) =>
         nodes.map((n) => n.getAttribute('data-target-lang'))
       );

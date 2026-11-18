@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   rootUrl,
-  siblingPath,
   canonicalForVariant,
   localizedPath,
 } from '../../src/utils/siteUrl';
@@ -35,44 +34,6 @@ describe('rootUrl', () => {
     vi.stubEnv('PUBLIC_SITE_URL', 'https://preview.obentoo.org/');
     expect(rootUrl('en')).toBe('https://preview.obentoo.org/');
     expect(rootUrl('pt')).toBe('https://preview.obentoo.org/pt/');
-  });
-});
-
-describe('siblingPath', () => {
-  it('maps /v/mario/ → /pt/v/mario/', () => {
-    expect(siblingPath('/v/mario/')).toBe('/pt/v/mario/');
-  });
-
-  it('maps /pt/v/mario/ → /v/mario/', () => {
-    expect(siblingPath('/pt/v/mario/')).toBe('/v/mario/');
-  });
-
-  it('maps / → /pt/', () => {
-    expect(siblingPath('/')).toBe('/pt/');
-  });
-
-  it('maps /pt/ → /', () => {
-    expect(siblingPath('/pt/')).toBe('/');
-  });
-
-  it('maps /pt → / (no trailing slash variant)', () => {
-    expect(siblingPath('/pt')).toBe('/');
-  });
-
-  it('maps /privacy → /pt/privacy', () => {
-    expect(siblingPath('/privacy')).toBe('/pt/privacy');
-  });
-
-  it('maps /pt/privacy → /privacy', () => {
-    expect(siblingPath('/pt/privacy')).toBe('/privacy');
-  });
-
-  it('maps /es/v/mario/ → /v/mario/ (back to default)', () => {
-    expect(siblingPath('/es/v/mario/')).toBe('/v/mario/');
-  });
-
-  it('maps /es/ → / (back to default)', () => {
-    expect(siblingPath('/es/')).toBe('/');
   });
 });
 

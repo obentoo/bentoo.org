@@ -1,4 +1,4 @@
-// Hand-minified IIFE for inline injection into `/`, `/pt/`, and `/es/`.
+// Hand-minified IIFE for inline injection into `/` and every locale root (`/pt/`, `/es/`, `/ru/`, `/zh/`).
 // The 21-variant array is duplicated from src/data/variants.ts and validated
 // by scripts/check-variants-sync.mjs on every CI run.
 //

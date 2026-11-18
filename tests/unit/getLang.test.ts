@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getLang } from '../../src/utils/getLang';
+import { getLang, htmlLangFor, ogLocaleFor, hreflangFor, LOCALES } from '../../src/utils/getLang';
 
 describe('getLang', () => {
   it('returns en for /', () => {
@@ -52,5 +52,41 @@ describe('getLang', () => {
 
   it('does not match /espanol (only /es or /es/ prefix)', () => {
     expect(getLang('/espanol/something')).toBe('en');
+  });
+
+  it.each([
+    ['/ru', 'ru'],
+    ['/ru/', 'ru'],
+    ['/ru/v/mario/', 'ru'],
+    ['/ru/notices/2026-10-02-foo/', 'ru'],
+    ['/zh', 'zh'],
+    ['/zh/', 'zh'],
+    ['/zh/privacy', 'zh'],
+  ] as const)('returns %s → %s', (path, lang) => {
+    expect(getLang(path)).toBe(lang);
+  });
+
+  it('does not match /rust or /zh-cn (only the exact prefix)', () => {
+    expect(getLang('/rust/something')).toBe('en');
+    expect(getLang('/zh-cn/')).toBe('en');
+  });
+});
+
+describe('locale tags', () => {
+  it.each([
+    ['en', 'en', 'en_US'],
+    ['pt', 'pt-BR', 'pt_BR'],
+    ['es', 'es', 'es_ES'],
+    ['ru', 'ru', 'ru_RU'],
+    ['zh', 'zh-CN', 'zh_CN'],
+  ] as const)('%s → html lang %s, og:locale %s', (lang, html, og) => {
+    expect(htmlLangFor(lang)).toBe(html);
+    expect(hreflangFor(lang)).toBe(html);
+    expect(ogLocaleFor(lang)).toBe(og);
+  });
+
+  it('gives every locale a distinct tag', () => {
+    expect(new Set(LOCALES.map(htmlLangFor)).size).toBe(LOCALES.length);
+    expect(new Set(LOCALES.map(ogLocaleFor)).size).toBe(LOCALES.length);
   });
 });

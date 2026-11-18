@@ -213,6 +213,8 @@ const NO_TAGLINE_EMPHASIS: Readonly<Partial<Record<VariantSlug, string>>> = {
 const LOCALES = [
   { lang: 'en', path: (slug: string) => `/v/${slug}/` },
   { lang: 'pt', path: (slug: string) => `/pt/v/${slug}/` },
+  { lang: 'ru', path: (slug: string) => `/ru/v/${slug}/` },
+  { lang: 'zh', path: (slug: string) => `/zh/v/${slug}/` },
 ] as const;
 
 type Computed = Record<string, string>;

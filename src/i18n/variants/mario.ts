@@ -83,4 +83,30 @@ export const mario: Record<Lang, MarioContent> = {
     },
     notifyPromptLabel: '> PULSA START PARA RECIBIR NOVEDADES',
   },
+  ru: {
+    title: 'bentoo — мир 1-1 · stage5',
+    description: 'Bentoo — удобный Stage5 Gentoo Linux. Мир 1-1.',
+    brandAriaLabel: 'bentoo — главная',
+    hud: { world: 'МИР', time: 'ВРЕМЯ', coins: 'МОНЕТЫ', lives: 'ЖИЗНИ', build: 'BUILD' },
+    taglineUpper: 'УДОБНЫЙ STAGE5 GENTOO LINUX',
+    menu: {
+      github: { label: 'GITHUB', sub: '[ИСХОДНИКИ]' },
+      contact: { label: 'КОНТАКТЫ', sub: '[СООБЩЕСТВО]' },
+      notify: { label: 'УВЕДОМИТЬ МЕНЯ', sub: '[НОВОСТИ]' },
+    },
+    notifyPromptLabel: '> НАЖМИТЕ START, ЧТОБЫ ПОЛУЧАТЬ НОВОСТИ',
+  },
+  zh: {
+    title: 'bentoo — 世界 1-1 · stage5',
+    description: 'Bentoo —— 易于上手的 Gentoo Linux Stage5。世界 1-1。',
+    brandAriaLabel: 'bentoo 首页',
+    hud: { world: '世界', time: '时间', coins: '金币', lives: '生命', build: 'BUILD' },
+    taglineUpper: '易于上手的 GENTOO LINUX STAGE5',
+    menu: {
+      github: { label: 'GITHUB', sub: '[源码]' },
+      contact: { label: '联系', sub: '[社区]' },
+      notify: { label: '通知我', sub: '[动态]' },
+    },
+    notifyPromptLabel: '> 按 START 接收最新动态',
+  },
 };

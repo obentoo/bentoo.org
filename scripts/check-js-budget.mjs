@@ -2,7 +2,7 @@
 // CI gate for R5.2 (JS budget).
 //
 // Budget tiers (per inline <script> block, gzip size):
-//   CORE    (rotator on /, /pt/, /es/; form-handler on every variant)  <= 1536 B
+//   CORE    (rotator on every locale root; form-handler on every variant)  <= 1536 B
 //   VARIANT (retro interactive scripts inside a variant page,          <= 5120 B
 //            e.g. v3i install.exe shell, v3j IRIX xterm, mario
 //            ground-tile, matrix rain, clocks)

@@ -49,13 +49,6 @@ export function localizedPath(path: string, target: Lang): string {
   return `/${target}${normalized}`;
 }
 
-export function siblingPath(path: string): string {
-  const { rest } = stripLangPrefix(path);
-  const isDefault = rest === path;
-  const target: Lang = isDefault ? 'pt' : DEFAULT_LOCALE;
-  return localizedPath(path, target);
-}
-
 export function canonicalForVariant(_slug: VariantSlug, lang: Lang): string {
   return rootUrl(lang);
 }

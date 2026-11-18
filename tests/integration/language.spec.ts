@@ -102,4 +102,21 @@ test.describe('language routing', () => {
     const cookies = await page.evaluate(() => document.cookie);
     expect(cookies).toBe('');
   });
+
+  for (const [nav, prefix] of [
+    ['ru-RU', 'ru'],
+    ['zh-CN', 'zh'],
+  ] as const) {
+    test(`(5) navigator.language=${nav} + no bentoo-lang redirects / to /${prefix}/`, async ({ page }) => {
+      await page.addInitScript((lang) => {
+        Object.defineProperty(navigator, 'language', { value: lang, configurable: true });
+        Object.defineProperty(navigator, 'languages', { value: [lang], configurable: true });
+      }, nav);
+
+      await page.goto('/');
+      await page.waitForURL(new RegExp(`/${prefix}/v/[^/]+/$`));
+      await expect(page.locator('html')).toHaveAttribute('lang', nav === 'zh-CN' ? 'zh-CN' : 'ru');
+    });
+  }
 });
+

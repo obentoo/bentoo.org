@@ -8,6 +8,8 @@ const PRIVACY = {
   en: '/privacy/',
   'pt-BR': '/pt/privacy/',
   es: '/es/privacy/',
+  ru: '/ru/privacy/',
+  'zh-CN': '/zh/privacy/',
 } as const;
 
 async function headLinks(page: Page) {
@@ -28,6 +30,8 @@ test.describe('privacy page + consent', () => {
       en: `${ORIGIN}${PRIVACY.en}`,
       'pt-BR': `${ORIGIN}${PRIVACY['pt-BR']}`,
       es: `${ORIGIN}${PRIVACY.es}`,
+      ru: `${ORIGIN}${PRIVACY.ru}`,
+      'zh-CN': `${ORIGIN}${PRIVACY['zh-CN']}`,
       'x-default': `${ORIGIN}${PRIVACY.en}`,
     };
 
@@ -54,6 +58,8 @@ test.describe('privacy page + consent', () => {
     for (const [variant, lang, href] of [
       ['/v/v4/', 'en', '/privacy'],
       ['/pt/v/v4/', 'pt-BR', '/pt/privacy'],
+      ['/ru/v/v4/', 'ru', '/ru/privacy'],
+      ['/zh/v/v4/', 'zh-CN', '/zh/privacy'],
     ] as const) {
       await page.goto(variant);
       const privacyLink = page.locator('.privacy-consent a[href$="/privacy"]');

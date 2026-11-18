@@ -23,11 +23,8 @@ function walk(dir) {
 }
 
 let failed = 0;
-const variantFiles = walk(distDir).filter((f) =>
-  /\/v\/[^/]+\/index\.html$/.test(f) ||
-  /\/pt\/v\/[^/]+\/index\.html$/.test(f) ||
-  /\/es\/v\/[^/]+\/index\.html$/.test(f)
-);
+// Matches /v/<slug>/ and every locale tree (/pt/v/<slug>/, /ru/v/<slug>/, …).
+const variantFiles = walk(distDir).filter((f) => /\/v\/[^/]+\/index\.html$/.test(f));
 
 if (variantFiles.length === 0) {
   console.error('fail: no variant HTML files in dist — run build first');
@@ -65,9 +62,9 @@ for (const file of variantFiles) {
     console.error(`fail: ${file} — missing <input type="hidden" name="embed" value="1">`);
   }
 
-  const isPt = file.includes('/pt/v/');
-  const isEs = file.includes('/es/v/');
-  const expectedPrivacy = isPt ? '/pt/privacy' : isEs ? '/es/privacy' : '/privacy';
+  // The locale prefix is the dist/ segment before /v/, if any.
+  const localeMatch = file.slice(distDir.length).match(/^\/([a-z]{2})\/v\//);
+  const expectedPrivacy = localeMatch ? `/${localeMatch[1]}/privacy` : '/privacy';
   if (!html.includes(`href="${expectedPrivacy}"`)) {
     failed++;
     console.error(`fail: ${file} — missing privacy consent link to ${expectedPrivacy}`);
