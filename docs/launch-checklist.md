@@ -70,7 +70,7 @@ too.
   ```
 
   Expect `Allow: /` and `Sitemap: https://obentoo.org/sitemap.xml` (a `Disallow: /` alone means the build missed `PUBLIC_IS_PRODUCTION`).
-- [ ] **sitemap.xml** — lists `/`, `/pt/`, `/es/` and `/notices/` in each locale (plus one entry per notice):
+- [ ] **sitemap.xml** — lists `/`, `/pt/`, `/es/`, `/ru/`, `/zh/` and `/notices/` in each locale (plus one entry per notice):
 
   ```sh
   curl -s https://obentoo.org/sitemap.xml | grep -oE '<loc>[^<]*</loc>'
@@ -167,10 +167,10 @@ returning to `/`. Implementation:
 
 A floating circular flag button stacks **above** the shuffle cube in the
 bottom-right of every variant home page. Closed state shows the current
-locale's flag (BR / US / ES) inside a dark-glass circle with a tiny
+locale's flag (BR / US / ES / RU / CN) inside a dark-glass circle with a tiny
 globe badge in the bottom-right corner. Clicking it expands a vertical
-menu of the other two locales (each with a side mono-caps pill label —
-`português` / `english` / `español`, always endonyms). Implementation:
+menu of the other four locales (each with a side mono-caps pill label —
+`português` / `english` / `español` / `русский` / `中文`, always endonyms). Implementation:
 
 - Markup + style live in `src/layouts/VariantLayout.astro`; the inline
   open/close IIFE comes from `src/scripts/lang-fab.inline.ts`. The
@@ -191,10 +191,10 @@ menu of the other two locales (each with a side mono-caps pill label —
   + translate animation.
 - A11y: `aria-haspopup="menu"`, `role="menu"` / `role="menuitem"`,
   locale-aware `aria-label` (`switch language` / `trocar idioma` /
-  `cambiar idioma`), `:focus-visible` outline, `prefers-reduced-motion`
+  `cambiar idioma` / `сменить язык` / `切换语言`), `:focus-visible` outline, `prefers-reduced-motion`
   disables animations, `@media print` hides the FAB.
 - Mobile (≤680 px) shrinks trigger to 52 × 52, items to 46 × 46, and
   hides the side pill labels.
 - Tests: `tests/integration/language-fab.spec.ts` covers toggle,
   ESC/click-outside dismissal, item navigation+localStorage persistence,
-  and per-locale trigger correctness across en/pt/es.
+  and per-locale trigger correctness across en/pt/es/ru/zh.

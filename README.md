@@ -5,6 +5,17 @@ Cloudflare Workers Static Assets at <https://obentoo.org>. Besides the landing
 pages it publishes the bentoo **notices** (security issues, releases, news,
 announcements) as a JSON Feed, an Atom feed and one page per notice.
 
+## Languages
+
+The site ships five locales: English at `/` (the default), Brazilian
+Portuguese at `/pt/`, Spanish at `/es/`, Russian at `/ru/` and Simplified
+Chinese at `/zh/` (`lang="zh-CN"`). The list lives in `src/utils/getLang.ts`
+(`LOCALES`); the UI strings in `src/i18n/<lang>.ts`, the themed homepages in
+`src/i18n/variants/*.ts`. `tests/unit/i18n-completeness.test.ts` fails when a
+locale misses a string or drops HTML markup from one. Notice bodies are
+author text and stay in English in every locale; only their labels are
+translated.
+
 ## Requirements
 
 - Node.js **>= 22.18.0** — the unit tests and the golden-fixture script load
@@ -83,7 +94,7 @@ The notices are published at:
 |---|---|
 | `/notices.json` | JSON Feed 1.1 with a `_bentoo` extension (`serial`, `expires`) |
 | `/notices.atom` | Atom feed |
-| `/notices/`, `/notices/<id>/` | index and one page per notice (also under `/pt/` and `/es/`) |
+| `/notices/`, `/notices/<id>/` | index and one page per notice (also under `/pt/`, `/es/`, `/ru/` and `/zh/`) |
 
 The JSON contract is pinned by the golden fixture
 `tests/fixtures/notices.golden.json`, which bentoolkit also tests against. It

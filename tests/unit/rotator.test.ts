@@ -177,4 +177,37 @@ describe('rotator', () => {
     const slug = VARIANTS[0];
     expect(loc.replace).toHaveBeenCalledWith(`/pt/v/${slug}/`);
   });
+
+  it.each([
+    ['ru-RU', '/ru/'],
+    ['ru', '/ru/'],
+    ['zh-CN', '/zh/'],
+    ['zh-Hans-CN', '/zh/'],
+    ['zh-TW', '/zh/'],
+  ])('(12) root / with navigator.language=%s → %s', (nav, target) => {
+    setNavLang(nav);
+    const loc = setLocation('https://obentoo.org/');
+    runRotator();
+    expect(loc.replace).toHaveBeenCalledWith(target);
+  });
+
+  it('(13) stored bentoo-lang=zh wins over navigator.language=ru', () => {
+    setNavLang('ru-RU');
+    window.localStorage.setItem('bentoo-lang', 'zh');
+    window.localStorage.setItem('bentoo-lang-expires', String(Date.now() + 10_000));
+    const loc = setLocation('https://obentoo.org/');
+    runRotator();
+    expect(loc.replace).toHaveBeenCalledWith('/zh/');
+  });
+
+  it('(14) ru and zh trees keep their prefix: /ru/ → /ru/v/<slug>/, /zh/ → /zh/v/<slug>/', () => {
+    const slug = VARIANTS[0];
+    const ru = setLocation('https://obentoo.org/ru/');
+    runRotator();
+    expect(ru.replace).toHaveBeenCalledWith(`/ru/v/${slug}/`);
+    const zh = setLocation('https://obentoo.org/zh/');
+    runRotator();
+    expect(zh.replace).toHaveBeenCalledWith(`/zh/v/${slug}/`);
+  });
 });
+

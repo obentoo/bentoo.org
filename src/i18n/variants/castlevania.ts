@@ -52,4 +52,26 @@ export const castlevania: Record<Lang, CastlevaniaContent> = {
     footerCopyHtml:
       '© 2018 – 2026 · <b>BENTOO</b> · OSCURIDAD BASADA EN CÓDIGO FUENTE',
   },
+  ru: {
+    title: 'bentoo — симфония исходников',
+    description: 'Bentoo — удобный Stage5 Gentoo Linux. Тьма из исходников.',
+    menu: 'Пролог · Исходники · Замок',
+    taglineHtml: 'Удобный <em>Stage5</em> Gentoo Linux',
+    ornament: '✧ Симфония исходников ✧',
+    linkContact: 'КОНТАКТЫ',
+    linkNotify: 'УВЕДОМИТЬ МЕНЯ',
+    summonsLabel: '▸ Получите зов, когда замок откроет врата ◂',
+    footerCopyHtml: '© 2018 – 2026 · <b>BENTOO</b> · ТЬМА ИЗ ИСХОДНИКОВ',
+  },
+  zh: {
+    title: 'bentoo — 源码交响曲',
+    description: 'Bentoo —— 易于上手的 Gentoo Linux Stage5。源自源码的黑暗。',
+    menu: '序章 · 源码 · 城堡',
+    taglineHtml: '易于上手的 Gentoo Linux <em>Stage5</em>',
+    ornament: '✧ 源码交响曲 ✧',
+    linkContact: '联系',
+    linkNotify: '通知我',
+    summonsLabel: '▸ 城堡开启之时，接受召唤 ◂',
+    footerCopyHtml: '© 2018 – 2026 · <b>BENTOO</b> · 源自源码的黑暗',
+  },
 };

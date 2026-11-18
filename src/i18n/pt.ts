@@ -8,7 +8,7 @@ export const strings = {
   privacyConsent: 'Ao inscrever-se, você concorda com nossa política de privacidade',
   privacyLinkLabel: 'privacidade',
   languageToggleLabel: 'pt-BR',
-  footerCopyright: 'feito à mão, código aberto · © 2026 obentoo.org',
+  footerCopyright: 'feito à mão, código-fonte primeiro · © 2026 obentoo.org',
   privacyPageTitle: 'Privacidade',
   privacyPageBody: `A Bentoo respeita sua privacidade e coleta apenas o mínimo de dados necessário para anunciar o lançamento.
 
@@ -31,7 +31,7 @@ Contato. Para solicitações de acesso, exclusão ou qualquer questão de privac
   loaderAriaLabel: 'carregando',
   indexTitle: 'bentoo — carregando',
   indexDescription:
-    'Bentoo é um Gentoo Linux (Stage5) amigável para o usuário.',
+    'Bentoo é um Stage5 amigável do Gentoo Linux.',
   privacyPageDescription:
     'Como a Bentoo trata seus dados no site de pré-lançamento.',
   backLink: '← voltar',

@@ -24,9 +24,13 @@ describe('sitemap.xml', () => {
       'https://obentoo.org/',
       'https://obentoo.org/pt/',
       'https://obentoo.org/es/',
+      'https://obentoo.org/ru/',
+      'https://obentoo.org/zh/',
       'https://obentoo.org/notices/',
       'https://obentoo.org/pt/notices/',
       'https://obentoo.org/es/notices/',
+      'https://obentoo.org/ru/notices/',
+      'https://obentoo.org/zh/notices/',
     ]);
   });
 
@@ -36,6 +40,8 @@ describe('sitemap.xml', () => {
     expect(body).toContain('hreflang="en"');
     expect(body).toContain('hreflang="pt-BR"');
     expect(body).toContain('hreflang="es"');
+    expect(body).toContain('hreflang="ru"');
+    expect(body).toContain('hreflang="zh-CN"');
     expect(body).toContain('hreflang="x-default"');
   });
 

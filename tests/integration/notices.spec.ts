@@ -6,6 +6,8 @@ import { test, expect, type APIRequestContext } from '@playwright/test';
 import { strings as en } from '../../src/i18n/en';
 import { strings as pt } from '../../src/i18n/pt';
 import { strings as es } from '../../src/i18n/es';
+import { strings as ru } from '../../src/i18n/ru';
+import { strings as zh } from '../../src/i18n/zh';
 
 type Item = {
   id: string;
@@ -15,7 +17,7 @@ type Item = {
   date_modified: string;
   _bentoo: { type: string; severity: string; affects: { cp: string; slot?: string; ranges: { op: string; ver: string }[] }[] };
 };
-const S = { en, pt, es } as unknown as Record<string, Record<string, string>>;
+const S = { en, pt, es, ru, zh } as unknown as Record<string, Record<string, string>>;
 const NO_NOTICES = 'no notice in the build: build with NOTICES_DIR=tests/fixtures/notices';
 
 async function items(request: APIRequestContext): Promise<Item[]> {
@@ -39,7 +41,14 @@ async function head(request: APIRequestContext, p: string) {
   return { html, canonical: new URL(attr(canonical ?? '', 'href') ?? '').pathname, alternates };
 }
 
-const localized = (p: string) => ({ en: p, 'pt-BR': `/pt${p}`, es: `/es${p}`, 'x-default': p });
+const localized = (p: string) => ({
+  en: p,
+  'pt-BR': `/pt${p}`,
+  es: `/es${p}`,
+  ru: `/ru${p}`,
+  'zh-CN': `/zh${p}`,
+  'x-default': p,
+});
 
 test.describe('notice pages (R5.1)', () => {
   test('each notice page renders title, type, severity, affected atoms, dates and body', async ({ page, request }) => {
@@ -122,7 +131,7 @@ test.describe('notice index (R5.2)', () => {
 
 test.describe('locales, canonical and hreflang (R5.3)', () => {
   test('the index has its own canonical and hreflang alternates in every locale', async ({ request }) => {
-    for (const [lang, p] of [['en', '/notices/'], ['pt', '/pt/notices/'], ['es', '/es/notices/']] as const) {
+    for (const [lang, p] of [['en', '/notices/'], ['pt', '/pt/notices/'], ['es', '/es/notices/'], ['ru', '/ru/notices/'], ['zh', '/zh/notices/']] as const) {
       const h = await head(request, p);
       expect(h.canonical, p).toBe(p);
       expect(h.alternates, p).toEqual(localized('/notices/'));
@@ -136,7 +145,7 @@ test.describe('locales, canonical and hreflang (R5.3)', () => {
     test.skip(all.length === 0, NO_NOTICES);
     const canonicals = new Set<string>();
     for (const item of all) {
-      for (const prefix of ['', '/pt', '/es']) {
+      for (const prefix of ['', '/pt', '/es', '/ru', '/zh']) {
         const p = `${prefix}/notices/${item.id}/`;
         const h = await head(request, p);
         expect(h.canonical, p).toBe(p);
@@ -144,14 +153,14 @@ test.describe('locales, canonical and hreflang (R5.3)', () => {
         canonicals.add(h.canonical);
       }
     }
-    expect(canonicals.size).toBe(all.length * 3);
+    expect(canonicals.size).toBe(all.length * 5);
   });
 
-  test('pt and es notice pages show their locale chrome with the notice in English', async ({ page, request }) => {
+  test('pt, es, ru and zh notice pages show their locale chrome with the notice in English', async ({ page, request }) => {
     const all = await items(request);
     test.skip(all.length === 0, NO_NOTICES);
     const item = all[0];
-    for (const [lang, htmlLang] of [['pt', 'pt-BR'], ['es', 'es']] as const) {
+    for (const [lang, htmlLang] of [['pt', 'pt-BR'], ['es', 'es'], ['ru', 'ru'], ['zh', 'zh-CN']] as const) {
       await page.goto(`/${lang}/notices/${item.id}/`);
       await expect(page.locator('html')).toHaveAttribute('lang', htmlLang);
       await expect(page.locator('h1')).toContainText(item.title);
@@ -167,7 +176,7 @@ test.describe('locales, canonical and hreflang (R5.3)', () => {
 
   // Converse: the BaseLayout change must leave the locale roots as they were.
   test('the locale roots keep their canonical and alternates', async ({ request }) => {
-    for (const p of ['/', '/pt/', '/es/']) {
+    for (const p of ['/', '/pt/', '/es/', '/ru/', '/zh/']) {
       const h = await head(request, p);
       expect(h.canonical, p).toBe(p);
       expect(h.alternates, p).toEqual(localized('/'));
