@@ -44,7 +44,7 @@ export const deathStrandingV3: Record<Lang, DeathStrandingContent> = {
     cubeBoxNotify: 'AVISO',
     chiralLabelHtml: '<b>◉</b> ABRIR CANAL CHIRAL · SINGLE-PING',
     footerCopyHtml:
-      '© 2018 – 2026 · <b>BENTOO</b> · FEITO À MÃO · CÓDIGO ABERTO',
+      '© 2018 – 2026 · <b>BENTOO</b> · FEITO À MÃO · CÓDIGO-FONTE PRIMEIRO',
   },
   es: {
     title: 'bentoo — un Stage5 fácil de usar de Gentoo Linux',
@@ -59,7 +59,7 @@ export const deathStrandingV3: Record<Lang, DeathStrandingContent> = {
     cubeBoxNotify: 'AVISO',
     chiralLabelHtml: '<b>◉</b> ABRIR CANAL CHIRAL · SINGLE-PING',
     footerCopyHtml:
-      '© 2018 – 2026 · <b>BENTOO</b> · HECHO A MANO · CÓDIGO ABIERTO',
+      '© 2018 – 2026 · <b>BENTOO</b> · HECHO A MANO · CÓDIGO FUENTE PRIMERO',
   },
   ru: {
     title: 'bentoo — удобный Stage5 Gentoo Linux',

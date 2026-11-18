@@ -74,7 +74,7 @@ export const v3b: Record<Lang, V3bContent> = {
       { kanji: '守', text: 'escritorio listo' },
       { kanji: '速', text: '-march=x86-64-v3' },
       { kanji: '自', text: 'uso diario' },
-      { kanji: '選', text: 'estándares opinativos' },
+      { kanji: '選', text: 'valores predeterminados con criterio' },
       { kanji: '味', text: 'gentoo por dentro' },
     ],
     taglineHtml: 'Un <em>Stage5</em> fácil de usar de Gentoo Linux.',

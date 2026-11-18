@@ -84,7 +84,7 @@ export const v3h: Record<Lang, V3hContent> = {
       { kanji: '守', text: 'escritorio listo' },
       { kanji: '速', text: '-march=x86-64-v3' },
       { kanji: '自', text: 'uso diario' },
-      { kanji: '選', text: 'estándares opinativos' },
+      { kanji: '選', text: 'valores predeterminados con criterio' },
       { kanji: '味', text: 'gentoo por dentro' },
     ],
     taglineHtml: 'UN <em>STAGE5</em> FÁCIL DE USAR DE GENTOO LINUX',

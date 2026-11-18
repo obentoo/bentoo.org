@@ -45,7 +45,7 @@ export const severanceV2: Record<Lang, SeveranceV2Content> = {
     ledeHtml:
       'Um <b>Stage5</b> amigável do Gentoo Linux.<br />Baseado em código-fonte · rolling · pronto para desktop.',
     notifyLabel: 'Protocolar · integrar · ping único',
-    footerLeftHtml: '© 2018 – 2026 <b>bentoo</b> · feito à mão, código aberto',
+    footerLeftHtml: '© 2018 – 2026 <b>bentoo</b> · feito à mão, código-fonte primeiro',
     footerRightHtml: 'kier eagan · louvado · <b>gentoo por dentro</b>',
   },
   es: {
@@ -61,7 +61,7 @@ export const severanceV2: Record<Lang, SeveranceV2Content> = {
     ledeHtml:
       'Un <b>Stage5</b> fácil de usar de Gentoo Linux.<br />Basado en código fuente · rolling · listo para escritorio.',
     notifyLabel: 'Registrar · incorporar · ping único',
-    footerLeftHtml: '© 2018 – 2026 <b>bentoo</b> · hecho a mano, código abierto',
+    footerLeftHtml: '© 2018 – 2026 <b>bentoo</b> · hecho a mano, código fuente primero',
     footerRightHtml: 'kier eagan · alabado · <b>gentoo por dentro</b>',
   },
   ru: {

@@ -8,7 +8,7 @@ export const strings = {
   privacyConsent: 'al suscribirte, aceptas nuestra política de privacidad',
   privacyLinkLabel: 'privacidad',
   languageToggleLabel: 'es',
-  footerCopyright: 'hecho a mano, código abierto · © 2026 obentoo.org',
+  footerCopyright: 'hecho a mano, código fuente primero · © 2026 obentoo.org',
   privacyPageTitle: 'Privacidad',
   privacyPageBody: `Bentoo respeta tu privacidad y recopila únicamente los datos mínimos necesarios para anunciar el lanzamiento.
 

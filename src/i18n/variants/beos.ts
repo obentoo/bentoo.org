@@ -92,7 +92,7 @@ export const beos: Record<Lang, BeosContent> = {
     statusBarOk: 'PRONTO',
     noteHtml:
       'PING DE LANÇAMENTO · <b>ÚNICO</b> · SEM NEWSLETTER · DESCADASTRO INCLUÍDO',
-    footerHandcrafted: 'FEITO À MÃO · CÓDIGO ABERTO',
+    footerHandcrafted: 'FEITO À MÃO · CÓDIGO-FONTE PRIMEIRO',
   },
   es: {
     title: 'bentoo — asistente de instalación BeOS',
@@ -126,7 +126,7 @@ export const beos: Record<Lang, BeosContent> = {
     statusBarOk: 'LISTO',
     noteHtml:
       'PING DE LANZAMIENTO · <b>ÚNICO</b> · SIN BOLETÍN · BAJA INTEGRADA',
-    footerHandcrafted: 'HECHO A MANO · CÓDIGO ABIERTO',
+    footerHandcrafted: 'HECHO A MANO · CÓDIGO FUENTE PRIMERO',
   },
   ru: {
     title: 'bentoo — мастер установки BeOS',

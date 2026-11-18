@@ -55,7 +55,7 @@ export const synthwave: Record<Lang, SynthwaveContent> = {
     btnNotify: '⚡ ME AVISE',
     pingLabelHtml: 'PING DE LANÇAMENTO · <b>ÚNICO</b> · SEM NEWSLETTER',
     footerCopyHtml:
-      '© 2018 – 2026 <em>BENTOO.</em> · FEITO À MÃO, CÓDIGO ABERTO',
+      '© 2018 – 2026 <em>BENTOO.</em> · FEITO À MÃO, CÓDIGO-FONTE PRIMEIRO',
   },
   es: {
     title: 'BENTOO // synthwave outrun',
@@ -74,7 +74,7 @@ export const synthwave: Record<Lang, SynthwaveContent> = {
     btnNotify: '⚡ AVÍSAME',
     pingLabelHtml: 'PING DE LANZAMIENTO · <b>ÚNICO</b> · SIN BOLETÍN',
     footerCopyHtml:
-      '© 2018 – 2026 <em>BENTOO.</em> · HECHO A MANO, CÓDIGO ABIERTO',
+      '© 2018 – 2026 <em>BENTOO.</em> · HECHO A MANO, CÓDIGO FUENTE PRIMERO',
   },
   ru: {
     title: 'BENTOO // synthwave outrun',

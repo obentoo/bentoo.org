@@ -63,7 +63,7 @@ export const v4: VariantI18N = {
       { kanji: '守', text: 'escritorio listo' },
       { kanji: '速', text: '-march=x86-64-v3' },
       { kanji: '自', text: 'uso diario' },
-      { kanji: '選', text: 'estándares opinativos' },
+      { kanji: '選', text: 'valores predeterminados con criterio' },
       { kanji: '味', text: 'gentoo por dentro' },
     ],
   },
