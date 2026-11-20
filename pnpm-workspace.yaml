@@ -2,7 +2,72 @@ minimumReleaseAge: 10080
 
 # Packages allowed to skip the age rule. Empty by policy: an entry needs a
 # comment of its own naming the advisory or reason that justifies it.
-minimumReleaseAgeExclude: []
+# 2026-11-20: cooldown waived at the author's request for the patch/minor refresh
+# (astro 7.4.13 closes GHSA-r3h5-4585-7x3w and GHSA-mh32-jxcr-mh9f). Each entry is
+# pinned to the exact version locked that day, so the age rule still applies to any
+# other version. All of them are past the 7-day mark on 2026-11-27: drop the list then.
+minimumReleaseAgeExclude:
+  - 'astro@7.4.13' # cooldown waived 2026-11-20, see above
+  - '@astrojs/markdown-satteri@0.4.10' # cooldown waived 2026-11-20, see above
+  - '@astrojs/runtime@0.1.2' # cooldown waived 2026-11-20, see above
+  - '@astrojs/vite-plugin-astro@0.1.3' # cooldown waived 2026-11-20, see above
+  - '@cloudflare/kv-asset-handler@0.5.1' # cooldown waived 2026-11-20, see above
+  - '@cloudflare/workerd-darwin-64@1.20261118.1' # cooldown waived 2026-11-20, see above
+  - '@cloudflare/workerd-darwin-arm64@1.20261118.1' # cooldown waived 2026-11-20, see above
+  - '@cloudflare/workerd-linux-64@1.20261118.1' # cooldown waived 2026-11-20, see above
+  - '@cloudflare/workerd-linux-arm64@1.20261118.1' # cooldown waived 2026-11-20, see above
+  - '@cloudflare/workerd-windows-64@1.20261118.1' # cooldown waived 2026-11-20, see above
+  - '@cloudflare/workers-utils@0.55.0' # cooldown waived 2026-11-20, see above
+  - 'miniflare@5.20261118.0-beta' # cooldown waived 2026-11-20, see above
+  - '@oxc-project/types@0.159.0' # cooldown waived 2026-11-20, see above
+  - 'playwright@1.65.1' # cooldown waived 2026-11-20, see above
+  - 'playwright-core@1.65.1' # cooldown waived 2026-11-20, see above
+  - '@playwright/test@1.65.1' # cooldown waived 2026-11-20, see above
+  - 'pnpm@12.21.0' # cooldown waived 2026-11-20, see above
+  - '@pnpm/exe.android-arm64@12.21.0' # cooldown waived 2026-11-20, see above
+  - '@pnpm/exe.android-x64@12.21.0' # cooldown waived 2026-11-20, see above
+  - '@pnpm/exe.darwin-arm64@12.21.0' # cooldown waived 2026-11-20, see above
+  - '@pnpm/exe.darwin-x64@12.21.0' # cooldown waived 2026-11-20, see above
+  - '@pnpm/exe.freebsd-x64@12.21.0' # cooldown waived 2026-11-20, see above
+  - '@pnpm/exe.linux-arm64@12.21.0' # cooldown waived 2026-11-20, see above
+  - '@pnpm/exe.linux-arm64-musl@12.21.0' # cooldown waived 2026-11-20, see above
+  - '@pnpm/exe.linux-ppc64@12.21.0' # cooldown waived 2026-11-20, see above
+  - '@pnpm/exe.linux-riscv64@12.21.0' # cooldown waived 2026-11-20, see above
+  - '@pnpm/exe.linux-s390x@12.21.0' # cooldown waived 2026-11-20, see above
+  - '@pnpm/exe.linux-x64@12.21.0' # cooldown waived 2026-11-20, see above
+  - '@pnpm/exe.linux-x64-musl@12.21.0' # cooldown waived 2026-11-20, see above
+  - '@pnpm/exe.netbsd-x64@12.21.0' # cooldown waived 2026-11-20, see above
+  - '@pnpm/exe.win32-arm64@12.21.0' # cooldown waived 2026-11-20, see above
+  - '@pnpm/exe.win32-x64@12.21.0' # cooldown waived 2026-11-20, see above
+  - 'rolldown@1.3.3' # cooldown waived 2026-11-20, see above
+  - '@rolldown/binding-android-arm64@1.3.3' # cooldown waived 2026-11-20, see above
+  - '@rolldown/binding-android-arm-eabi@1.3.3' # cooldown waived 2026-11-20, see above
+  - '@rolldown/binding-darwin-arm64@1.3.3' # cooldown waived 2026-11-20, see above
+  - '@rolldown/binding-darwin-x64@1.3.3' # cooldown waived 2026-11-20, see above
+  - '@rolldown/binding-freebsd-x64@1.3.3' # cooldown waived 2026-11-20, see above
+  - '@rolldown/binding-linux-arm64-gnu@1.3.3' # cooldown waived 2026-11-20, see above
+  - '@rolldown/binding-linux-arm64-musl@1.3.3' # cooldown waived 2026-11-20, see above
+  - '@rolldown/binding-linux-arm-gnueabihf@1.3.3' # cooldown waived 2026-11-20, see above
+  - '@rolldown/binding-linux-ppc64-gnu@1.3.3' # cooldown waived 2026-11-20, see above
+  - '@rolldown/binding-linux-s390x-gnu@1.3.3' # cooldown waived 2026-11-20, see above
+  - '@rolldown/binding-linux-x64-gnu@1.3.3' # cooldown waived 2026-11-20, see above
+  - '@rolldown/binding-linux-x64-musl@1.3.3' # cooldown waived 2026-11-20, see above
+  - '@rolldown/binding-openharmony-arm64@1.3.3' # cooldown waived 2026-11-20, see above
+  - '@rolldown/binding-win32-arm64-msvc@1.3.3' # cooldown waived 2026-11-20, see above
+  - '@rolldown/binding-win32-x64-msvc@1.3.3' # cooldown waived 2026-11-20, see above
+  - 'vitest@5.1.1' # cooldown waived 2026-11-20, see above
+  - '@vitest/mocker@5.1.1' # cooldown waived 2026-11-20, see above
+  - '@vitest/spy@5.1.1' # cooldown waived 2026-11-20, see above
+  - 'workerd@1.20261118.1' # cooldown waived 2026-11-20, see above
+  - 'wrangler@4.165.0' # cooldown waived 2026-11-20, see above
+
+# rolldown >= 1.2.19 lists @rolldown/binding-wasm32-wasi again; that binding pins
+# @emnapi/{core,runtime} 2.0.0-beta.2, and pnpm then hands the beta runtime to
+# @astrojs/astro2tsx's @napi-rs/wasm-runtime peer next to @emnapi/core 1.11.3 --
+# `astro check` dies with `this.bridge.setLastError is not a function`. The binding
+# only installs on cpu=wasm32, which no build or CI host here is.
+ignoredOptionalDependencies:
+  - '@rolldown/binding-wasm32-wasi'
 
 # Install scripts allowed (true) or denied (false). pnpm 12 fails the install
 # on any dependency with a build script that is not listed here.
